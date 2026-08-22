@@ -1,0 +1,19 @@
+{
+  "appId": "eu.mariofantini.notula",
+  "appName": "Notula",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": [
+      "accounts.google.com",
+      "*.google.com",
+      "*.google.it"
+    ]
+  },
+  "android": {
+    "backgroundColor": "#0f172a",
+    "allowMixedContent": true,
+    "overrideUserAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.90 Mobile Safari/537.36"
+  }
+}

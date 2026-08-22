@@ -1,0 +1,6 @@
+{
+  "name": "Notula - Memo Management & CLI",
+  "description": "Applicazione di gestione memo avanzata con interfaccia grafica e CLI integrata, organizzazione calendario, sincronizzazione cloud (Google Drive & Firestore) e cifratura E2E.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

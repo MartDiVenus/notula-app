@@ -1,0 +1,159 @@
+name: Compilazione Android APK (Notula)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Tipo di compilazione APK'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+          - both
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: 📱 Compilazione Pacchetto Android (.apk)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Codice Sorgente
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: ☕ Setup Java JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🤖 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 📦 Installazione Dipendenze del Progetto
+        run: npm install --no-audit --no-fund
+
+      - name: 📦 Installazione Strumenti Capacitor per Android
+        run: |
+          npm install --no-save @capacitor/core@^6.0.0 @capacitor/cli@^6.0.0 @capacitor/android@^6.0.0
+
+      - name: 🔨 Compilazione Applicazione Web (Vite Build)
+        run: npm run build
+
+      - name: 🔄 Generazione / Sincronizzazione Progetto Android Nativo
+        run: |
+          if [ ! -d "android" ]; then
+            echo "🚀 Inizializzazione piattaforma nativa Android con Capacitor..."
+            npx cap add android
+          else
+            echo "🔄 Sincronizzazione asset web nella piattaforma Android esistente..."
+            npx cap sync android
+          fi
+
+      - name: 🎨 Configurazione Icone e Risorse Android
+        run: |
+          npm install -g @capacitor/assets
+          node scripts/generate-icons.js
+          mkdir -p assets
+          cp public/icon-512.png assets/icon.png
+          cp public/icon-512.png assets/logo.png
+          npx @capacitor/assets generate --android
+
+
+      - name: 🐘 Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 🔐 Permessi di Esecuzione per Gradle Wrapper
+        run: |
+          cd android
+          chmod +x gradlew
+
+      - name: 🔨 Compilazione Android Debug APK
+        if: "${{ github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == 'both' || github.event.inputs.build_type == '' }}"
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon
+
+      - name: 🔨 Compilazione Android Release APK
+        if: "${{ github.event.inputs.build_type == 'release' || github.event.inputs.build_type == 'both' || startsWith(github.ref, 'refs/tags/v') }}"
+        run: |
+          cd android
+          ./gradlew assembleRelease --no-daemon
+
+      - name: 🔑 Firma dell'APK Release
+        if: "${{ github.event.inputs.build_type == 'release' || github.event.inputs.build_type == 'both' || startsWith(github.ref, 'refs/tags/v') }}"
+        run: |
+          # Generazione di un Keystore fittizio per firmare la build
+          keytool -genkey -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000 -storepass password -keypass password -dname "CN=Mario Fantini, O=Notula, C=IT"
+          
+          # Trova l'APK non firmato
+          RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*-unsigned.apk" 2>/dev/null | head -n 1)
+          if [ -n "$RELEASE_APK" ] && [ -f "$RELEASE_APK" ]; then
+            # Firma l'APK con apksigner (disponibile in build-tools di Android SDK)
+            BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | tail -1)
+            $BUILD_TOOLS_DIR/apksigner sign --ks release.keystore --ks-pass pass:password --key-pass pass:password "$RELEASE_APK"
+          fi
+
+      - name: 📁 Raccolta e Ridenominazione Pacchetti APK
+        run: |
+          mkdir -p build_output/apk
+          VERSION=$(node -p "require('./package.json').version || '2.2.0'")
+
+          # Ricerca e copia dell'APK Debug
+          DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -n 1)
+          if [ -n "$DEBUG_APK" ] && [ -f "$DEBUG_APK" ]; then
+            cp "$DEBUG_APK" "build_output/apk/Notula-v${VERSION}-debug.apk"
+            echo "✅ Generato APK Debug: build_output/apk/Notula-v${VERSION}-debug.apk"
+          fi
+
+          # Ricerca e copia dell'APK Release
+          RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*.apk" 2>/dev/null | head -n 1)
+          if [ -n "$RELEASE_APK" ] && [ -f "$RELEASE_APK" ]; then
+            # Rinomina per rimuovere il suffisso '-unsigned' dal nome file se presente
+            cp "$RELEASE_APK" "build_output/apk/Notula-v${VERSION}-release.apk"
+            echo "✅ Generato APK Release (Firmato): build_output/apk/Notula-v${VERSION}-release.apk"
+          fi
+
+          ls -la build_output/apk/
+
+      - name: 💾 Archiviazione Artefatto APK per il Download Diretto
+        uses: actions/upload-artifact@v4
+        with:
+          name: Notula-Android-APK
+          path: build_output/apk/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: 🚀 Pubblicazione nella Release GitHub (solo per Tag di Versione)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build_output/apk/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
