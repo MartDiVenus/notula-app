@@ -200,7 +200,7 @@ Notula™ è ottimizzata per l'uso standalone:
 ## ⚖️ Proprietà Intellettuale & Note Legali
 
 - **Ideazione, Architettura & Sviluppo Software**: **Ing. Mario Fantini**  
-- **Sito Web Ufficiale**: [https://mariofantini.eu](https://mariofantini.eu)  
+- **Contatti dell'Autore**: [https://mariofantini.eu](https://mariofantini.eu)  
 - **Copyright**: © 2026 Ing. Mario Fantini. Tutti i Diritti Riservati (*All Rights Reserved*).
 
 *Note sui Marchi Registrati*: Google™ Calendar e Google™ Drive sono marchi di Google™ LLC. Notula™ non è sponsorizzata o affiliata a Google™ LLC.
