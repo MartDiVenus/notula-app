@@ -50,7 +50,7 @@ import { CliManualModal } from './CliManualModal';
 interface InfoGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'info' | 'guide';
+  initialTab?: 'info' | 'install' | 'guide';
   onOpenCliManual?: () => void;
 }
 
@@ -109,31 +109,44 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
         </div>
 
         {/* Tab Selector */}
-        <div className="flex border-b border-[var(--border-color)] bg-[var(--bg-card)] px-6 shrink-0">
+        <div className="flex border-b border-[var(--border-color)] bg-[var(--bg-card)] px-6 shrink-0 overflow-x-auto hide-scrollbar">
           <button
             type="button"
             onClick={() => setActiveTab('info')}
-            className={`flex items-center gap-2 py-3 px-4 text-xs font-bold border-b-2 transition cursor-pointer ${
+            className={`flex items-center whitespace-nowrap gap-2 py-3 px-4 text-xs font-bold border-b-2 transition cursor-pointer ${
               activeTab === 'info'
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
           >
             <Copyright className="w-4 h-4" />
-            <span>Autore, Emblema Notula™ &amp; Tutela Diritti</span>
+            <span>Autore, Contatti, Copyright</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('install')}
+            className={`flex items-center whitespace-nowrap gap-2 py-3 px-4 text-xs font-bold border-b-2 transition cursor-pointer ${
+              activeTab === 'install'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
+            }`}
+          >
+            <Smartphone className="w-4 h-4" />
+            <span>Installazione, Emblema</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('guide')}
-            className={`flex items-center gap-2 py-3 px-4 text-xs font-bold border-b-2 transition cursor-pointer ${
+            className={`flex items-center whitespace-nowrap gap-2 py-3 px-4 text-xs font-bold border-b-2 transition cursor-pointer ${
               activeTab === 'guide'
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
           >
             <BookOpen className="w-4 h-4" />
-            <span>Guida Funzionale &amp; Manuale d'Uso</span>
+            <span>Guida Funzionale, Manuale d'Uso</span>
           </button>
         </div>
 
@@ -141,7 +154,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
         <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs text-[var(--text-main)] leading-relaxed">
           
           {/* ========================================================================= */}
-          {/* TAB 1: AUTORE, EMBLEMA INGRANDITO, TUTELA DIRITTI & CONTATTI */}
+          {/* TAB 1: AUTORE, CONTATTI, COPYRIGHT */}
           {/* ========================================================================= */}
           {activeTab === 'info' && (
             <div className="space-y-6">
@@ -163,16 +176,83 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                   </div>
                 </div>
 
-                <a
-                  href="https://mariofantini.eu"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-md transition shrink-0"
-                >
-                  <Globe className="w-4 h-4" />
-                  <span>mariofantini.eu</span>
-                  <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-                </a>
+                <div className="flex flex-col sm:flex-col gap-2 shrink-0 w-full sm:w-auto">
+                  <a
+                    href="https://mariofantini.eu"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-blue-500/50 text-[var(--text-main)] font-bold text-xs transition"
+                  >
+                    <Globe className="w-4 h-4 text-blue-500" />
+                    <span>mariofantini.eu</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-50" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Proprietary License & Rights Reservation Notice */}
+              <div className="p-5 rounded-xl border border-amber-500/40 bg-amber-500/5 space-y-3">
+                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
+                  <ShieldCheck className="w-5 h-5 shrink-0" />
+                  <span>Avviso di Riserva Integrale dei Diritti &amp; Tutela Proprietà Intellettuale</span>
+                </div>
+                
+                <div className="font-mono text-[11px] bg-black/10 dark:bg-black/40 p-3 rounded-lg border border-[var(--border-color)] text-[var(--text-main)] space-y-1">
+                  <div><strong>Copyright &copy; 2026 Ing. Mario Fantini. Tutti i diritti riservati.</strong></div>
+                  <div><strong>All Rights Reserved &bull; Proprietary &amp; Confidential Software.</strong></div>
+                </div>
+
+                <div className="text-xs text-[var(--text-muted)] space-y-2 text-justify">
+                  <p>
+                    L'applicazione <strong>Notula™</strong>, comprensiva della sua architettura software, dell'interfaccia a riga di comando (CLI), del motore di sincronizzazione bidirezionale Google™ Drive-First, del sistema di offuscamento multilivello e della crittografia hardware AES-256 GCM, è protetta dalle leggi vigenti in materia di diritto d'autore e proprietà intellettuale (Legge 22 aprile 1941 n. 633 e successive modifiche, nonché convenzioni WIPO/OMPI).
+                  </p>
+                  <p>
+                    <strong>Intellectual Property Notice</strong>: Si rimanda al file <code className="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1 rounded">README.md</code> per approfondimenti riguardo la proprietà intellettuale ("Intellectual Property Notice"), in cui si esplicita che l'architettura software, la logica di parsing e il codice sorgente sono opera proprietaria dell'autore. Manifestazioni di interesse per l'acquisizione completa dei diritti commerciali sono valutabili, previa intesa economica e salvaguardando la paternità storica e morale (Contatto: marfant7@gmail.com).
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 2: INSTALLAZIONE ED EMBLEMA */}
+          {/* ========================================================================= */}
+          {activeTab === 'install' && (
+            <div className="space-y-6">
+
+              {/* Installazione Web App */}
+              <div className="p-5 rounded-2xl border border-blue-500/30 bg-blue-500/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-blue-600 text-white rounded-xl shadow-lg">
+                    <Smartphone className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                      Progressive Web App (PWA)
+                    </div>
+                    <div className="text-lg font-extrabold text-[var(--text-main)]">
+                      Installazione Ufficiale
+                    </div>
+                    <div className="text-xs text-[var(--text-muted)] mt-0.5">
+                      Installa Notula™ direttamente sul tuo dispositivo per un'esperienza nativa e offline.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-col gap-2 shrink-0 w-full sm:w-auto">
+                  <a
+                    href="https://martdivenus.github.io/notula-app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-md transition"
+                    title="URL ufficiale per l'installazione della Web App (PWA)"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Installa Web App</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                  </a>
+                </div>
               </div>
 
               {/* EMBLEMA UFFICIALE INGRANDITO & SPIEGAZIONE SIMBOLICA */}
@@ -218,7 +298,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                       <span>L'Uccello Messaggero di Apollo</span>
                     </div>
                     <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                      Nobile volatile rapace piumato con <strong>esclusivamente due sole ali spiegate</strong>, becco dorato acuminato e coda a ventaglio. Simbolo araldico di tempestività e custodia delle memorie nel tempo.
+                      Nobile volatile rapace, con becco dorato acuminato e coda a ventaglio. Simbolo araldico di tempestività e custodia delle memorie nel tempo.
                     </p>
                   </div>
 
@@ -233,26 +313,6 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                   </div>
                 </div>
               </div>
-
-              {/* Proprietary License & Rights Reservation Notice */}
-              <div className="p-5 rounded-xl border border-amber-500/40 bg-amber-500/5 space-y-3">
-                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
-                  <ShieldCheck className="w-5 h-5 shrink-0" />
-                  <span>Avviso di Riserva Integrale dei Diritti &amp; Tutela Proprietà Intellettuale</span>
-                </div>
-                
-                <div className="font-mono text-[11px] bg-black/10 dark:bg-black/40 p-3 rounded-lg border border-[var(--border-color)] text-[var(--text-main)] space-y-1">
-                  <div><strong>Copyright &copy; 2026 Ing. Mario Fantini. Tutti i diritti riservati.</strong></div>
-                  <div><strong>All Rights Reserved &bull; Proprietary &amp; Confidential Software.</strong></div>
-                </div>
-
-                <div className="text-xs text-[var(--text-muted)] space-y-2 text-justify">
-                  <p>
-                    L'applicazione <strong>Notula™</strong>, comprensiva della sua architettura software, dell'interfaccia a riga di comando (CLI), del motore di sincronizzazione bidirezionale Google™ Drive-First, del sistema di offuscamento multilivello e della crittografia hardware AES-256 GCM, è protetta dalle leggi vigenti in materia di diritto d'autore e proprietà intellettuale (Legge 22 aprile 1941 n. 633 e successive modifiche, nonché convenzioni WIPO/OMPI).
-                  </p>
-                </div>
-              </div>
-
             </div>
           )}
 

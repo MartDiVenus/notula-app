@@ -59,7 +59,8 @@ import {
   Maximize2,
   Minimize2,
   Info,
-  BookOpen
+  BookOpen,
+  Smartphone
 } from 'lucide-react';
 
 const STORAGE_KEY = 'notula_db_v2';
@@ -842,7 +843,18 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-blue-500 rounded-lg transition text-left"
             >
               <Info className="w-4 h-4 text-blue-500" />
-              <span>Autore &amp; Copyright</span>
+              <span>Autore, Contatti, Copyright</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setInfoGuideTab('install');
+                setIsInfoGuideOpen(true);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-blue-500 rounded-lg transition text-left"
+            >
+              <Smartphone className="w-4 h-4 text-blue-500" />
+              <span>Installazione, Emblema</span>
             </button>
 
             <button
@@ -853,7 +865,7 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-purple-500 rounded-lg transition text-left"
             >
               <BookOpen className="w-4 h-4 text-purple-500" />
-              <span>Guida alle Funzioni</span>
+              <span>Guida Funzionale, Manuale d'Uso</span>
             </button>
           </div>
 
@@ -968,7 +980,18 @@ export default function App() {
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-blue-500"
               >
-                <Info className="w-4 h-4" /><span>Autore &amp; Copyright</span>
+                <Info className="w-4 h-4" /><span>Autore, Contatti, Copyright</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsMobileDrawerOpen(false);
+                  setInfoGuideTab('install');
+                  setIsInfoGuideOpen(true);
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-blue-500"
+              >
+                <Smartphone className="w-4 h-4" /><span>Installazione, Emblema</span>
               </button>
 
               <button
@@ -979,7 +1002,7 @@ export default function App() {
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-purple-500"
               >
-                <BookOpen className="w-4 h-4" /><span>Guida alle Funzioni</span>
+                <BookOpen className="w-4 h-4" /><span>Guida Funzionale, Manuale d'Uso</span>
               </button>
             </div>
           </div>
