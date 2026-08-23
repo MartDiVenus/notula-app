@@ -1,0 +1,583 @@
+!(m.repeatType === 'none' && m.expirationDate
+", type: "string", desc: "Stringa raw XML conforme allo schema
+"AES-256"
+"Aggiorna Passphrase"
+"Cerca"
+"Disattiva Passphrase"
+"Elimina"
+"Esporta Archivio"
+"Modifica / Cambia Passphrase"
+&bull;
+&copy; 2026 Ing. Mario Fantini
+&lt;notula&gt;&lt;memo&gt;
+('');
+  const [feedback, setFeedback] = useState
+('');
+  const [idVal, setIdVal] = useState
+('');
+  const [isManualOpen, setIsManualOpen] = useState
+('');
+  const [selectedCategory, setSelectedCategory] = useState
+('a');
+  const [revealedMemoIds, setRevealedMemoIds] = useState
+('all');
+  const [copiedCode, setCopiedCode] = useState
+('all');
+  const [revealedMemoIds, setRevealedMemoIds] = useState
+('dark');
+  const [privacyMode, setPrivacyMode] = useState
+('docked');
+  const [history, setHistory] = useState
+('info');
+
+  // Active Item for Edit or Print
+  const [editingMemo, setEditingMemo] = useState
+('json');
+  const [isExporting, setIsExporting] = useState(false);
+  const [doneMsg, setDoneMsg] = useState
+('none');
+  const [isEncrypted, setIsEncrypted] = useState
+('none');
+  const [obfuscation, setObfuscation] = useState
+('not_connected');
+  const [testMsg, setTestMsg] = useState
+('reference');
+  const [searchQuery, setSearchQuery] = useState
+('text');
+  const [textQuery, setTextQuery] = useState('');
+  const [dateQuery, setDateQuery] = useState('');
+  const [idQuery, setIdQuery] = useState('');
+  const [filterType, setFilterType] = useState
+(-1);
+  const [inputVal, setInputVal] = useState
+(1);
+  const [yearVal, setYearVal] = useState
+(A) Sostituisci Tutti
+(Copia)
+(Ctrl+Shift+P per toggle)
+(I) Ignora
+(Ignora) &bull;
+(M) Tieni Entrambi
+(Oggi)
+(Sostituisci) &bull;
+(String(new Date().getDate()).padStart(2, '0'));
+  const [titleVal, setTitleVal] = useState
+(String(new Date().getFullYear()));
+  const [monthVal, setMonthVal] = useState
+(String(new Date().getMonth() + 1).padStart(2, '0'));
+  const [dayVal, setDayVal] = useState
+(Tutti) &bull;
+(Y) Sostituisci
+([
+    "══════════════════════════════════════════════════════════════════════════════",
+    "  NOTULA™ CLI v2.2 • INTERPRETE COMANDI INGEGNERISTICO",
+    "  Ideazione & Sviluppo: Ing. Mario Fantini • https://mariofantini.eu",
+    "══════════════════════════════════════════════════════════════════════════════",
+    "💡 Digita 'help' per consultare la guida o 'man' per aprire il Manuale Ufficiale.",
+    "   Comandi: add, edit, export (json/xml/md/ics/pdf/txt), import, pdf, ls, rm, man.",
+  ]);
+
+  const outputContainerRef = useRef
+([]);
+  const [historyIdx, setHistoryIdx] = useState
+(accesso ristretto alla sola cartella
+(false);
+
+  // Cloud Sync & Connectivity State
+  const [isOnline, setIsOnline] = useState
+(false);
+  const [error, setError] = useState
+(false);
+  const [exportTargetMemo, setExportTargetMemo] = useState
+(false);
+  const [guideSection, setGuideSection] = useState
+(false);
+  const [infoGuideTab, setInfoGuideTab] = useState
+(false);
+  const [isCloudSyncOpen, setIsCloudSyncOpen] = useState
+(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState
+(false);
+  const [isExportOpen, setIsExportOpen] = useState
+(false);
+  const [isFormOpen, setIsFormOpen] = useState
+(false);
+  const [isListOpen, setIsListOpen] = useState
+(false);
+  const [isPrintOpen, setIsPrintOpen] = useState
+(false);
+  const [isSearchOpen, setIsSearchOpen] = useState
+(false);
+  const [isSecurityOpen, setIsSecurityOpen] = useState
+(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState
+(false);
+  const [masterPassword, setMasterPassword] = useState
+(false);
+  const [outputLines, setOutputLines] = useState
+(false);
+  const [syncStatusMsg, setSyncStatusMsg] = useState
+(getStoredDriveConfig());
+  const [clientIdInput, setClientIdInput] = useState(config.clientId);
+  const [authStatus, setAuthStatus] = useState
+(initialTab);
+  const [isCliManualOpen, setIsCliManualOpen] = useState
+(new NotulaCore([]));
+  const [, setRenderTrigger] = useState
+(new Set());
+  const [revealedMemoIds, setRevealedMemoIds] = useState
+(null);
+
+  // File Input Ref for Import
+  const fileInputRef = useRef
+(null);
+
+  // Responsive & Sidebar Layout State (Default: Collapsed for Calendar-First Immediate View)
+  const [sidebarMode, setSidebarMode] = useState
+(null);
+  const [formDefaultDate, setFormDefaultDate] = useState
+(null);
+  const [isInfoGuideOpen, setIsInfoGuideOpen] = useState
+(null);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState
+(null);
+  const [memoToDelete, setMemoToDelete] = useState
+(null);
+  const [printingMemo, setPrintingMemo] = useState
+(null);
+  const [successMsg, setSuccessMsg] = useState
+(null);
+  const conflictResolverRef = useRef
+(null);
+  const inputRef = useRef
+(settings.language === "en" ? "Download from Google™ Drive" : "Scarica da Google™ Drive")
+(today.getDate());
+
+  // App Configuration & Security
+  const [themeMode, setThemeMode] = useState
+(today.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState
+(today.getMonth());
+  const [selectedDay, setSelectedDay] = useState
+(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [isSyncing, setIsSyncing] = useState
+(undefined);
+
+  // Interactive Conflict Resolution State
+  const [conflictPrompt, setConflictPrompt] = useState
+(undefined);
+
+  // Modals & Panels
+  const [isTerminalOpen, setIsTerminalOpen] = useState
+(undefined);
+
+export const SettingsProvider: React.FC
+) : (
+                              /* Testo in chiaro o svelato */
+) : (
+            /* LaTeX Source Tab */
+) : line.startsWith('═') || line.startsWith('─') ? (
+) : line.startsWith('✅') ? (
+) : line.startsWith('❌') ? (
+) : line.startsWith('📋') || line.startsWith('🔍') || line.startsWith('ℹ️') ? (
+) : themeMode === 'dark' ? (
+) e digita:
+), consentendo il riconoscimento a colpo d'occhio.
+). Il testo rimane occultato finché non si preme il tasto Privacy o Svela.
+, Notula ricalcola istantaneamente le chiavi crittografiche hardware AES-GCM (100.000 iterazioni PBKDF2).
+, Notula™ archivia lo schedario nella cartella riservata
+, compatibile con database e archivi legacy.',
+      icon:
+, comprensiva della sua architettura software, dell'interfaccia a riga di comando (CLI), del motore di sincronizzazione bidirezionale Google™ Drive-First, del sistema di offuscamento multilivello e della crittografia hardware AES-256 GCM, è protetta dalle leggi vigenti in materia di diritto d'autore e proprietà intellettuale (Legge 22 aprile 1941 n. 633 e successive modifiche, nonché convenzioni WIPO/OMPI).
+--date
+. Le modifiche a titolo, descrizione e sicurezza verranno sincronizzate
+/ info
+/Notula
+1. Cosa Fa Notula™: Lo Schedario Ingegneristico Universale
+1. Cosa fa Notula™
+1. Per Titolo / Testo
+2. ESPORTAZIONI MULTIFORMATO &amp; GENERAZIONE PDF (export • pdf)
+2. Peculiarità e Punti di Forza Unici di Notula™
+2. Per Data
+2. Punti di Forza
+3. IMPORTAZIONE DATI (import)
+3. Legenda &amp; Ricorrenze (groupID)
+3. Legenda Visiva del Calendario &amp; Gestione Ricorrenze con groupID
+3. Per IDs
+4. I 3 Strati di Sicurezza Notula™ &amp; Gestione Passphrase
+4. Sicurezza &amp; Passphrase
+5. Esportazioni &amp; PDF
+5. Esportazioni Multiformato (JSON, XML, MD, ICS, PDF, TXT)
+5. LE 9 MODALITÀ DI ELIMINAZIONE MIRATA (rm / remove)
+6. Google™ Drive
+6. Sincronizzazione Google™ Drive: Indipendenza Totale dal Dispositivo
+6. UTILITY, SICUREZZA &amp; GOOGLE™ DRIVE
+7. Funzionalità Quotidiane &amp; Scorciatoie Pratiche
+7. Funzioni Quotidiane
+8. Terminale CLI (edit/export/import)
+8. Terminale CLI per Utenti Avanzati &amp; Power Users
+: Si rimanda al file
+: basta ricollegare il tuo account Google™ Drive e inserire la tua Master Passphrase.
+: theme === 'light' ?
+= 1900 && val
+A
+A differenza delle comuni app SaaS commerciali, Notula™ non archivia nulla su server proprietari o database remoti. I dati appartengono solo all'utente.
+AES-256
+Aggiornamento Automatico Ricorrenze (groupID)
+All Rights Reserved • Proprietary &amp; Confidential Software.
+Ambito di autorizzazione:
+Anno:
+Annuale (Ricorrente ogni anno)
+Annulla / Chiudi
+Apri il terminale (
+Architettura Offline-First &amp; Immediata
+Avviso di Riserva Integrale dei Diritti &amp; Tutela Proprietà Intellettuale
+Azzera filtri
+Bordo Arancio = Puntuale oggi
+Bordo Arancione:
+Bordo Magenta = Puntuale futuro
+Bordo Magenta/Viola:
+Bordo Rosso = Puntuale scaduto
+Bordo Rosso:
+CLI
+Canoni, fatture, rinnovi, compleanni o tagliandi con ripetizione giornaliera, settimanale, mensile o annuale.
+Censura solida completa (
+Cerca per ID univoco");
+      log("   info
+Cerca per data esatta");
+      log("   find --id
+Chiudi Guida
+Chiudi Manuale
+Cifratura Cloud:
+Cifratura hardware Web Crypto API con 100.000 iterazioni PBKDF2 e AES-GCM 256-bit. I dati sono matematicamente inviolabili.
+Clicca sul pulsante
+Cliccando sull'icona dell'occhio nella barra superiore, puoi mascherare all'istante tutti i contenuti sullo schermo se qualcuno si avvicina.
+Cloud &amp; Archivio
+Come funziona il cambio?
+Come funziona l'aggiornamento automatico con groupID:
+Con Cifratura AES-256 attiva.
+Copyright &copy; 2026 Ing. Mario Fantini. Tutti i diritti riservati.
+Copyright &copy; 2026 Tutti i Diritti Riservati
+Crittografia hardware AES-256 GCM (PBKDF2 100.000 cicli)
+Crittografia hardware AES-256-GCM su disco e backup Google™ Drive
+Ctrl+Shift+P
+Da Terminale CLI:
+Dall'Interfaccia Grafica:
+Dark
+Data di Riferimento / Scadenza *
+Database completo strutturato. Ideale per backup integrali e ripristini crittografati AES-256.
+Descrizione &amp; Contenuto:
+Descrizione, Dettagli e Note
+Descrizione:
+Disattiva Passphrase
+Documentazione completa dei 17 comandi con sintassi POSIX, opzioni, esempi reali, architettura
+Doppia Interfaccia: GUI • CLI
+EMBLEMA NOTULA™
+Effetto:
+English (EN)
+Esegui Test Crittografico AES-256-GCM
+Esempi Pratici di Esecuzione:
+Esporta Dati Notula™
+Esporta il calendario per Google™ Calendar / Outlook");
+      log("   pdf --id
+Eventi e scadenze importabili direttamente in Google™ Calendar, Apple Calendar e Microsoft Outlook.
+Fasti
+File formattato per Obsidian, Notion, GitHub o editor Markdown.
+Filtra per Mese (ricorrenti)");
+      log("   ls --group
+Filtri Parametrici:
+Filtro:
+Funziona sempre, anche in assenza totale di connessione Internet. All'avvio carica istantaneamente l'archivio locale.
+Gestione Conflitti Intelligente:
+Giornaliero (Ricorrente ogni giorno)
+Giorno (01 - 31):
+Giorno:
+Google™ Drive Sync
+Google™ Drive-First
+Grazie all'architettura
+Gruppo
+I
+I punti cardinali, la stella polare e le costellazioni che guidavano gli antichi romani nell'osservazione astronomica, nella navigazione e nella scansione ciclica delle stagioni.
+IB•••401
+ID Memo (separati da virgola se multipli):
+Ideatore, Sviluppatore &amp; Titolare Unico
+Ideazione &amp; Sviluppo Ing. Mario Fantini •
+Ideazione, Sviluppo &amp; Proprietà Intellettuale •
+Il calendario Notula™ adotta una semantica cromatica rigorosa per distinguere al colpo d'occhio la natura e l'urgenza di ciascun evento:
+Impegni con una data esatta, contrassegnati da stati cromatici temporali (scaduto, oggi, futuro).
+Importa JSON da testo");
+      log("   import --xml '
+In caso di divergenza tra la memoria locale e Google™ Drive, Notula™ ti consente di risolvere il conflitto con facilità (Sostituisci [Y], Ignora [I], Duplica entrambi [M] o Applica a tutti [A]).
+In qualunque mese o anno tu sia nel calendario, con un solo clic sul pulsante
+In scadenza Oggi.
+Ing. Mario Fantini
+Ingegneria del Software • Crittografia Hardware E2E • Algoritmi di Sincronizzazione Google™ Drive-First
+Inserendo una nuova passphrase qui sotto o tramite comando CLI
+Installa Notula™ direttamente sul tuo dispositivo per un'esperienza nativa e offline.
+Installazione Ufficiale
+Intellectual Property Notice
+Interfaccia grafica ad alta reattività con calendario interattivo unita a un potente terminale a riga di comando ingegneristico.
+Italiano (IT)
+JSON (.json)
+L'Emblema Notula™: Radici Storiche, Volatile di Apollo &amp; Astronomia
+L'Uccello Messaggero di Apollo
+L'applicazione
+L'emblema visivo di Notula™ è stato disegnato e concepito dall'
+La Master Passphrase può essere modificata liberamente in qualsiasi momento:
+La nuova passphrase viene impiegata per tutti i nuovi salvataggi, cifrature locali ed esportazioni protette.
+LaTeX (.tex)
+Light
+M
+Manuale Ufficiale NOTULA™ CLI
+Manuale Ufficiale NOTULA™ CLI v2.2 (Edizione Ingegneristica)
+Markdown (.md)
+Maschera i caratteri centrali con puntini (es.
+Master Password attiva: il file verrà cifrato con AES-256-GCM.
+Mensile (Ricorrente ogni mese)
+Mese (01 - 12):
+Mese:
+Modificando un memo ricorrente legato a una serie, tutti gli altri memo della serie collegati da groupID vengono sincronizzati in automatico.
+Mostra solo memo scaduti");
+      log("");
+      log("6. RICERCA & DIAGNOSTICA:");
+      log("   find --title \"
+NOTULA MEMORANDUM • SCHEDA UFFICIALE
+Navigazione Rapida • Tasto (Oggi)
+Nefasti
+Nessun comando corrisponde ai criteri di ricerca.
+Nessuna descrizione o nota aggiuntiva.
+Nessuno (Testo in chiaro)
+Nobile volatile rapace, con becco dorato acuminato e coda a ventaglio. Simbolo araldico di tempestività e custodia delle memorie nel tempo.
+Nota Architetturale Ingegneristica:
+Notula
+Notula Vault &bull; Ing. Mario Fantini
+Notula utilizza lo standard OAuth 2.0 per accedere in modo sicuro ai tuoi file.
+Notula/
+Notula™
+Notula™ CLI &bull; Ing. Mario Fantini
+Notula™ Cloud Sync &bull; Google™ Drive API v3
+Notula™ garantisce la totale libertà di esportazione senza vincoli proprietari. Clicca su
+Notula™ ricalcola all'istante la chiave crittografica hardware; da quel momento tutti i nuovi memo cifrati, le modifiche e i file di sincronizzazione su Google™ Drive useranno la nuova Master Passphrase.
+Notula™ • Centro Informazioni &amp; Guida Utente
+Obbligatorio
+Offuscamento (Privacy)
+Offuscamento visivo per sguardi indiscreti e cifratura hardware di livello militare AES-256.
+PC Windows, Mac, Linux, Tablet o Smartphone
+PDF Ink-Friendly A4
+Pallino Blu = Ricorrente oggi
+Pallino Grigio = Ricorrente passato
+Pallino Verde = Ricorrente futuro
+Parametri &amp; Opzioni:
+Parametri di Rimozione
+Per disattivare temporaneamente la richiesta di cifratura puoi fare clic su
+Per ingegneri, amministratori di sistema e amanti della tastiera, Notula™ include una shell interattiva completa con supporto a comandi per creazione,
+Progressive Web App (PWA)
+Pronto per la compilazione con
+Protezione Multi-Strato
+Prova a cambiare query o selezionare un'altra modalità di ricerca.
+Puntuale (Non ricorrente)
+README.md
+Rappresenta la
+Reimposta filtri
+Revisione Auto
+Ricerca Globale Multi-Criterio
+Ricorrente Annuale / Mensile.
+Ricorrente Settimanale / Giornaliero.
+Riferimento Comandi &amp; Sintassi
+Rimuovi TUTTI i memo");
+      log("");
+      log("8. SICUREZZA, PASSPHRASE & PRIVACY:");
+      log("   passwd
+Rimuovi l'intera serie ricorrente collegata");
+      log("   rm --title \"
+Rimuovi singolo memo per ID");
+      log("   rm --group
+Risultati filtrati:
+SCADUTO
+Salva su Google™ Drive ad ogni aggiunta/modifica/eliminazione
+Scadenza futura nel mese.
+Scaduto (la data è già passata).
+Scheda diagnostica completa con groupID e dettagli AES-256");
+      log("");
+      log("7. ELIMINAZIONE MEMO (rm):");
+      log("   rm --id
+Scheda testuale pura leggibile da qualsiasi dispositivo senza software aggiuntivo.
+Scheda ufficiale Notula™ impaginata per la stampa su carta o archiviazione PDF a zero consumo d'inchiostro.
+Scorciatoia: Ctrl+Shift+P
+Scorciatoie da tastiera:
+Se cambi computer o formatti il dispositivo,
+Sei libero e indipendente da qualsiasi dispositivo o sistema operativo!
+Sei sicuro di voler eliminare definitivamente questo promemoria? Questa azione non può essere annullata.
+Seleziona il formato di esportazione:
+Settimanale (Ricorrente ogni settimana)
+Sicurezza &amp; Master Passphrase
+Sintassi Formale:
+Solo Puntuali (Non ricorrenti)
+Sorgente .tex
+Sorgente Formattato Ufficiale LaTeX (.tex)
+Sorgente LaTeX Accademico (.tex)
+Sovranità Assoluta sui Dati (Zero Cloud Terzo)
+Specifica Ingegneristica &amp; Riferimento Sintattico dei Comandi Shell
+Strato 1: Parziale
+Strato 1: Parziale (•••)
+Strato 2: Totale
+Strato 2: Totale (••••••••)
+Strato 3: AES-256
+Strato 3: AES-256 E2E
+Strato 3: Cifratura Forte AES-256 E2E
+Struttura universale gerarchica
+System
+Sì, Elimina
+Sì, la passphrase si può cambiare in qualunque momento:
+Tabula
+Testo Piano (.txt)
+Titolo esatto da cancellare:
+Titolo:
+Tutte le Sezioni
+Versione Locale (Attuale)
+Versione in Arrivo (Google™ Drive / File)
+XML (.xml)
+Y
+[--opzione
+[--title
+[--title \"...\"] [--date YYYY-MM-DD] [--desc \"...\"] [--repeat ...] [--obfuscate ...] [--encrypt / --no-encrypt]");
+      log("   Esempio: edit --id n_123 --title \"Udienza Rinviata\" --date 2026-10-02");
+      log("   (Nota: la modifica sincronizza AUTOMATICAMENTE tutti i memo collegati dallo stesso groupID!)");
+      log("");
+      log("3. ESPORTAZIONE MULTIFORMATO (export):");
+      log("   export --id
+[m.id, m]));
+    let autoAcceptAll = false;
+
+    for (let i = 0; i
+\" --date YYYY-MM-DD [--desc \"...\"] [--repeat
+] --format
+] [--date
+] [--desc
+] [--expired] [--search
+] [--group
+] [--month
+] [--obfuscate none|partial|full] [--encrypt]");
+      log("   • Default (memo puntuale singolo): add --title \"Revisione\" --date 2026-09-01");
+      log("   • Ricorrente (ripetizione per N giorni): add --title \"Revisione\" --date 2026-09-01 --repeat 10");
+      log("   • Esempio cifrato: add --title \"Udienza Tribunale\" --date 2026-09-15 --desc \"Fascicolo 401\" --encrypt");
+      log("");
+      log("2. MODIFICA & AGGIORNAMENTO (edit):");
+      log("   edit --id
+] [--security
+] [--title
+`).join('\n');
+
+  return `
+accademico.
+add --title "Server" --date 2026-09-01 --repeat monthly --desc "Fattura 88" --encrypt
+add --title "Udienza" --date 2026-09-20
+automaticamente a tutti i memo collegati
+cloud-test
+con sincronizzazione automatica dei gruppi (`groupID`),
+conforme per software documentali e archivi aziendali.
+dateStr
+del tuo account Google™. Questo significa che:
+e
+e sorgente
+edit --id n_12345 --title "Udienza Rinviata" --date 2026-10-15
+esportazione multiformato (`export` / `pdf`)
+export --all --format json|xml|md|ics|txt
+export --id n_12345 --format json|xml|md|ics|pdf|txt
+export --year 2026 --format ics
+find --title "progetto"
+groupID
+https://mariofantini.eu
+https://www.googleapis.com/auth/drive.file
+iCalendar (.ics)
+import
+import --json '[&#123;"title":"...","expirationDate":"2026-09-01"&#125;]'
+import --xml '&lt;notula&gt;&lt;memos&gt;...&lt;/memos&gt;&lt;/notula&gt;'
+importazione (`import`)
+in pietra incisa del calendario nell'Antica Roma, su cui venivano scolpite le scadenze legali, le festività e i giorni
+info n_12345
+inserisci la nuova parola chiave &rarr; clicca
+ls
+ls --expired
+ls --group grp_12345
+ls --year 2026
+m.expirationDate
+m.repeatType !== 'none').length;
+  const expiredCount = coreRef.current.listExpiredNonEternal().length;
+
+  // Sidebar dynamic classes based on mode
+  const sidebarWidthClass = 
+    sidebarMode === 'collapsed' 
+      ? 'hidden' 
+      : sidebarMode === 'expanded' 
+        ? 'w-full md:w-84 lg:w-96' 
+        : 'w-full md:w-64';
+
+  return (
+m.repeatType === 'none' && m.expirationDate
+mariofantini.eu
+memo
+modifica (`edit`)
+nella barra in alto &rarr; nel riquadro
+nella barra laterale o nel sottomenu Elenco per scegliere tra:
+new Date(), []);
+  const [currentYear, setCurrentYear] = useState
+non perdi nulla
+notula passwd &lt;nuova_password&gt;
+notula&gt;
+o
+passwd MiaNuovaPassword2026!
+passwd NuovaPassword2026!
+pdf --id n_12345
+pdflatex
+per approfondimenti riguardo la proprietà intellettuale ("Intellectual Property Notice"), in cui si esplicita che l'architettura software, la logica di parsing e il codice sorgente sono opera proprietaria dell'autore. Manifestazioni di interesse per l'acquisizione completa dei diritti commerciali sono valutabili, previa intesa economica e salvaguardando la paternità storica e morale (Contatto: marfant7@gmail.com).
+per generare il PDF accademico a stampa perfetta.
+per unire rigore ingegneristico, orientamento temporale e memoria storica. Non contiene riferimenti a loghi commerciali, ma affonda le sue radici nell'archetipo classico del calendario romano e della comunicazione:
+ritorni istantaneamente alla data corrente.
+rm --all
+rm --expired
+rm --group grp_12345
+rm --id n_12345
+rm --title "Udienza"
+sync
+v1.1
+v2.2 Enterprise
+xelatex
+| --all | --year
+| --xml
+È stata rilevata una discrepanza tra la versione attualmente presente nel database locale e quella in arrivo. Seleziona come procedere:
+è una piattaforma avanzata per la gestione temporale di promemoria, scadenze critiche, adempimenti legali/fiscali, progetti professionali e note personali protette.
+• 1. Elimina singolo memo per ID
+• Apre la finestra di dialogo grafica per selezionare file .json o .xml
+• Avvia sincronizzazione da Google™ Drive
+• Blu:
+• Diagnostica di connessione Google™ Drive
+• Elimina TUTTI i memo (pulizia totale)
+• Elimina l'intera serie ricorrente legata da groupID
+• Elimina per corrispondenza del titolo
+• Elimina tutti i memo scaduti
+• Esporta l'intero archivio
+• Esporta scadenze dell'anno in iCalendar (.ics)
+• Esporta singolo memo nel formato indicato
+• Filtra per anno (solo puntuali)
+• Genera e scarica all'istante il PDF A4 Ink-Friendly
+• Importa XML da testo
+• Importa array JSON da testo
+• Modifica memo (aggiorna in automatico tutti i memo con lo stesso groupID)
+• Modifica/imposta Master Passphrase AES-256
+• Mostra esclusivamente i memo scaduti
+• Mostra tutti i memo della serie collegata
+• Mostra tutti i memo presenti
+• Ricerca testuale rapida
+• Ricorrente cifrato AES-256
+• Scheda diagnostica completa con groupID
+• Singola scadenza
+• Verde:
+• Viola:
+ℹ️ Come funziona il cambio della Passphrase in Notula:
+ℹ️ Verranno eliminati tutti i memo puntuali (non ricorrenti) la cui data è antecedente a oggi. I memo ricorrenti non verranno toccati.
+● AES-256 E2E
+⚠️ Attenzione: questa azione cancellerà l'intero archivio memo di Notula (sia puntuali che ricorrenti).
+📅 Scadenza:
+🔒 Offuscamento:

@@ -1,0 +1,214 @@
+= 1900 && val 
+1. Cosa Fa Notula™: Lo Schedario Ingegneristico Universale
+1. Per anno (puntuali / non ricorrenti)
+1. Per Titolo / Testo
+2. Peculiarità e Punti di Forza Unici di Notula™
+2. Per anno e mese (puntuali)
+2. Per Data
+3. Legenda Visiva del Calendario &amp; Gestione Ricorrenze con groupID
+3. Per anno, mese e giorno (puntuali)
+3. Per IDs
+4. I 3 Strati di Sicurezza Notula™ &amp; Gestione Passphrase
+4. Per titolo
+5. Esportazioni Multiformato (JSON, XML, MD, ICS, PDF, TXT)
+5. Rimuovi scaduti (puntuali)
+6. Per mese (ricorrenti)
+6. Sincronizzazione Google™ Drive: Indipendenza Totale dal Dispositivo
+7. Funzionalità Quotidiane &amp; Scorciatoie Pratiche
+7. Per mese e giorno (ricorrenti)
+8. Terminale CLI per Utenti Avanzati &amp; Power Users
+8. TUTTI i memo (puntuali e ricorrenti)
+9. Per IDs (singolo o separati da virgola)
+● AES-256 E2E
+Aggiornamento Automatico Ricorrenze (groupID)
+Anno:
+Annuale (Ricorrente ogni anno)
+Architettura Offline-First &amp; Immediata
+(A) Sostituisci Tutti
+Autore, Contatti, Copyright
+Avviso di Riserva Integrale dei Diritti &amp; Tutela Proprietà Intellettuale
+Badge Dorato = Giorno Corrente (Oggi)
+Bordo Arancio = Puntuale oggi
+Bordo Magenta = Puntuale futuro
+Bordo Rosso = Puntuale scaduto
+&bull;
+Cifratura Cloud: <strong>{masterPassword ? 'ATTIVA (Protetto con PBKDF2/AES-256-GCM)' : 'Disattivata (Plain JSON)'}</strong>
+{CLI_MANUAL_SITE.replace('https://', '')}
+{cmd.notes}
+{cmd.syntax}
+Come funziona il cambio?
+{copiedCode === 'all-latex' ? 'Copiato!' : 'Copia Sorgente .tex'}
+{copied ? 'Copiato!' : 'Copia Testo Strutturato'}
+&copy; 2026 {CLI_MANUAL_AUTHOR}
+&copy; 2026 Ing. Mario Fantini
+Copyright &copy; 2026 Tutti i Diritti Riservati
+Dall'Interfaccia Grafica:</strong> Clicca sul pulsante <em>"AES-256"</em> nella barra in alto &rarr; nel riquadro <em>"Modifica / Cambia Passphrase"</em> inserisci la nuova parola chiave &rarr; clicca <em>"Aggiorna Passphrase"
+Dark
+Data di Riferimento / Scadenza *
+Data Scadenza:
+Da Terminale CLI:</strong> Apri il terminale (<kbd className="font-mono bg-[var(--bg-subtle)] px-1 rounded">Ctrl+Shift+P</kbd>) e digita: <code>passwd MiaNuovaPassword2026!
+\" --date YYYY-MM-DD [--desc \"...\"] [--repeat 
+Descrizione:
+Descrizione, Dettagli e Note
+{doneMsg}
+Doppia Interfaccia: GUI • CLI
+ e 
+Effetto:
+Elimina Memo (GEM 1-9)
+English (EN)
+Esegui Test Crittografico AES-256-GCM
+"Esporta Archivio"
+Esporta questi {items.length} memo
+{ex}
+Filtri Parametrici:
+{fmt.label}
+Giornaliero (Ricorrente ogni giorno)
+Giorno:
+Giorno (01 - 31):
+Google™ Drive-First</strong>, Notula™ archivia lo schedario nella cartella riservata <code>Notula/
+groupID</code> e sorgente <span className="font-mono font-semibold">LaTeX (.tex)
+Guida Funzionale, Manuale d'Uso
+https://mariofantini.eu
+https://www.googleapis.com/auth/drive.file</code> (accesso ristretto alla sola cartella <code>/Notula
+IB•••401
+iCalendar (.ics)
+ID Memo (separati da virgola se multipli):
+(I) Ignora
+Ing. Mario Fantini
+{initialMemo ? 'Salva Modifiche' : 'Archivia in Notula™'}
+Inserendo una nuova passphrase qui sotto o tramite comando CLI <code>notula passwd &lt;nuova_password&gt;</code>, Notula ricalcola istantaneamente le chiavi crittografiche hardware AES-GCM (100.000 iterazioni PBKDF2).
+Installazione, Emblema
+Intellectual Property Notice</strong>: Si rimanda al file <code className="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1 rounded">README.md
+{isExporting ? 'Esportazione in corso...' : `Scarica .${selectedFormat.toUpperCase()}`}
+{isGeneratingPdf ? 'Generazione...' : 'Scarica PDF A4'}
+{isLegendOpen ? 'Nascondi' : 'Espandi'}
+{isSyncing ? 'Sincronizzazione...' : 'Scarica da Google™ Drive'}
+{isTesting ? 'Verifica in corso...' : 'Verifica e Connetti Google™ Drive'}
+Italiano (IT)
+{items.length}
+JSON (.json)
+La Master Passphrase può essere modificata liberamente in qualsiasi momento:
+La nuova passphrase viene impiegata per tutti i nuovi salvataggi, cifrature locali ed esportazioni protette.
+L'Emblema Notula™: Radici Storiche, Volatile di Apollo &amp; Astronomia
+Light
+{line}
+&lt;notula&gt;&lt;memo&gt;
+L'Uccello Messaggero di Apollo
+Manuale Ufficiale NOTULA™ CLI v2.2 (Edizione Ingegneristica)
+mariofantini.eu
+Markdown (.md)
+{masterPassword ? 'Aggiorna Passphrase' : 'Salva Passphrase'}
+Master Password attiva: il file verrà cifrato con AES-256-GCM.
+{masterPassword ? 'Modifica / Cambia Passphrase' : 'Crea Nuova Master Passphrase'}
+{memo.expirationDate}
+{memo.groupId}
+<memos>...</memos>
+Mensile (Ricorrente ogni mese)
+Mese:
+Mese (01 - 12):
+modifica (`edit`)</strong> con sincronizzazione automatica dei gruppi (`groupID`), <strong>esportazione multiformato (`export` / `pdf`)</strong> e <strong>importazione (`import`)
+ m.repeatType === 'none' && m.expirationDate 
+(M) Tieni Entrambi
+Navigazione Rapida • Tasto (settings.language === "en" ? "Today" : "Oggi")
+Nessuna descrizione o nota aggiuntiva.
+Nessun comando corrisponde ai criteri di ricerca.
+Nessun memo presente per il {selectedDateStr}.
+Nessuno (Testo in chiaro)
+{new Date(memo.createdAt).toLocaleDateString('it-IT')}
+Nota Architetturale Ingegneristica:
+/Notula
+notula&gt;
+NOTULA MEMORANDUM • SCHEDA UFFICIALE
+Notula™
+Notula™ Cloud Sync &bull; Google™ Drive API v3
+{obfuscationLabel}
+Offuscamento (Privacy)
+🔒 Offuscamento: <strong>{memo.obfuscation === 'full' ? 'Strato 2 (Totale)' : memo.obfuscation === 'partial' ? 'Strato 1 (Parziale)' : 'Nessuno'}</strong>
+{opt.desc}
+{opt.flag}
+Pallino Blu = Ricorrente oggi
+Pallino Grigio = Ricorrente passato
+Pallino Verde = Ricorrente futuro
+PDF Ink-Friendly A4
+pdflatex</code> o <code className="font-mono">xelatex
+Per disattivare temporaneamente la richiesta di cifratura puoi fare clic su <em>"Disattiva Passphrase"</em>.
+Protezione Multi-Strato
+Prova a cambiare query o selezionare un'altra modalità di ricerca.
+Puntuale (Non ricorrente)
+{recurrenceLabel}
+Ricerca Globale Multi-Criterio
+Ricorrenza:
+Riferimento Comandi &amp; Sintassi
+Salva su Google™ Drive ad ogni aggiunta/modifica/eliminazione
+📅 Scadenza: <strong>{memo.expirationDate}</strong>
+Scarica .tex
+Se cambi computer o formatti il dispositivo, <strong>non perdi nulla</strong>: basta ricollegare il tuo account Google™ Drive e inserire la tua Master Passphrase.
+Sei libero e indipendente da qualsiasi dispositivo o sistema operativo!
+Settimanale (Ricorrente ogni settimana)
+(settings.language === "en" ? "Today" : "Oggi")
+Sì, la passphrase si può cambiare in qualunque momento:
+Sincronizzazione Cloud & Google™ Drive
+Solo Puntuali (Non ricorrenti)
+Sorgente Formattato Ufficiale LaTeX (.tex)
+Sorgente LaTeX Accademico (.tex)
+Sorgente .tex
+Sovranità Assoluta sui Dati (Zero Cloud Terzo)
+<span className="text-amber-300">export --all --format json|xml|md|ics|txt</span> <span className="text-gray-400 text-[10px]">• Esporta l'intero archivio</span>
+<span className="text-amber-300">export --id n_12345 --format json|xml|md|ics|pdf|txt</span> <span className="text-gray-400 text-[10px]">• Esporta singolo memo nel formato indicato</span>
+<span className="text-amber-300">export --year 2026 --format ics</span> <span className="text-gray-400 text-[10px]">• Esporta scadenze dell'anno in iCalendar (.ics)</span>
+<span className="text-amber-300">pdf --id n_12345</span> <span className="text-gray-400 text-[10px]">• Genera e scarica all'istante il PDF A4 Ink-Friendly</span>
+<span className="text-blue-300">cloud-test</span> <span className="text-gray-400 text-[10px]">• Diagnostica di connessione Google™ Drive</span>
+<span className="text-blue-300">find --title "progetto"</span> <span className="text-gray-400 text-[10px]">• Ricerca testuale rapida</span>
+<span className="text-blue-300">info n_12345</span> <span className="text-gray-400 text-[10px]">• Scheda diagnostica completa con groupID</span>
+<span className="text-blue-300">passwd NuovaPassword2026!</span> <span className="text-gray-400 text-[10px]">• Modifica/imposta Master Passphrase AES-256</span>
+<span className="text-blue-300">sync</span> <span className="text-gray-400 text-[10px]">• Avvia sincronizzazione da Google™ Drive</span>
+<span className="text-cyan-300">add --title "Server" --date 2026-09-01 --repeat monthly --desc "Fattura 88" --encrypt</span> <span className="text-gray-400 text-[10px]">• Ricorrente cifrato AES-256</span>
+<span className="text-cyan-300">add --title "Udienza" --date 2026-09-20</span> <span className="text-gray-400 text-[10px]">• Singola scadenza</span>
+<span className="text-cyan-300">edit --id n_12345 --title "Udienza Rinviata" --date 2026-10-15</span> <span className="text-gray-400 text-[10px]">• Modifica memo (aggiorna in automatico tutti i memo con lo stesso groupID)</span>
+<span className="text-purple-300">import --json '[&#123;"title":"...","expirationDate":"2026-09-01"&#125;]'</span> <span className="text-gray-400 text-[10px]">• Importa array JSON da testo</span>
+<span className="text-purple-300">import</span> <span className="text-gray-400 text-[10px]">• Apre la finestra di dialogo grafica per selezionare file .json o .xml</span>
+<span className="text-purple-300">import --xml '&lt;notula&gt;&lt;memos&gt;...&lt;/memos&gt;&lt;/notula&gt;'</span> <span className="text-gray-400 text-[10px]">• Importa XML da testo</span>
+<span className="text-red-400">rm --all</span> <span className="text-gray-400 text-[10px]">• Elimina TUTTI i memo (pulizia totale)</span>
+<span className="text-red-400">rm --expired</span> <span className="text-gray-400 text-[10px]">• Elimina tutti i memo scaduti</span>
+<span className="text-red-400">rm --group grp_12345</span> <span className="text-gray-400 text-[10px]">• Elimina l'intera serie ricorrente legata da groupID</span>
+<span className="text-red-400">rm --id n_12345</span> <span className="text-gray-400 text-[10px]">• 1. Elimina singolo memo per ID</span>
+<span className="text-red-400">rm --title "Udienza"</span> <span className="text-gray-400 text-[10px]">• Elimina per corrispondenza del titolo</span>
+<span className="text-yellow-300">ls --expired</span> <span className="text-gray-400 text-[10px]">• Mostra esclusivamente i memo scaduti</span>
+<span className="text-yellow-300">ls --group grp_12345</span> <span className="text-gray-400 text-[10px]">• Mostra tutti i memo della serie collegata</span>
+<span className="text-yellow-300">ls</span> <span className="text-gray-400 text-[10px]">• Mostra tutti i memo presenti</span>
+<span className="text-yellow-300">ls --year 2026</span> <span className="text-gray-400 text-[10px]">• Filtra per anno (solo puntuali)</span>
+Stato Vault: {masterPassword ? '🔒 Protetto con AES-256' : '🔓 Non protetto (In chiaro)'}
+Strato 1: Parziale
+Strato 1: Parziale (•••)
+Strato 2: Totale
+Strato 2: Totale (••••••••)
+Strato 3: AES-256
+Strato 3: AES-256 E2E
+<strong>All Rights Reserved • Proprietary &amp; Confidential Software.</strong>
+<strong className="text-amber-500">Bordo Arancione:</strong> In scadenza Oggi.
+<strong className="text-blue-500">• Blu:</strong> Ricorrente Settimanale / Giornaliero.
+<strong className="text-emerald-500">• Verde:</strong> Ricorrente Annuale / Mensile.
+<strong className="text-pink-500">Bordo Magenta/Viola:</strong> Scadenza futura nel mese.
+<strong className="text-purple-500">• Viola:</strong> Con Cifratura AES-256 attiva.
+<strong className="text-red-500">Bordo Rosso:</strong> Scaduto (la data è già passata).
+<strong>Copyright &copy; 2026 Ing. Mario Fantini. Tutti i diritti riservati.</strong>
+<strong>Gestione Conflitti Intelligente:</strong> In caso di divergenza tra la memoria locale e Google™ Drive, Notula™ ti consente di risolvere il conflitto con facilità (Sostituisci [Y], Ignora [I], Duplica entrambi [M] o Applica a tutti [A]).
+System
+Tabula</em> in pietra incisa del calendario nell'Antica Roma, su cui venivano scolpite le scadenze legali, le festività e i giorni <em>Fasti</em> e <em>Nefasti
+Testo Piano (.txt)
+ : theme === 'light' ? <Sun className="w-5 h-5" /> : 
+Titolo esatto da cancellare:
+{t.language}
+{t.languageDesc}
+™
+{t.notifications}
+{t.notificationsDesc}
+{t.sound}
+{t.soundDesc}
+{t.theme}
+{t.themeDesc}
+{t.title}
+Tutti ({memos.length})
+XML (.xml)
+(Y) Sostituisci
+Y</strong> (Sostituisci) &bull; <strong className="text-amber-500">A</strong> (Tutti) &bull; <strong className="text-red-500">I</strong> (Ignora) &bull; <strong className="text-emerald-500">M

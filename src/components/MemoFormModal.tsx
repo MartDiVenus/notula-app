@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { getLocalYYYYMMDD } from '../utils/notulaCore';
 import { MemoItem, RepeatType, ObfuscationLevel } from '../types';
 import { PlusCircle, Edit3, X, Calendar, Shield, Repeat, FileText, Check, Lock, Layers } from 'lucide-react';
@@ -33,6 +34,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
   defaultDate,
   hasMasterPassword = false,
 }) => {
+  const { settings } = useSettings();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [expirationDate, setExpirationDate] = useState('');
@@ -95,10 +97,10 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
             </div>
             <div>
               <h2 className="font-bold text-lg text-[var(--text-main)]">
-                {initialMemo ? 'Modifica Memo' : 'Nuovo Memo in Notula™'}
+                {initialMemo ? (settings.language === 'en' ? 'Edit Memo' : 'Modifica Memo') : (settings.language === 'en' ? 'New Memo in Notula™' : 'Nuovo Memo in Notula™')}
               </h2>
               <p className="text-xs text-[var(--text-muted)]">
-                {initialMemo ? `ID: ${initialMemo.id}` : 'Crea memo puntuale o ricorrente con opzione AES-256'}
+                {initialMemo ? `ID: ${initialMemo.id}` : (settings.language === 'en' ? 'Create one-time or recurring memo with AES-256 option' : 'Crea memo puntuale o ricorrente con opzione AES-256')}
               </p>
             </div>
           </div>
@@ -123,8 +125,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
             <div className="p-3 rounded-xl border border-blue-500/30 bg-blue-500/5 flex items-center gap-3">
               <Layers className="w-4 h-4 text-blue-500 shrink-0" />
               <div className="text-[11px] text-[var(--text-main)]">
-                <span className="font-bold text-blue-600 dark:text-blue-400">Serie Ricorrente Collegata:</span> Gruppo <code className="font-mono">{initialMemo.groupId}</code>. Le modifiche a titolo, descrizione e sicurezza verranno sincronizzate <strong>automaticamente</strong> su tutti i memo della serie.
-              </div>
+                <span className="font-bold text-blue-600 dark:text-blue-400">{settings.language === 'en' ? 'Linked Recurring Series:' : 'Serie Ricorrente Collegata:'}</span> Gruppo <code className="font-mono">{initialMemo.groupId}</code>. Le modifiche a titolo, descrizione e sicurezza verranno sincronizzate <strong>{settings.language === 'en' ? 'automatically' : 'automaticamente'}</strong>{settings.language === "en" ? " across all memos in the series." : " su tutti i memo della serie."}</div>
             </div>
           )}
 
@@ -132,12 +133,12 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
           <div>
             <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-blue-500" />
-              <span>Titolo del Memo *</span>
+              <span>{settings.language === "en" ? "Memo Title *" : "Titolo del Memo *"}</span>
             </label>
             <input
               type="text"
               required
-              placeholder="Es. Scadenza assicurazione, Udienza Tribunale, Controllo caldaia..."
+              placeholder={settings.language === "en" ? "E.g. Insurance expiry, Court Hearing, Boiler check..." : "Es. Scadenza assicurazione, Udienza Tribunale, Controllo caldaia..."}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
@@ -149,7 +150,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
           <div>
             <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-blue-500" />
-              <span>Data di Riferimento / Scadenza *</span>
+              <span>{settings.language === "en" ? "Reference Date / Expiration *" : "Data di Riferimento / Scadenza *"}</span>
             </label>
             <input
               type="date"
@@ -166,18 +167,18 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
             <div>
               <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 flex items-center gap-1.5">
                 <Repeat className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Ricorrenza</span>
+                <span>{settings.language === "en" ? "Recurrence" : "Ricorrenza"}</span>
               </label>
               <select
                 value={repeatType}
                 onChange={(e) => setRepeatType(e.target.value as RepeatType)}
                 className="w-full px-3 py-2 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-main)] font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 cursor-pointer"
               >
-                <option value="none">Puntuale (Non ricorrente)</option>
-                <option value="yearly">Annuale (Ricorrente ogni anno)</option>
-                <option value="monthly">Mensile (Ricorrente ogni mese)</option>
-                <option value="weekly">Settimanale (Ricorrente ogni settimana)</option>
-                <option value="daily">Giornaliero (Ricorrente ogni giorno)</option>
+                <option value="none">{settings.language === "en" ? "One-time (Non-recurring)" : "Puntuale (Non ricorrente)"}</option>
+                <option value="yearly">{settings.language === "en" ? "Yearly (Recurring every year)" : "Annuale (Ricorrente ogni anno)"}</option>
+                <option value="monthly">{settings.language === "en" ? "Monthly (Recurring every month)" : "Mensile (Ricorrente ogni mese)"}</option>
+                <option value="weekly">{settings.language === "en" ? "Weekly (Recurring every week)" : "Settimanale (Ricorrente ogni settimana)"}</option>
+                <option value="daily">{settings.language === "en" ? "Daily (Recurring every day)" : "Giornaliero (Ricorrente ogni giorno)"}</option>
               </select>
             </div>
 
@@ -185,16 +186,16 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
             <div>
               <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5 text-amber-500" />
-                <span>Offuscamento (Privacy)</span>
+                <span>{settings.language === "en" ? "Obfuscation (Privacy)" : "Offuscamento (Privacy)"}</span>
               </label>
               <select
                 value={obfuscation}
                 onChange={(e) => setObfuscation(e.target.value as ObfuscationLevel)}
                 className="w-full px-3 py-2 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-main)] font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer"
               >
-                <option value="none">Nessuno (Testo in chiaro)</option>
-                <option value="partial">Strato 1: Parziale (•••)</option>
-                <option value="full">Strato 2: Totale (••••••••)</option>
+                <option value="none">{settings.language === "en" ? "None (Plain text)" : "Nessuno (Testo in chiaro)"}</option>
+                <option value="partial">{settings.language === "en" ? "Layer 1: Partial (•••)" : "Strato 1: Parziale (•••)"}</option>
+                <option value="full">{settings.language === "en" ? "Layer 2: Total (••••••••)" : "Strato 2: Totale (••••••••)"}</option>
               </select>
             </div>
           </div>
@@ -206,10 +207,10 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
                 <Lock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 <div>
                   <span className="text-xs font-bold text-[var(--text-main)]">
-                    Strato 3: Cifratura Forte AES-256 E2E
+                    {settings.language === 'en' ? 'Layer 3: Strong AES-256 E2E Encryption' : 'Strato 3: Cifratura Forte AES-256 E2E'}
                   </span>
                   <p className="text-[11px] text-[var(--text-muted)]">
-                    Crittografia hardware AES-256-GCM su disco e backup Google™ Drive
+                    {settings.language === 'en' ? 'AES-256-GCM hardware encryption on disk and Google™ Drive backup' : 'Crittografia hardware AES-256-GCM su disco e backup Google™ Drive'}
                   </p>
                 </div>
               </div>
@@ -233,11 +234,11 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
           {/* Description */}
           <div>
             <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 flex items-center gap-1.5">
-              <span>Descrizione, Dettagli e Note</span>
+              <span>{settings.language === "en" ? "Description, Details and Notes" : "Descrizione, Dettagli e Note"}</span>
             </label>
             <textarea
               rows={4}
-              placeholder="Inserisci dettagli, note o testo formattato..."
+              placeholder={settings.language === "en" ? "Enter details, notes, or formatted text..." : "Inserisci dettagli, note o testo formattato..."}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none font-sans"
@@ -250,15 +251,13 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
               type="button"
               onClick={onClose}
               className="px-4 py-2 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
-            >
-              Annulla
-            </button>
+            >{settings.language === "en" ? "Cancel" : "Annulla"}</button>
             <button
               type="submit"
               className="px-5 py-2.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md transition flex items-center gap-1.5"
             >
               <Check className="w-4 h-4" />
-              <span>{initialMemo ? 'Salva Modifiche' : 'Archivia in Notula™'}</span>
+              <span>{initialMemo ? (settings.language === 'en' ? 'Update Memo' : 'Salva Modifiche') : (settings.language === 'en' ? 'Save to Notula™' : 'Archivia in Notula™')}</span>
             </button>
           </div>
         </form>

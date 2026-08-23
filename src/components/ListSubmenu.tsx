@@ -4,7 +4,8 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { MemoItem, REPEAT_LABELS_IT } from '../types';
+import { useSettings } from '../contexts/SettingsContext';
+import { MemoItem, REPEAT_LABELS_IT, REPEAT_LABELS_EN } from '../types';
 import { NotulaCore, getLocalYYYYMMDD } from '../utils/notulaCore';
 import { getObfuscatedDisplay } from '../utils/obfuscation';
 import { ListFilter, Calendar, Download, FileText, Printer, Edit3, Trash2, X, ArrowRight, Repeat, Lock, Shield, Eye, EyeOff } from 'lucide-react';
@@ -34,6 +35,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
   onPrintMemo,
   onExportBatch,
 }) => {
+  const { settings } = useSettings();
   const [listCategory, setListCategory] = useState<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g'>('a');
   const [revealedMemoIds, setRevealedMemoIds] = useState<Set<string>>(new Set());
 
@@ -60,7 +62,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
       case 'd':
         return core.listByMonthEternal(monthVal);
       case 'e':
-        return core.listByYearMonthDayNonEternal(yearVal, monthVal, dayVal);
+        return core.listByExactDateNonEternal(yearVal, monthVal, dayVal);
       case 'f':
         return core.listByMonthAndDayEternal(monthVal, dayVal);
       case 'g':
@@ -82,8 +84,8 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
               <ListFilter className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-lg text-[var(--text-main)]">Elenco Memo (GEM a-g)</h2>
-              <p className="text-xs text-[var(--text-muted)]">Visualizza e filtra i memo per categoria</p>
+              <h2 className="font-bold text-lg text-[var(--text-main)]">{settings.language === "en" ? "Memo List (GEM a-z)" : 'Elenco Memo (GEM a-g)'}</h2>
+              <p className="text-xs text-[var(--text-muted)]">{settings.language === "en" ? "View and filter memos by category" : "Visualizza e filtra i memo per categoria"}</p>
             </div>
           </div>
           <button
@@ -105,7 +107,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              a. Tutti
+              {settings.language === "en" ? "a. All" : "a. Tutti"}
             </button>
 
             <button
@@ -116,7 +118,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              b. Anno (Puntuali)
+              {settings.language === "en" ? "b. Year (One-time)" : "b. Anno (Puntuali)"}
             </button>
 
             <button
@@ -127,7 +129,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              c. Anno &amp; Mese
+              {settings.language === "en" ? "c. Year & Month" : "c. Anno & Mese"}
             </button>
 
             <button
@@ -138,7 +140,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              d. Mese (Ricorrenti)
+              {settings.language === "en" ? "d. Month (Recurring)" : "d. Mese (Ricorrenti)"}
             </button>
 
             <button
@@ -149,7 +151,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              e. A/M/G (Puntuali)
+              {settings.language === "en" ? "e. Y/M/D (One-time)" : "e. A/M/G (Puntuali)"}
             </button>
 
             <button
@@ -160,7 +162,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              f. M/G (Ricorrenti)
+              {settings.language === "en" ? "f. M/D (Recurring)" : "f. M/G (Ricorrenti)"}
             </button>
 
             <button
@@ -171,18 +173,18 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              g. Scaduti
+              {settings.language === "en" ? "g. Expired" : "g. Scaduti"}
             </button>
           </div>
 
           {/* Conditional Filters depending on category */}
           {['b', 'c', 'd', 'e', 'f'].includes(listCategory) && (
             <div className="flex flex-wrap gap-3 items-center bg-[var(--bg-subtle)] p-3 rounded-xl border border-[var(--border-color)] text-xs">
-              <span className="font-semibold text-[var(--text-muted)]">Filtri Parametrici:</span>
+              <span className="font-semibold text-[var(--text-muted)]">{settings.language === "en" ? "Parametric Filters:" : "Filtri Parametrici:"}</span>
 
               {['b', 'c', 'e'].includes(listCategory) && (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[var(--text-muted)]">Anno:</span>
+                  <span className="text-[var(--text-muted)]">{settings.language === "en" ? "Year:" : "Anno:"}</span>
                   <input
                     type="number"
                     value={yearVal}
@@ -194,7 +196,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
 
               {['c', 'd', 'e', 'f'].includes(listCategory) && (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[var(--text-muted)]">Mese:</span>
+                  <span className="text-[var(--text-muted)]">{settings.language === "en" ? "Month:" : "Mese:"}</span>
                   <select
                     value={monthVal}
                     onChange={(e) => setMonthVal(e.target.value)}
@@ -214,7 +216,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
 
               {['e', 'f'].includes(listCategory) && (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[var(--text-muted)]">Giorno:</span>
+                  <span className="text-[var(--text-muted)]">{settings.language === "en" ? "Day:" : "Giorno:"}</span>
                   <input
                     type="number"
                     min={1}
@@ -230,7 +232,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
 
           <div className="flex justify-between items-center px-1">
             <span className="text-xs text-[var(--text-muted)]">
-              Risultati filtrati: <strong>{items.length}</strong> memo
+              {settings.language === "en" ? "Filtered results:" : "Risultati filtrati:"} <strong>{items.length}</strong> memo
             </span>
 
             {items.length > 0 && (
@@ -239,7 +241,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                 className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 bg-emerald-500/10 px-3 py-1.5 rounded-lg transition border border-emerald-500/20"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Esporta questi {items.length} memo</span>
+                <span>{settings.language === "en" ? `Export these ${items.length} memos` : `Esporta questi ${items.length} memo`}</span>
               </button>
             )}
           </div>
@@ -249,7 +251,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
         <div className="flex-1 overflow-y-auto p-6 pt-2 space-y-3">
           {items.length === 0 ? (
             <div className="py-12 text-center text-[var(--text-muted)]">
-              <p className="text-sm font-medium">Nessun memo presente per la categoria selezionata.</p>
+              <p className="text-sm font-medium">{settings.language === "en" ? "No memos present for the selected category." : "Nessun memo presente per la categoria selezionata."}</p>
             </div>
           ) : (
             items.map((memo) => {
@@ -280,7 +282,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                           }`}
                         >
                           {!isPunctual && <Repeat className="w-3 h-3" />}
-                          {isPunctual ? 'Puntuale' : `Ricorrente (${REPEAT_LABELS_IT[memo.repeatType] || memo.repeatType})`}
+                          {isPunctual ? (settings.language === 'en' ? 'One-time' : 'Puntuale') : (settings.language === 'en' ? `Recurring (${REPEAT_LABELS_EN[memo.repeatType] || memo.repeatType})` : `Ricorrente (${REPEAT_LABELS_IT[memo.repeatType] || memo.repeatType})`)}
                         </span>
                         <span className="text-xs text-[var(--text-muted)]">
                           📅 {memo.expirationDate}
@@ -289,21 +291,21 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                         {memo.obfuscation === 'partial' && (
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center gap-1">
                             <Shield className="w-2.5 h-2.5" />
-                            <span>Strato 1: Parziale</span>
+                            <span>{settings.language === "en" ? "Layer 1: Partial" : "Strato 1: Parziale"}</span>
                           </span>
                         )}
                         {/* Layer 2 */}
                         {memo.obfuscation === 'full' && (
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-500/15 border border-orange-500/30 text-orange-600 dark:text-orange-400 flex items-center gap-1">
                             <Shield className="w-2.5 h-2.5" />
-                            <span>Strato 2: Totale</span>
+                            <span>{settings.language === "en" ? "Layer 2: Total" : "Strato 2: Totale"}</span>
                           </span>
                         )}
                         {/* Layer 3 */}
                         {memo.isEncrypted && (
                           <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-600 dark:text-purple-400 flex items-center gap-1">
                             <Lock className="w-2.5 h-2.5" />
-                            <span>Strato 3: AES-256</span>
+                            <span>{settings.language === "en" ? "Layer 3: AES-256" : "Strato 3: AES-256"}</span>
                           </span>
                         )}
                       </div>
@@ -338,10 +340,10 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                                   toggleRevealMemo(memo.id);
                                 }}
                                 className="px-2 py-0.5 rounded bg-slate-300/80 dark:bg-slate-700 hover:bg-slate-400/50 text-slate-800 dark:text-slate-200 transition text-[10px] flex items-center gap-1 shadow-xs font-sans font-semibold shrink-0 cursor-pointer"
-                                title="Svela"
+                                title={settings.language === "en" ? "Reveal" : "Svela"}
                               >
                                 <Eye className="w-3 h-3 text-blue-500" />
-                                <span>Svela</span>
+                                <span>{settings.language === "en" ? "Reveal" : "Svela"}</span>
                               </button>
                             </div>
                           );
@@ -360,7 +362,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                                   toggleRevealMemo(memo.id);
                                 }}
                                 className="p-1 rounded bg-[var(--bg-subtle)] border border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition shrink-0"
-                                title="Offusca"
+                                title={settings.language === "en" ? "Obfuscate" : "Offusca"}
                               >
                                 <EyeOff className="w-3 h-3 text-amber-500" />
                               </button>
@@ -377,7 +379,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                           onClose();
                         }}
                         className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-500/10 transition flex items-center gap-1 text-xs"
-                        title="Visualizza nel calendario"
+                        title={settings.language === "en" ? "View in calendar" : "Visualizza nel calendario"}
                       >
                         <ArrowRight className="w-4 h-4" />
                       </button>
@@ -385,7 +387,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                       <button
                         onClick={() => onExportMemo(memo)}
                         className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-emerald-600 hover:bg-emerald-500/10 transition"
-                        title="Esporta singolo memo"
+                        title={settings.language === "en" ? "Export single memo" : "Esporta singolo memo"}
                       >
                         <Download className="w-4 h-4" />
                       </button>
@@ -393,7 +395,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                       <button
                         onClick={() => onPrintMemo(memo)}
                         className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
-                        title="Genera & Esporta Scheda PDF"
+                        title={settings.language === "en" ? "Generate & Export PDF Card" : "Genera & Esporta Scheda PDF"}
                       >
                         <FileText className="w-4 h-4 text-blue-500" />
                       </button>
@@ -401,7 +403,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                       <button
                         onClick={() => onEditMemo(memo)}
                         className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
-                        title="Modifica"
+                        title={settings.language === "en" ? "Edit" : "Modifica"}
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
@@ -409,7 +411,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                       <button
                         onClick={() => onDeleteMemo(memo.id)}
                         className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-red-600 hover:bg-red-500/10 transition"
-                        title="Elimina"
+                        title={settings.language === "en" ? "Delete" : "Elimina"}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

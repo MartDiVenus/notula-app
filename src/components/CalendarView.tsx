@@ -4,7 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { MemoItem, DayAnalysis, REPEAT_LABELS_IT } from '../types';
+import { useSettings } from '../contexts/SettingsContext';
+import { MemoItem, DayAnalysis, REPEAT_LABELS_IT, REPEAT_LABELS_EN } from '../types';
 import { NotulaCore } from '../utils/notulaCore';
 import { getObfuscatedDisplay } from '../utils/obfuscation';
 import { 
@@ -60,6 +61,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   onExportMemo,
   onPrintMemo,
 }) => {
+  const { settings } = useSettings();
   const [isLegendOpen, setIsLegendOpen] = useState(false);
   const [expandedMemoIds, setExpandedMemoIds] = useState<Set<string>>(new Set());
   const [revealedMemoIds, setRevealedMemoIds] = useState<Set<string>>(new Set());
@@ -100,11 +102,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const selectedDayMemos = core.getMemosForDay(currentYear, currentMonth, selectedDay);
 
   const monthNames = [
-    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+    (settings.language === 'en' ? 'January' : 'Gennaio'), (settings.language === 'en' ? 'February' : 'Febbraio'), (settings.language === 'en' ? 'March' : 'Marzo'), (settings.language === 'en' ? 'April' : 'Aprile'), (settings.language === 'en' ? 'May' : 'Maggio'), (settings.language === 'en' ? 'June' : 'Giugno'),
+    (settings.language === 'en' ? 'July' : 'Luglio'), (settings.language === 'en' ? 'August' : 'Agosto'), (settings.language === 'en' ? 'September' : 'Settembre'), (settings.language === 'en' ? 'October' : 'Ottobre'), (settings.language === 'en' ? 'November' : 'Novembre'), (settings.language === 'en' ? 'December' : 'Dicembre')
   ];
 
-  const weekDayNames = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+  const weekDayNames = [(settings.language === 'en' ? 'Mon' : 'Lun'), (settings.language === 'en' ? 'Tue' : 'Mar'), (settings.language === 'en' ? 'Wed' : 'Mer'), (settings.language === 'en' ? 'Thu' : 'Gio'), (settings.language === 'en' ? 'Fri' : 'Ven'), (settings.language === 'en' ? 'Sat' : 'Sab'), (settings.language === 'en' ? 'Sun' : 'Dom')];
 
   // Handle fine-grained Month change
   const handleMonthSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -139,7 +141,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 value={currentMonth}
                 onChange={handleMonthSelect}
                 className="bg-[var(--bg-subtle)] border border-[var(--border-color)] text-[var(--text-main)] font-black text-sm sm:text-base px-2 sm:px-3 py-1.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs shrink-0"
-                title="Seleziona Mese"
+                title={settings.language === "en" ? "Select Month" : "Seleziona Mese"}
               >
                 {monthNames.map((m, idx) => (
                   <option key={m} value={idx}>
@@ -157,7 +159,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   value={currentYear}
                   onChange={handleYearChange}
                   className="w-14 sm:w-16 bg-transparent text-[var(--text-main)] font-black text-sm sm:text-base font-mono focus:outline-none text-center"
-                  title="Digita o cambia Anno"
+                  title={settings.language === "en" ? "Type or change Year" : "Digita o cambia Anno"}
                 />
               </div>
             </div>
@@ -170,8 +172,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               <button
                 onClick={() => onChangeMonth(-1)}
                 className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-card)] text-[var(--text-main)] transition"
-                title="Mese precedente"
-                aria-label="Mese precedente"
+                title={settings.language === "en" ? "Previous month" : "Mese precedente"}
+                aria-label={settings.language === "en" ? "Previous month" : "Mese precedente"}
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -181,8 +183,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               <button
                 onClick={() => onChangeMonth(1)}
                 className="p-1.5 sm:p-2 rounded-lg hover:bg-[var(--bg-card)] text-[var(--text-main)] transition"
-                title="Mese successivo"
-                aria-label="Mese successivo"
+                title={settings.language === "en" ? "Next month" : "Mese successivo"}
+                aria-label={settings.language === "en" ? "Next month" : "Mese successivo"}
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -199,10 +201,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   ? 'bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-500/30'
                   : 'bg-[var(--bg-subtle)] hover:bg-[var(--bg-card)] text-[var(--text-main)] border border-[var(--border-color)]'
               }`}
-              title="Vai alla data di oggi (Mese e Giorno corrente)"
+              title={settings.language === "en" ? "Go to today's date (Current Month and Day)" : "Vai alla data di oggi (Mese e Giorno corrente)"}
             >
               <RotateCcw className="w-3.5 h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">Oggi</span>
+              <span className="whitespace-nowrap">{settings.language === 'en' ? 'Today' : 'Oggi'}</span>
             </button>
           </div>
         </div>
@@ -215,10 +217,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           >
             <div className="flex items-center gap-1.5 font-semibold text-[var(--text-main)]">
               <Info className="w-3.5 h-3.5 text-blue-500" />
-              <span>Legenda Grafica</span>
+              <span>{settings.language === 'en' ? 'Graphic Legend' : 'Legenda Grafica'}</span>
             </div>
             <div className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
-              <span>{isLegendOpen ? 'Nascondi' : 'Espandi'}</span>
+              <span>{isLegendOpen ? (settings.language === 'en' ? 'Hide' : 'Nascondi') : (settings.language === 'en' ? 'Expand' : 'Espandi')}</span>
               {isLegendOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </div>
           </button>
@@ -227,31 +229,31 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-3 bg-[var(--bg-subtle)] rounded-xl border border-[var(--border-color)] text-[11px] text-[var(--text-muted)] animate-in fade-in duration-150">
               <div className="flex items-center gap-2">
                 <span className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 font-black text-[9px] flex items-center justify-center shrink-0">19</span>
-                <span>Badge Dorato = Giorno Corrente (Oggi)</span>
+                <span>{settings.language === "en" ? "Golden Badge = Current Day (Today)" : "Badge Dorato = Giorno Corrente (Oggi)"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded border-2 border-red-500 bg-transparent shrink-0"></span>
-                <span>Bordo Rosso = Puntuale scaduto</span>
+                <span>{settings.language === "en" ? "Red Border = Expired one-time" : "Bordo Rosso = Puntuale scaduto"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded border-2 border-amber-500 bg-transparent shrink-0"></span>
-                <span>Bordo Arancio = Puntuale oggi</span>
+                <span>{settings.language === "en" ? "Orange Border = One-time today" : "Bordo Arancio = Puntuale oggi"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded border-2 border-fuchsia-500 bg-transparent shrink-0"></span>
-                <span>Bordo Magenta = Puntuale futuro</span>
+                <span>{settings.language === "en" ? "Magenta Border = Future one-time" : "Bordo Magenta = Puntuale futuro"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></span>
-                <span>Pallino Blu = Ricorrente oggi</span>
+                <span>{settings.language === "en" ? "Blue Dot = Recurring today" : "Pallino Blu = Ricorrente oggi"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[var(--text-muted)] shrink-0"></span>
-                <span>Pallino Grigio = Ricorrente passato</span>
+                <span>{settings.language === "en" ? "Gray Dot = Past recurring" : "Pallino Grigio = Ricorrente passato"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
-                <span>Pallino Verde = Ricorrente futuro</span>
+                <span>{settings.language === "en" ? "Green Dot = Future recurring" : "Pallino Verde = Ricorrente futuro"}</span>
               </div>
             </div>
           )}
@@ -308,7 +310,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     ? 'bg-blue-500/15 ring-2 ring-blue-500 font-bold'
                     : 'bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)]'
                 } ${analysis.isToday ? 'ring-2 ring-amber-500/90 bg-amber-500/10 shadow-xs' : ''}`}
-                title={analysis.isToday ? `Giorno Corrente: ${dayNum} (Oggi)` : `Giorno ${dayNum}`}
+                title={analysis.isToday ? settings.language === 'en' ? `Current Day: ${dayNum} (Today)` : `Giorno Corrente: ${dayNum} (Oggi)` : settings.language === 'en' ? `Day ${dayNum}` : `Giorno ${dayNum}`}
               >
                 {/* Top: Day number (Circular solid gold badge for Today) + Subtle Today Dot Indicator */}
                 <div className="flex items-center justify-between">
@@ -332,7 +334,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   {analysis.isToday && (
                     <span 
                       className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500 shrink-0" 
-                      title="Giorno Odierno"
+                      title={settings.language === "en" ? "Today" : "Giorno Odierno"}
                     />
                   )}
                 </div>
@@ -352,10 +354,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         }`}
                         title={
                           analysis.isToday
-                            ? 'Memo ricorrente oggi (Pallino Blu)'
+                            ? (settings.language === 'en' ? 'Recurring memo today (Blue Dot)' : 'Memo ricorrente oggi (Pallino Blu)')
                             : analysis.recurringExpired
-                              ? 'Memo ricorrente passato (Pallino Grigio)'
-                              : 'Memo ricorrente futuro (Pallino Verde)'
+                              ? (settings.language === 'en' ? 'Past recurring memo (Gray Dot)' : 'Memo ricorrente passato (Pallino Grigio)')
+                              : (settings.language === 'en' ? 'Future recurring memo (Green Dot)' : 'Memo ricorrente futuro (Pallino Verde)')
                         }
                       />
                     )}
@@ -383,10 +385,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             </div>
             <div>
               <h3 className="text-sm sm:text-base font-bold text-[var(--text-main)]">
-                Memo del {selectedDay} {monthNames[currentMonth]} {currentYear}
+                {settings.language === "en" ? "Memos for" : "Memo del"} {selectedDay} {monthNames[currentMonth]} {currentYear}
               </h3>
               <p className="text-[11px] sm:text-xs text-[var(--text-muted)]">
-                {selectedDayMemos.length} memo archiviati per questa data
+                {selectedDayMemos.length} {settings.language === "en" ? "memos archived for this date" : "memo archiviati per questa data"}
               </p>
             </div>
           </div>
@@ -403,7 +405,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               const isExpired = isPunctual && memo.expirationDate < todayStr;
               const isTodayMemo = memo.expirationDate === todayStr;
               const isExpanded = expandedMemoIds.has(memo.id);
-              const recurrenceLabel = REPEAT_LABELS_IT[memo.repeatType] || memo.repeatType;
+              const recurrenceLabel = settings.language === 'en' ? (REPEAT_LABELS_EN[memo.repeatType] || memo.repeatType) : (REPEAT_LABELS_IT[memo.repeatType] || memo.repeatType);
 
               return (
                 <div
@@ -443,7 +445,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {memo.obfuscation === 'partial' && (
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 shrink-0 flex items-center gap-1">
                           <Shield className="w-2.5 h-2.5" />
-                          <span>Strato 1: Parziale</span>
+                          <span>{settings.language === "en" ? "Layer 1: Partial" : "Strato 1: Parziale"}</span>
                         </span>
                       )}
 
@@ -451,7 +453,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {memo.obfuscation === 'full' && (
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-orange-500/15 border border-orange-500/30 text-orange-600 dark:text-orange-400 shrink-0 flex items-center gap-1">
                           <Shield className="w-2.5 h-2.5" />
-                          <span>Strato 2: Totale</span>
+                          <span>{settings.language === "en" ? "Layer 2: Total" : "Strato 2: Totale"}</span>
                         </span>
                       )}
 
@@ -459,7 +461,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {memo.isEncrypted && (
                         <span className="text-[9px] font-bold font-mono px-1.5 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-600 dark:text-purple-400 shrink-0 flex items-center gap-1">
                           <Lock className="w-2.5 h-2.5" />
-                          <span>Strato 3: AES-256</span>
+                          <span>{settings.language === "en" ? "Layer 3: AES-256" : "Strato 3: AES-256"}</span>
                         </span>
                       )}
 
@@ -476,7 +478,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       </span>
                       <button
                         type="button"
-                        aria-label={isExpanded ? 'Comprimi' : 'Espandi'}
+                        aria-label={isExpanded ? (settings.language === 'en' ? 'Collapse' : 'Comprimi') : (settings.language === 'en' ? 'Expand' : 'Espandi')}
                         className="p-1 text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -515,10 +517,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                     toggleRevealMemo(memo.id);
                                   }}
                                   className="px-2 py-1 rounded bg-slate-300/80 dark:bg-slate-700 hover:bg-slate-400/50 text-slate-800 dark:text-slate-200 transition text-[10px] flex items-center gap-1 shadow-xs font-sans font-semibold shrink-0 cursor-pointer"
-                                  title="Svela temporaneamente testo"
+                                  title={settings.language === "en" ? "Temporarily reveal text" : "Svela temporaneamente testo"}
                                 >
                                   <Eye className="w-3 h-3 text-blue-500" />
-                                  <span>Svela</span>
+                                  <span>{settings.language === "en" ? "Reveal" : "Svela"}</span>
                                 </button>
                               </div>
                             ) : (
@@ -535,17 +537,17 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                                       toggleRevealMemo(memo.id);
                                     }}
                                     className="absolute top-2 right-2 p-1 rounded bg-[var(--bg-subtle)] border border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition text-[10px] flex items-center gap-1 shadow-xs"
-                                    title="Offusca nuovamente"
+                                    title={settings.language === "en" ? "Obfuscate again" : "Offusca nuovamente"}
                                   >
                                     <EyeOff className="w-3 h-3 text-amber-500" />
-                                    <span className="font-mono text-[9px]">Offusca</span>
+                                    <span className="font-mono text-[9px]">{settings.language === "en" ? "Obfuscate" : "Offusca"}</span>
                                   </button>
                                 )}
                               </div>
                             )}
                           </div>
                         ) : (
-                          <p className="text-xs text-[var(--text-muted)] italic">Nessuna descrizione o nota aggiuntiva.</p>
+                          <p className="text-xs text-[var(--text-muted)] italic">{settings.language === "en" ? "No description or additional note." : "Nessuna descrizione o nota aggiuntiva."}</p>
                         )}
 
                         <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[var(--border-color)]/40">
@@ -559,7 +561,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           <button
                             onClick={(e) => { e.stopPropagation(); onExportMemo(memo); }}
                             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-emerald-600 hover:bg-emerald-500/10 transition"
-                            title="Esporta singolo memo"
+                            title={settings.language === "en" ? "Export single memo" : "Esporta singolo memo"}
                           >
                             <Download className="w-4 h-4" />
                           </button>
@@ -567,7 +569,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           <button
                             onClick={(e) => { e.stopPropagation(); onPrintMemo(memo); }}
                             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
-                            title="Genera & Esporta Documento PDF"
+                            title={settings.language === "en" ? "Generate & Export PDF Document" : "Genera & Esporta Documento PDF"}
                           >
                             <FileText className="w-4 h-4 text-blue-500" />
                           </button>
@@ -575,7 +577,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           <button
                             onClick={(e) => { e.stopPropagation(); onEditMemo(memo); }}
                             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
-                            title="Modifica memo"
+                            title={settings.language === "en" ? "Edit memo" : "Modifica memo"}
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
@@ -583,7 +585,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           <button
                             onClick={(e) => { e.stopPropagation(); onDeleteMemo(memo.id); }}
                             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-red-600 hover:bg-red-500/10 transition"
-                            title="Elimina memo"
+                            title={settings.language === "en" ? "Delete memo" : "Elimina memo"}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { Trash2, AlertTriangle, X, Check, Calendar, Hash, Tag, Clock, Repeat } from 'lucide-react';
 import { NotulaCore } from '../utils/notulaCore';
 
@@ -20,6 +21,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
   core,
   onMemosChanged,
 }) => {
+  const { settings } = useSettings();
   const [selectedMethod, setSelectedMethod] = useState<number>(1);
   const [yearVal, setYearVal] = useState<string>(String(new Date().getFullYear()));
   const [monthVal, setMonthVal] = useState<string>(String(new Date().getMonth() + 1).padStart(2, '0'));
@@ -62,7 +64,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
           deleted = core.removeByMonthAndDayEternal(monthVal, dayVal);
           break;
         case 8:
-          if (confirm("Sei assolutamente sicuro di voler cancellare TUTTI i memo archiviati?")) {
+          if (confirm((settings.language === 'en' ? 'Are you absolutely sure you want to delete ALL stored memos?' : 'Sei assolutamente sicuro di voler cancellare TUTTI i memo archiviati?'))) {
             deleted = core.removeAll();
           } else {
             return;
@@ -97,8 +99,8 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               <Trash2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-lg text-[var(--text-main)]">Elimina Memo (GEM 1-9)</h2>
-              <p className="text-xs text-[var(--text-muted)]">Seleziona una delle 9 modalità di rimozione memo</p>
+              <h2 className="font-bold text-lg text-[var(--text-main)]">{settings.language === 'en' ? 'Delete Memo (GEM 1-9)' : 'Elimina Memo (GEM 1-9)'}</h2>
+              <p className="text-xs text-[var(--text-muted)]">{settings.language === 'en' ? 'Select one of the 9 memo removal modes' : 'Seleziona una delle 9 modalità di rimozione memo'}</p>
             </div>
           </div>
           <button
@@ -121,7 +123,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <Calendar className="w-4 h-4 shrink-0" />
-              <span>1. Per anno (puntuali / non ricorrenti)</span>
+              <span>{settings.language === "en" ? "1. By year (one-time / non-recurring)" : "1. Per anno (puntuali / non ricorrenti)"}</span>
             </button>
 
             <button
@@ -133,7 +135,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <Calendar className="w-4 h-4 shrink-0" />
-              <span>2. Per anno e mese (puntuali)</span>
+              <span>{settings.language === "en" ? "2. By year and month (one-time)" : "2. Per anno e mese (puntuali)"}</span>
             </button>
 
             <button
@@ -145,7 +147,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <Calendar className="w-4 h-4 shrink-0" />
-              <span>3. Per anno, mese e giorno (puntuali)</span>
+              <span>{settings.language === "en" ? "3. By year, month, and day (one-time)" : "3. Per anno, mese e giorno (puntuali)"}</span>
             </button>
 
             <button
@@ -157,7 +159,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <Tag className="w-4 h-4 shrink-0" />
-              <span>4. Per titolo</span>
+              <span>{settings.language === "en" ? "4. By title" : "4. Per titolo"}</span>
             </button>
 
             <button
@@ -169,7 +171,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <Clock className="w-4 h-4 shrink-0" />
-              <span>5. Rimuovi scaduti (puntuali)</span>
+              <span>{settings.language === "en" ? "5. Remove expired (one-time)" : "5. Rimuovi scaduti (puntuali)"}</span>
             </button>
 
             <button
@@ -181,7 +183,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <Repeat className="w-4 h-4 shrink-0" />
-              <span>6. Per mese (ricorrenti)</span>
+              <span>{settings.language === "en" ? "6. By month (recurring)" : "6. Per mese (ricorrenti)"}</span>
             </button>
 
             <button
@@ -193,7 +195,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <Repeat className="w-4 h-4 shrink-0" />
-              <span>7. Per mese e giorno (ricorrenti)</span>
+              <span>{settings.language === "en" ? "7. By month and day (recurring)" : "7. Per mese e giorno (ricorrenti)"}</span>
             </button>
 
             <button
@@ -205,7 +207,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span>8. TUTTI i memo (puntuali e ricorrenti)</span>
+              <span>{settings.language === 'en' ? '8. ALL memos (one-time and recurring)' : '8. TUTTI i memo (puntuali e ricorrenti)'}</span>
             </button>
 
             <button
@@ -217,24 +219,24 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               }`}
             >
               <Hash className="w-4 h-4 shrink-0" />
-              <span>9. Per IDs (singolo o separati da virgola)</span>
+              <span>{settings.language === "en" ? "9. By IDs (single or comma-separated)" : "9. Per IDs (singolo o separati da virgola)"}</span>
             </button>
           </div>
 
           {/* Form Parameters for Selected Method */}
           <div className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] space-y-3">
             <h4 className="font-semibold text-xs text-[var(--text-main)] uppercase tracking-wider">
-              Parametri di Rimozione
+              {settings.language === "en" ? "Removal Parameters" : "Parametri di Rimozione"}
             </h4>
 
             {[1, 2, 3].includes(selectedMethod) && (
               <div>
-                <label className="block text-xs text-[var(--text-muted)] mb-1">Anno:</label>
+                <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Year:" : "Anno:"}</label>
                 <input
                   type="number"
                   value={yearVal}
                   onChange={(e) => setYearVal(e.target.value)}
-                  placeholder="Es. 2026"
+                  placeholder={settings.language === "en" ? "E.g. 2026" : "Es. 2026"}
                   className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-sm font-mono text-[var(--text-main)]"
                 />
               </div>
@@ -242,7 +244,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
 
             {[2, 3, 6, 7].includes(selectedMethod) && (
               <div>
-                <label className="block text-xs text-[var(--text-muted)] mb-1">Mese (01 - 12):</label>
+                <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Month (01 - 12):" : "Mese (01 - 12):"}</label>
                 <select
                   value={monthVal}
                   onChange={(e) => setMonthVal(e.target.value)}
@@ -262,7 +264,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
 
             {[3, 7].includes(selectedMethod) && (
               <div>
-                <label className="block text-xs text-[var(--text-muted)] mb-1">Giorno (01 - 31):</label>
+                <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Day (01 - 31):" : "Giorno (01 - 31):"}</label>
                 <input
                   type="number"
                   min={1}
@@ -276,12 +278,12 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
 
             {selectedMethod === 4 && (
               <div>
-                <label className="block text-xs text-[var(--text-muted)] mb-1">Titolo esatto da cancellare:</label>
+                <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Exact title to delete:" : "Titolo esatto da cancellare:"}</label>
                 <input
                   type="text"
                   value={titleVal}
                   onChange={(e) => setTitleVal(e.target.value)}
-                  placeholder="Titolo del memo..."
+                  placeholder={settings.language === "en" ? "Memo title..." : "Titolo del memo..."}
                   className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-main)]"
                 />
               </div>
@@ -301,12 +303,12 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
 
             {selectedMethod === 9 && (
               <div>
-                <label className="block text-xs text-[var(--text-muted)] mb-1">ID Memo (separati da virgola se multipli):</label>
+                <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Memo IDs (comma-separated if multiple):" : "ID Memo (separati da virgola se multipli):"}</label>
                 <input
                   type="text"
                   value={idVal}
                   onChange={(e) => setIdVal(e.target.value)}
-                  placeholder="Es: n_1724000000-12, n_1724000000-34"
+                  placeholder={settings.language === "en" ? "E.g. n_1724000000-12, n_1724000000-34" : "Es: n_1724000000-12, n_1724000000-34"}
                   className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-sm font-mono text-[var(--text-main)]"
                 />
               </div>
@@ -328,7 +330,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
           >
-            Annulla / Chiudi
+            {settings.language === "en" ? "Cancel / Close" : "Annulla / Chiudi"}
           </button>
 
           <button
@@ -336,7 +338,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
             className="px-5 py-2.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md transition flex items-center gap-2"
           >
             <Trash2 className="w-4 h-4" />
-            <span>Esegui Eliminazione</span>
+            <span>{settings.language === 'en' ? 'Execute Deletion' : 'Esegui Eliminazione'}</span>
           </button>
         </div>
       </div>

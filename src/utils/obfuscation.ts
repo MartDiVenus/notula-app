@@ -28,7 +28,7 @@ export function getObfuscatedDisplay(
   isRevealed: boolean = false
 ): { displayText: string; isMasked: boolean; levelLabel: string } {
   if (!text) {
-    return { displayText: '', isMasked: false, levelLabel: 'Nessuno' };
+    return { displayText: '', isMasked: false, levelLabel: 'None' };
   }
 
   // If user explicitly revealed this specific item or privacy mode is off and level is none
@@ -36,7 +36,7 @@ export function getObfuscatedDisplay(
     return {
       displayText: text,
       isMasked: false,
-      levelLabel: level === 'full' ? 'Totale (Svelato)' : level === 'partial' ? 'Parziale (Svelato)' : 'In chiaro',
+      levelLabel: level === 'full' ? 'Total (Revealed)' : level === 'partial' ? 'Partial (Revealed)' : 'Clear',
     };
   }
 
@@ -45,7 +45,7 @@ export function getObfuscatedDisplay(
     return {
       displayText: maskFullText(text),
       isMasked: true,
-      levelLabel: 'Offuscamento Totale (Strato 2)',
+      levelLabel: 'Total Obfuscation (Layer 2)',
     };
   }
 
@@ -54,7 +54,7 @@ export function getObfuscatedDisplay(
     return {
       displayText: maskPartialText(text),
       isMasked: true,
-      levelLabel: 'Offuscamento Parziale (Strato 1)',
+      levelLabel: 'Partial Obfuscation (Layer 1)',
     };
   }
 
@@ -63,10 +63,10 @@ export function getObfuscatedDisplay(
     return {
       displayText: maskPartialText(text),
       isMasked: true,
-      levelLabel: 'Privacy a Schermo Attiva',
+      levelLabel: 'Screen Privacy Active',
     };
   }
 
-  return { displayText: text, isMasked: false, levelLabel: 'In chiaro' };
+  return { displayText: text, isMasked: false, levelLabel: 'Clear' };
 }
 

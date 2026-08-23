@@ -4,7 +4,8 @@
  */
 
 import React, { useEffect } from 'react';
-import { MemoItem, ConflictResolutionOption, REPEAT_LABELS_IT } from '../types';
+import { useSettings } from '../contexts/SettingsContext';
+import { MemoItem, ConflictResolutionOption, REPEAT_LABELS_IT, REPEAT_LABELS_EN } from '../types';
 import { AlertTriangle, Check, RefreshCw, X, Copy, Shield, Lock, Calendar, FileText } from 'lucide-react';
 
 interface ConflictModalProps {
@@ -20,6 +21,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
   remainingConflicts,
   onResolve,
 }) => {
+  const { settings } = useSettings();
   // Keyboard shortcut listener for fast resolution (Y/A/I/M)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -59,10 +61,9 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
             </div>
             <div>
               <h3 className="font-extrabold text-base sm:text-lg text-[var(--text-main)] flex items-center gap-2">
-                <span>Risoluzione Conflitto di Sincronizzazione</span>
+                <span>{settings.language === "en" ? "Synchronization Conflict Resolution" : "Risoluzione Conflitto di Sincronizzazione"}</span>
               </h3>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                ID Memo in conflitto: <code className="font-mono bg-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded font-bold text-[var(--text-main)]">{incomingMemo.id}</code>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">{settings.language === "en" ? "Conflicting Memo ID:" : "ID Memo in conflitto:"}<code className="font-mono bg-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded font-bold text-[var(--text-main)]">{incomingMemo.id}</code>
               </p>
             </div>
           </div>
@@ -106,22 +107,22 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
 
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border-color)]/60 text-[11px]">
                   <div>
-                    <span className="text-[var(--text-muted)] block text-[10px]">Data Scadenza:</span>
+                    <span className="text-[var(--text-muted)] block text-[10px]">{settings.language === "en" ? "Expiration Date:" : "Data Scadenza:"}</span>
                     <span className={`font-mono font-bold ${isDateDiff ? 'text-amber-500' : 'text-[var(--text-main)]'}`}>
                       {existingMemo.expirationDate}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[var(--text-muted)] block text-[10px]">Ricorrenza:</span>
+                    <span className="text-[var(--text-muted)] block text-[10px]">{settings.language === "en" ? "Recurrence:" : "Ricorrenza:"}</span>
                     <span className="font-semibold text-[var(--text-main)]">
-                      {existingMemo.repeatType === 'none' ? 'Puntuale' : REPEAT_LABELS_IT[existingMemo.repeatType] || existingMemo.repeatType}
+                      {existingMemo.repeatType === 'none' ? 'Puntuale' : settings.language === 'en' ? REPEAT_LABELS_EN[existingMemo.repeatType] : REPEAT_LABELS_IT[existingMemo.repeatType] || existingMemo.repeatType}
                     </span>
                   </div>
                 </div>
 
                 <div className="pt-2 border-t border-[var(--border-color)]/60">
                   <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] mb-1">
-                    <span>Descrizione:</span>
+                    <span>{settings.language === "en" ? "Description:" : "Descrizione:"}</span>
                     <div className="flex items-center gap-1">
                       {existingMemo.isEncrypted && (
                         <span className="px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 font-mono text-[9px] font-bold">
@@ -136,7 +137,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                     </div>
                   </div>
                   <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] text-xs text-[var(--text-main)] whitespace-pre-wrap max-h-28 overflow-y-auto font-sans">
-                    {existingMemo.description || <span className="italic text-[var(--text-muted)]">Nessuna descrizione</span>}
+                    {existingMemo.description || <span className="italic text-[var(--text-muted)]">{settings.language === 'en' ? 'No description' : 'Nessuna descrizione'}</span>}
                   </div>
                 </div>
               </div>
@@ -166,22 +167,22 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
 
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border-color)]/60 text-[11px]">
                   <div>
-                    <span className="text-[var(--text-muted)] block text-[10px]">Data Scadenza:</span>
+                    <span className="text-[var(--text-muted)] block text-[10px]">{settings.language === "en" ? "Expiration Date:" : "Data Scadenza:"}</span>
                     <span className={`font-mono font-bold ${isDateDiff ? 'text-amber-500 underline' : 'text-[var(--text-main)]'}`}>
                       {incomingMemo.expirationDate}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[var(--text-muted)] block text-[10px]">Ricorrenza:</span>
+                    <span className="text-[var(--text-muted)] block text-[10px]">{settings.language === "en" ? "Recurrence:" : "Ricorrenza:"}</span>
                     <span className="font-semibold text-[var(--text-main)]">
-                      {incomingMemo.repeatType === 'none' ? 'Puntuale' : REPEAT_LABELS_IT[incomingMemo.repeatType] || incomingMemo.repeatType}
+                      {incomingMemo.repeatType === 'none' ? 'Puntuale' : settings.language === 'en' ? REPEAT_LABELS_EN[incomingMemo.repeatType] : REPEAT_LABELS_IT[incomingMemo.repeatType] || incomingMemo.repeatType}
                     </span>
                   </div>
                 </div>
 
                 <div className="pt-2 border-t border-[var(--border-color)]/60">
                   <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] mb-1">
-                    <span>Descrizione:</span>
+                    <span>{settings.language === "en" ? "Description:" : "Descrizione:"}</span>
                     <div className="flex items-center gap-1">
                       {incomingMemo.isEncrypted && (
                         <span className="px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-600 dark:text-purple-400 font-mono text-[9px] font-bold">
@@ -196,7 +197,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                     </div>
                   </div>
                   <div className={`p-2.5 rounded-lg bg-[var(--bg-card)] border ${isDescDiff ? 'border-amber-500/40 bg-amber-500/5' : 'border-[var(--border-color)]'} text-xs text-[var(--text-main)] whitespace-pre-wrap max-h-28 overflow-y-auto font-sans`}>
-                    {incomingMemo.description || <span className="italic text-[var(--text-muted)]">Nessuna descrizione</span>}
+                    {incomingMemo.description || <span className="italic text-[var(--text-muted)]">{settings.language === 'en' ? 'No description' : 'Nessuna descrizione'}</span>}
                   </div>
                 </div>
               </div>
@@ -214,10 +215,10 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
               type="button"
               onClick={() => onResolve('yes')}
               className="flex items-center justify-center gap-2 px-3.5 py-2.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white shadow-md transition"
-              title="Sovrascrive la versione locale con questa versione in arrivo [Tasto Y]"
+              title={settings.language === "en" ? "Overwrite local version with this incoming version [Key Y]" : "Sovrascrive la versione locale con questa versione in arrivo [Tasto Y]"}
             >
               <Check className="w-4 h-4 shrink-0" />
-              <span>(Y) Sostituisci</span>
+              <span>{settings.language === "en" ? "(Y) Replace" : "(Y) Sostituisci"}</span>
             </button>
 
             {/* 2. Sostituisci Tutti (A) */}
@@ -225,10 +226,10 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
               type="button"
               onClick={() => onResolve('all')}
               className="flex items-center justify-center gap-2 px-3.5 py-2.5 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-700 active:scale-95 text-white shadow-md transition"
-              title="Accetta tutte le modifiche in arrivo per tutti i conflitti [Tasto A]"
+              title={settings.language === "en" ? "Accept all incoming changes for all conflicts [Key A]" : "Accetta tutte le modifiche in arrivo per tutti i conflitti [Tasto A]"}
             >
               <RefreshCw className="w-4 h-4 shrink-0" />
-              <span>(A) Sostituisci Tutti</span>
+              <span>{settings.language === "en" ? "(A) Replace All" : "(A) Sostituisci Tutti"}</span>
             </button>
 
             {/* 3. Ignora / Mantieni Locale (I) */}
@@ -236,10 +237,10 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
               type="button"
               onClick={() => onResolve('ignore')}
               className="flex items-center justify-center gap-2 px-3.5 py-2.5 text-xs font-bold rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-main)] border border-[var(--border-color)] active:scale-95 transition"
-              title="Conserva la versione locale e ignora questa in arrivo [Tasto I / Esc]"
+              title={settings.language === "en" ? "Keep local version and ignore this incoming one [Key I / Esc]" : "Conserva la versione locale e ignora questa in arrivo [Tasto I / Esc]"}
             >
               <X className="w-4 h-4 text-red-500 shrink-0" />
-              <span>(I) Ignora</span>
+              <span>{settings.language === "en" ? "(I) Ignore" : "(I) Ignora"}</span>
             </button>
 
             {/* 4. Tieni Entrambi (M) */}
@@ -247,10 +248,10 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
               type="button"
               onClick={() => onResolve('merge')}
               className="flex items-center justify-center gap-2 px-3.5 py-2.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-md transition"
-              title="Conserva la versione locale e importa la nuova come copia con nuovo ID [Tasto M]"
+              title={settings.language === "en" ? "Keep local version and import the new one as a copy with new ID [Key M]" : "Conserva la versione locale e importa la nuova come copia con nuovo ID [Tasto M]"}
             >
               <Copy className="w-4 h-4 shrink-0" />
-              <span>(M) Tieni Entrambi</span>
+              <span>{settings.language === "en" ? "(M) Keep Both" : "(M) Tieni Entrambi"}</span>
             </button>
 
           </div>

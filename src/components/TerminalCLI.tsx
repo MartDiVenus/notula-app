@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { NotulaCore } from '../utils/notulaCore';
 import { MemoItem, RepeatType, ObfuscationLevel } from '../types';
 import { exportSingleMemo, exportAllMemos, parseJSONMemos, parseXMLMemos, generateMemoPDF } from '../utils/exportImport';
@@ -39,6 +40,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
   onDownloadDrive,
   onChangeTheme,
 }) => {
+  const { settings } = useSettings();
   const [windowState, setWindowState] = useState<'docked' | 'fullscreen' | 'half'>('docked');
   const [history, setHistory] = useState<string[]>([]);
   const [historyIdx, setHistoryIdx] = useState<number>(-1);
@@ -46,11 +48,11 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
   const [isManualOpen, setIsManualOpen] = useState<boolean>(false);
   const [outputLines, setOutputLines] = useState<string[]>([
     "══════════════════════════════════════════════════════════════════════════════",
-    "  NOTULA™ CLI v2.2 • INTERPRETE COMANDI INGEGNERISTICO",
-    "  Ideazione & Sviluppo: Ing. Mario Fantini • https://mariofantini.eu",
+    settings.language === 'en' ? "  NOTULA™ CLI v2.2 • ENGINEERING COMMAND INTERPRETER" : "  NOTULA™ CLI v2.2 • INTERPRETE COMANDI INGEGNERISTICO",
+    settings.language === 'en' ? "  Conception & Development: Ing. Mario Fantini • https://mariofantini.eu" : "  Ideazione & Sviluppo: Ing. Mario Fantini • https://mariofantini.eu",
     "══════════════════════════════════════════════════════════════════════════════",
-    "💡 Digita 'help' per consultare la guida o 'man' per aprire il Manuale Ufficiale.",
-    "   Comandi: add, edit, export (json/xml/md/ics/pdf/txt), import, pdf, ls, rm, man.",
+    settings.language === 'en' ? "💡 Type 'help' to consult the guide or 'man' to open the Official Manual." : "💡 Digita 'help' per consultare la guida o 'man' per aprire il Manuale Ufficiale.",
+    settings.language === 'en' ? "   Commands: add, edit, export (json/xml/md/ics/pdf/txt), import, pdf, ls, rm, man." : "   Comandi: add, edit, export (json/xml/md/ics/pdf/txt), import, pdf, ls, rm, man.",
   ]);
 
   const outputContainerRef = useRef<HTMLDivElement>(null);
@@ -125,7 +127,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
     const action = args[0]?.toLowerCase();
 
     if (!action) {
-      log("Digita 'help' per visualizzare tutti i comandi disponibili.");
+      log(settings.language === "en" ? "Type 'help' to see all available commands." : "Digita 'help' per visualizzare tutti i comandi disponibili.");
       return;
     }
 
@@ -141,47 +143,47 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
 
     if (action === 'fullscreen' || action === 'max') {
       setWindowState('fullscreen');
-      log("Terminale impostato a schermo intero.");
+      log(settings.language === "en" ? "Terminal set to full screen." : "Terminale impostato a schermo intero.");
       return;
     }
 
     if (action === 'restore' || action === 'dock' || action === 'min') {
       setWindowState('docked');
-      log("Terminale ripristinato in finestra standard.");
+      log(settings.language === "en" ? "Terminal restored to standard window." : "Terminale ripristinato in finestra standard.");
       return;
     }
 
     if (action === 'man' || action === 'manual' || action === 'doc') {
       setIsManualOpen(true);
-      log("📖 Apertura del Manuale Ufficiale NOTULA™ CLI v2.2 (Edizione Ingegneristica)...");
+      log(settings.language === "en" ? "📖 Opening Official NOTULA™ CLI v2.2 Manual (Engineering Edition)..." : "📖 Apertura del Manuale Ufficiale NOTULA™ CLI v2.2 (Edizione Ingegneristica)...");
       return;
     }
 
     if (action === 'help' || action === '--help' || action === '-h') {
       log("─────────────────────────────────────────────────────────────────────────");
-      log("  GUIDA COMPLETA COMANDI NOTULA™ CLI (Ing. Mario Fantini)");
+      log(settings.language === "en" ? "  NOTULA™ CLI COMPLETE COMMAND GUIDE (Ing. Mario Fantini)" : "  GUIDA COMPLETA COMANDI NOTULA™ CLI (Ing. Mario Fantini)");
       log("─────────────────────────────────────────────────────────────────────────");
-      log("1. CREAZIONE MEMO:");
+      log(settings.language === "en" ? "1. MEMO CREATION:" : "1. CREAZIONE MEMO:");
       log("   add --title \"<titolo>\" --date YYYY-MM-DD [--desc \"...\"] [--repeat <giorni>] [--obfuscate none|partial|full] [--encrypt]");
       log("   • Default (memo puntuale singolo): add --title \"Revisione\" --date 2026-09-01");
       log("   • Ricorrente (ripetizione per N giorni): add --title \"Revisione\" --date 2026-09-01 --repeat 10");
       log("   • Esempio cifrato: add --title \"Udienza Tribunale\" --date 2026-09-15 --desc \"Fascicolo 401\" --encrypt");
       log("");
-      log("2. MODIFICA & AGGIORNAMENTO (edit):");
+      log(settings.language === "en" ? "2. EDIT & UPDATE (edit):" : "2. MODIFICA & AGGIORNAMENTO (edit):");
       log("   edit --id <id> [--title \"...\"] [--date YYYY-MM-DD] [--desc \"...\"] [--repeat ...] [--obfuscate ...] [--encrypt / --no-encrypt]");
       log("   Esempio: edit --id n_123 --title \"Udienza Rinviata\" --date 2026-10-02");
-      log("   (Nota: la modifica sincronizza AUTOMATICAMENTE tutti i memo collegati dallo stesso groupID!)");
+      log(settings.language === "en" ? "   (Note: editing AUTOMATICALLY syncs all memos linked by the same groupID!)" : "   (Nota: la modifica sincronizza AUTOMATICAMENTE tutti i memo collegati dallo stesso groupID!)");
       log("");
-      log("3. ESPORTAZIONE MULTIFORMATO (export):");
-      log("   export --id <id> --format json|xml|md|ics|pdf|txt   -> Esporta singolo memo nel formato indicato");
-      log("   export --all --format json|xml|md|ics|txt           -> Esporta l'intero archivio nel formato indicato");
-      log("   export --year YYYY --format ics                     -> Esporta il calendario per Google™ Calendar / Outlook");
-      log("   pdf --id <id>                                       -> Scorciatoia per generare e scaricare subito il PDF A4");
+      log(settings.language === "en" ? "3. MULTIFORMAT EXPORT (export):" : "3. ESPORTAZIONE MULTIFORMATO (export):");
+      log(settings.language === "en" ? "   export --id <id> --format json|xml|md|ics|pdf|txt   -> Export single memo in the specified format" : "   export --id <id> --format json|xml|md|ics|pdf|txt   -> Esporta singolo memo nel formato indicato");
+      log(settings.language === "en" ? "   export --all --format json|xml|md|ics|txt           -> Export entire archive in the specified format" : "   export --all --format json|xml|md|ics|txt           -> Esporta l'intero archivio nel formato indicato");
+      log(settings.language === "en" ? "   export --year YYYY --format ics                     -> Export calendar for Google™ Calendar / Outlook" : "   export --year YYYY --format ics                     -> Esporta il calendario per Google™ Calendar / Outlook");
+      log(settings.language === "en" ? "   pdf --id <id>                                       -> Shortcut to generate and instantly download the A4 PDF" : "   pdf --id <id>                                       -> Scorciatoia per generare e scaricare subito il PDF A4");
       log("");
-      log("4. IMPORTAZIONE DATI (import):");
+      log(settings.language === "en" ? "4. DATA IMPORT (import):" : "4. IMPORTAZIONE DATI (import):");
       log("   import --json '[{\"title\":\"...\", \"expirationDate\":\"2026-09-01\"}]' -> Importa JSON da testo");
-      log("   import --xml '<notula><memos>...</memos></notula>'  -> Importa XML da testo");
-      log("   import                                             -> Apre il selettore file grafico per importare .json o .xml");
+      log(settings.language === "en" ? "   import --xml '<notula><memos>...</memos></notula>'  -> Import XML from text" : "   import --xml '<notula><memos>...</memos></notula>'  -> Importa XML da testo");
+      log(settings.language === "en" ? "   import                                             -> Opens graphic file selector to import .json or .xml" : "   import                                             -> Apre il selettore file grafico per importare .json o .xml");
       log("");
       log("5. ELENCO & FILTRO MEMO (ls):");
       log("   ls                                                  -> Mostra tutti i memo");
@@ -195,7 +197,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
       log("   find --title \"<testo>\"                              -> Cerca per titolo o descrizione");
       log("   find --date YYYY-MM-DD                              -> Cerca per data esatta");
       log("   find --id <id>                                      -> Cerca per ID univoco");
-      log("   info <id>                                           -> Scheda diagnostica completa con groupID e dettagli AES-256");
+      log(settings.language === "en" ? "   info <id>                                           -> Complete diagnostic card with groupID and AES-256 details" : "   info <id>                                           -> Scheda diagnostica completa con groupID e dettagli AES-256");
       log("");
       log("7. ELIMINAZIONE MEMO (rm):");
       log("   rm --id <id>                                        -> Rimuovi singolo memo per ID");
@@ -206,17 +208,17 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
       log("   rm --expired                                        -> Rimuovi tutti i memo scaduti");
       log("   rm --all                                            -> Rimuovi TUTTI i memo");
       log("");
-      log("8. SICUREZZA, PASSPHRASE & PRIVACY:");
-      log("   passwd <nuova_passphrase>                           -> Imposta o cambia la Master Passphrase AES-256");
-      log("   passwd clear                                        -> Rimuove la Master Passphrase (opera in chiaro)");
-      log("   privacy on|off                                      -> Attiva/disattiva offuscamento a video");
+      log(settings.language === "en" ? "8. SECURITY, PASSPHRASE & PRIVACY:" : "8. SICUREZZA, PASSPHRASE & PRIVACY:");
+      log(settings.language === "en" ? "   passwd <new_passphrase>                             -> Sets or changes the AES-256 Master Passphrase" : "   passwd <nuova_passphrase>                           -> Imposta o cambia la Master Passphrase AES-256");
+      log(settings.language === "en" ? "   passwd clear                                        -> Removes Master Passphrase (operates in clear text)" : "   passwd clear                                        -> Rimuove la Master Passphrase (opera in chiaro)");
+      log(settings.language === "en" ? "   privacy on|off                                      -> Activates/deactivates screen obfuscation" : "   privacy on|off                                      -> Attiva/disattiva offuscamento a video");
       log("");
-      log("9. GOOGLE™ DRIVE, TEMA & UTILITÀ:");
-      log("   sync                                                -> Avvia sincronizzazione da Google™ Drive");
-      log("   cloud-test                                          -> Esegue test diagnostico cartella Google™ Drive /Notula/");
-      log("   theme dark|light|system                             -> Cambia tema visivo");
-      log("   clear                                               -> Pulisce la schermata del terminale");
-      log("   exit                                                -> Chiude il terminale CLI");
+      log(settings.language === "en" ? "9. GOOGLE™ DRIVE, THEME & UTILITIES:" : "9. GOOGLE™ DRIVE, TEMA & UTILITÀ:");
+      log(settings.language === "en" ? "   sync                                                -> Start synchronization from Google™ Drive" : "   sync                                                -> Avvia sincronizzazione da Google™ Drive");
+      log(settings.language === "en" ? "   cloud-test                                          -> Runs diagnostic test on Google™ Drive folder /Notula/" : "   cloud-test                                          -> Esegue test diagnostico cartella Google™ Drive /Notula/");
+      log(settings.language === "en" ? "   theme dark|light|system                             -> Changes visual theme" : "   theme dark|light|system                             -> Cambia tema visivo");
+      log(settings.language === "en" ? "   clear                                               -> Clears terminal screen" : "   clear                                               -> Pulisce la schermata del terminale");
+      log(settings.language === "en" ? "   exit                                                -> Closes CLI terminal" : "   exit                                                -> Chiude il terminale CLI");
       log("─────────────────────────────────────────────────────────────────────────");
       return;
     }
@@ -667,10 +669,10 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
               type="button"
               onClick={() => setIsManualOpen(true)}
               className="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[11px] font-bold border border-emerald-500/40 transition flex items-center gap-1 cursor-pointer"
-              title="Apri Manuale Ufficiale CLI (LaTeX / Reference)"
+              title={settings.language === "en" ? "Open Official CLI Manual (LaTeX / Reference)" : "Apri Manuale Ufficiale CLI (LaTeX / Reference)"}
             >
               <BookOpen className="w-3 h-3" />
-              <span className="hidden sm:inline">Manuale CLI</span>
+              <span className="hidden sm:inline">{settings.language === "en" ? "CLI Manual" : "Manuale CLI"}</span>
             </button>
 
             <button
@@ -686,7 +688,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
               type="button"
               onClick={onClose}
               className="p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition cursor-pointer"
-              title="Chiudi terminale (Esc)"
+              title={settings.language === "en" ? "Close terminal (Esc)" : "Chiudi terminale (Esc)"}
             >
               <X className="w-4 h-4" />
             </button>
@@ -726,7 +728,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Digita comando (es. 'help', 'man', 'edit --id ...', 'export --all --format xml', 'pdf --id ...')..."
+            placeholder={settings.language === "en" ? "Type command (e.g. 'help', 'man', 'edit --id ...', 'export --all --format xml', 'pdf --id ...')..." : "Digita comando (es. 'help', 'man', 'edit --id ...', 'export --all --format xml', 'pdf --id ...')..."}
             className="flex-1 bg-transparent border-none outline-none text-white text-xs font-mono placeholder:text-gray-600 focus:ring-0"
             autoComplete="off"
             spellCheck="false"
@@ -735,7 +737,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
             type="submit"
             className="px-2.5 py-1 rounded bg-[#21262d] hover:bg-[#30363d] text-gray-300 hover:text-white text-[11px] transition flex items-center gap-1 font-bold cursor-pointer"
           >
-            <span>Invio</span>
+            <span>{settings.language === "en" ? "Enter" : "Invio"}</span>
             <CornerDownLeft className="w-3 h-3" />
           </button>
         </form>

@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { 
   Terminal, 
   X, 
@@ -38,6 +39,7 @@ interface CliManualModalProps {
 }
 
 export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose }) => {
+  const { settings } = useSettings();
   const [activeTab, setActiveTab] = useState<'reference' | 'latex'>('reference');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -101,7 +103,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
                 </span>
               </div>
               <p className="text-xs text-[var(--text-muted)]">
-                Specifica Ingegneristica &amp; Riferimento Sintattico dei Comandi Shell
+                {settings.language === "en" ? "Engineering Specification & Syntax Reference of Shell Commands" : "Specifica Ingegneristica & Riferimento Sintattico dei Comandi Shell"}
               </p>
             </div>
           </div>
@@ -109,26 +111,26 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadLatex}
-              title="Scarica Sorgente LaTeX (.tex)"
+              title={settings.language === "en" ? "Download LaTeX Source (.tex)" : "Scarica Sorgente LaTeX (.tex)"}
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-semibold text-[var(--text-main)] transition cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-blue-500" />
-              <span>Sorgente .tex</span>
+              <span>{settings.language === "en" ? ".tex Source" : "Sorgente .tex"}</span>
             </button>
 
             <button
               onClick={handlePrint}
-              title="Stampa / Salva in PDF"
+              title={settings.language === "en" ? "Print / Save as PDF" : "Stampa / Salva in PDF"}
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs font-semibold text-[var(--text-main)] transition cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5 text-amber-500" />
-              <span>Stampa / PDF</span>
+              <span>{settings.language === "en" ? "Print / PDF" : "Stampa / PDF"}</span>
             </button>
 
             <button
               onClick={onClose}
               className="p-2 rounded-xl hover:bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition cursor-pointer"
-              title="Chiudi Manuale"
+              title={settings.language === "en" ? "Close Manual" : "Chiudi Manuale"}
             >
               <X className="w-5 h-5" />
             </button>
@@ -147,7 +149,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Riferimento Comandi &amp; Sintassi</span>
+              <span>{settings.language === "en" ? "Command Reference & Syntax" : "Riferimento Comandi & Sintassi"}</span>
             </button>
 
             <button
@@ -159,7 +161,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
               }`}
             >
               <FileCode className="w-3.5 h-3.5" />
-              <span>Sorgente LaTeX Accademico (.tex)</span>
+              <span>{settings.language === "en" ? "Academic LaTeX Source (.tex)" : "Sorgente LaTeX Accademico (.tex)"}</span>
             </button>
           </div>
 
@@ -171,7 +173,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Cerca comando, flag o sintassi..."
+                  placeholder={settings.language === "en" ? "Search command, flag or syntax..." : "Cerca comando, flag o sintassi..."}
                   className="w-full pl-8 pr-3 py-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
                 />
               </div>
@@ -215,7 +217,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
               <div className="space-y-4">
                 {filteredCommands.length === 0 ? (
                   <div className="p-8 text-center bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl text-[var(--text-muted)] space-y-2">
-                    <p className="text-sm font-semibold">Nessun comando corrisponde ai criteri di ricerca.</p>
+                    <p className="text-sm font-semibold">{settings.language === "en" ? "No command matches the search criteria." : "Nessun comando corrisponde ai criteri di ricerca."}</p>
                     <button
                       onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
                       className="text-xs text-blue-500 hover:underline"
@@ -254,14 +256,14 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
                       {/* Syntax Box */}
                       <div className="space-y-1">
                         <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                          Sintassi Formale:
+                          {settings.language === "en" ? "Formal Syntax:" : "Sintassi Formale:"}
                         </div>
                         <div className="flex items-center justify-between bg-[#0d1117] text-gray-200 font-mono text-xs p-2.5 rounded-xl border border-[#30363d] overflow-x-auto">
                           <code className="text-cyan-300 select-all">{cmd.syntax}</code>
                           <button
                             onClick={() => handleCopy(cmd.syntax, `syntax-${cmd.name}`)}
                             className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition shrink-0 ml-2 cursor-pointer"
-                            title="Copia sintassi"
+                            title={settings.language === "en" ? "Copy syntax" : "Copia sintassi"}
                           >
                             {copiedCode === `syntax-${cmd.name}` ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                           </button>
@@ -272,7 +274,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
                       {cmd.options.length > 0 && (
                         <div className="space-y-1.5">
                           <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                            Parametri &amp; Opzioni:
+                            {settings.language === "en" ? "Parameters & Options:" : "Parametri & Opzioni:"}
                           </div>
                           <div className="grid grid-cols-1 gap-1.5">
                             {cmd.options.map((opt) => (
@@ -314,7 +316,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
                                 <button
                                   onClick={() => handleCopy(ex, `ex-${cmd.name}-${idx}`)}
                                   className="p-1 rounded hover:bg-gray-800 text-gray-400 hover:text-white transition shrink-0 ml-2 cursor-pointer"
-                                  title="Copia comando"
+                                  title={settings.language === "en" ? "Copy command" : "Copia comando"}
                                 >
                                   {copiedCode === `ex-${cmd.name}-${idx}` ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                                 </button>
@@ -329,7 +331,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
                         <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-[var(--text-muted)] space-y-1">
                           <div className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5" />
-                            <span>Nota Architetturale Ingegneristica:</span>
+                            <span>{settings.language === "en" ? "Engineering Architectural Note:" : "Nota Architetturale Ingegneristica:"}</span>
                           </div>
                           <p>{cmd.notes}</p>
                         </div>
@@ -347,10 +349,10 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
                 <div className="space-y-0.5">
                   <div className="font-bold text-sm text-[var(--text-main)] flex items-center gap-2">
                     <FileCode className="w-4 h-4 text-purple-500" />
-                    <span>Sorgente Formattato Ufficiale LaTeX (.tex)</span>
+                    <span>{settings.language === "en" ? "Official Formatted LaTeX Source (.tex)" : "Sorgente Formattato Ufficiale LaTeX (.tex)"}</span>
                   </div>
                   <p className="text-xs text-[var(--text-muted)]">
-                    Pronto per la compilazione con <code className="font-mono">pdflatex</code> o <code className="font-mono">xelatex</code> per generare il PDF accademico a stampa perfetta.
+                    {settings.language === "en" ? "Ready to compile with" : "Pronto per la compilazione con"} <code className="font-mono">pdflatex</code> o <code className="font-mono">xelatex</code> {settings.language === "en" ? "to generate the perfectly printed academic PDF." : "per generare il PDF accademico a stampa perfetta."}
                   </p>
                 </div>
 
@@ -368,7 +370,7 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
                     className="px-3.5 py-2 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-xs font-bold text-[var(--text-main)] transition flex items-center gap-1.5 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5 text-blue-500" />
-                    <span>Scarica .tex</span>
+                    <span>{settings.language === "en" ? "Download .tex" : "Scarica .tex"}</span>
                   </button>
                 </div>
               </div>

@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { 
   Info, 
   X, 
@@ -60,6 +61,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
   initialTab = 'info',
   onOpenCliManual,
 }) => {
+  const { settings } = useSettings();
   const [activeTab, setActiveTab] = useState<'info' | 'guide'>(initialTab);
   const [isCliManualOpen, setIsCliManualOpen] = useState<boolean>(false);
   const [guideSection, setGuideSection] = useState<
@@ -86,14 +88,14 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-sm sm:text-base text-[var(--text-main)]">
-                  Notula™ &bull; Centro Informazioni &amp; Guida Utente
+                  Notula™ • {settings.language === "en" ? "Information Center \& User Guide" : "Centro Informazioni \& Guida Utente"}
                 </span>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
                   v2.2 Enterprise
                 </span>
               </div>
               <p className="text-[11px] text-[var(--text-muted)]">
-                Ideazione, Sviluppo &amp; Proprietà Intellettuale &bull; <strong>Ing. Mario Fantini</strong>
+                {settings.language === "en" ? "Conception, Development \& Intellectual Property" : "Ideazione, Sviluppo \& Proprietà Intellettuale"} • <strong>Ing. Mario Fantini</strong>
               </p>
             </div>
           </div>
@@ -102,7 +104,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
             type="button"
             onClick={onClose}
             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-card)] transition cursor-pointer"
-            title="Chiudi (Esc)"
+            title={settings.language === "en" ? "Close (Esc)" : "Chiudi (Esc)"}
           >
             <X className="w-5 h-5" />
           </button>
@@ -120,7 +122,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
             }`}
           >
             <Copyright className="w-4 h-4" />
-            <span>Autore, Contatti, Copyright</span>
+            <span>{settings.language === 'en' ? 'Author, Contacts, Copyright' : 'Autore, Contatti, Copyright'}</span>
           </button>
 
           <button
@@ -133,7 +135,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
             }`}
           >
             <Smartphone className="w-4 h-4" />
-            <span>Installazione, Emblema</span>
+            <span>{settings.language === 'en' ? 'Installation, Emblem' : 'Installazione, Emblema'}</span>
           </button>
 
           <button
@@ -146,7 +148,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
             }`}
           >
             <BookOpen className="w-4 h-4" />
-            <span>Guida Funzionale, Manuale d'Uso</span>
+            <span>{settings.language === 'en' ? 'Functional Guide, Manual' : "Guida Funzionale, Manuale d'Uso"}</span>
           </button>
         </div>
 
@@ -165,13 +167,13 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                   <NotulaLogo size="lg" showText={false} />
                   <div>
                     <div className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
-                      Ideatore, Sviluppatore &amp; Titolare Unico
+                      Ideatore, Sviluppatore & Titolare Unico
                     </div>
                     <div className="text-lg font-extrabold text-[var(--text-main)]">
                       Ing. Mario Fantini
                     </div>
                     <div className="text-xs text-[var(--text-muted)] mt-0.5">
-                      Ingegneria del Software &bull; Crittografia Hardware E2E &bull; Algoritmi di Sincronizzazione Google™ Drive-First
+                      {settings.language === "en" ? "Software Engineering • E2E Hardware Encryption • Google™ Drive-First Synchronization Algorithms" : "Ingegneria del Software • Crittografia Hardware E2E • Algoritmi di Sincronizzazione Google™ Drive-First"}
                     </div>
                   </div>
                 </div>
@@ -194,20 +196,20 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
               <div className="p-5 rounded-xl border border-amber-500/40 bg-amber-500/5 space-y-3">
                 <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
                   <ShieldCheck className="w-5 h-5 shrink-0" />
-                  <span>Avviso di Riserva Integrale dei Diritti &amp; Tutela Proprietà Intellettuale</span>
+                  <span>{settings.language === "en" ? "Full Rights Reservation Notice & Intellectual Property Protection" : "Avviso di Riserva Integrale dei Diritti & Tutela Proprietà Intellettuale"}</span>
                 </div>
                 
                 <div className="font-mono text-[11px] bg-black/10 dark:bg-black/40 p-3 rounded-lg border border-[var(--border-color)] text-[var(--text-main)] space-y-1">
-                  <div><strong>Copyright &copy; 2026 Ing. Mario Fantini. Tutti i diritti riservati.</strong></div>
-                  <div><strong>All Rights Reserved &bull; Proprietary &amp; Confidential Software.</strong></div>
+                  <div><strong>{settings.language === "en" ? "Copyright &copy; 2026 Ing. Mario Fantini. All rights reserved." : "Copyright &copy; 2026 Ing. Mario Fantini. Tutti i diritti riservati."}</strong></div>
+                  <div><strong>All Rights Reserved • Proprietary & Confidential Software.</strong></div>
                 </div>
 
                 <div className="text-xs text-[var(--text-muted)] space-y-2 text-justify">
                   <p>
-                    L'applicazione <strong>Notula™</strong>, comprensiva della sua architettura software, dell'interfaccia a riga di comando (CLI), del motore di sincronizzazione bidirezionale Google™ Drive-First, del sistema di offuscamento multilivello e della crittografia hardware AES-256 GCM, è protetta dalle leggi vigenti in materia di diritto d'autore e proprietà intellettuale (Legge 22 aprile 1941 n. 633 e successive modifiche, nonché convenzioni WIPO/OMPI).
+                    {settings.language === 'en' ? <>The <strong>Notula™</strong> application, including its software architecture, command-line interface (CLI), Google™ Drive-First bidirectional synchronization engine, multi-level obfuscation system, and hardware AES-256 GCM encryption, is protected by current laws on copyright and intellectual property.</> : <>L'applicazione <strong>Notula™</strong>, comprensiva della sua architettura software, dell'interfaccia a riga di comando (CLI), del motore di sincronizzazione bidirezionale Google™ Drive-First, del sistema di offuscamento multilivello e della crittografia hardware AES-256 GCM, è protetta dalle leggi vigenti in materia di diritto d'autore e proprietà intellettuale (Legge 22 aprile 1941 n. 633 e successive modifiche, nonché convenzioni WIPO/OMPI).</>}
                   </p>
                   <p>
-                    <strong>Intellectual Property Notice</strong>: Si rimanda al file <code className="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1 rounded">README.md</code> per approfondimenti riguardo la proprietà intellettuale ("Intellectual Property Notice"), in cui si esplicita che l'architettura software, la logica di parsing e il codice sorgente sono opera proprietaria dell'autore. Manifestazioni di interesse per l'acquisizione completa dei diritti commerciali sono valutabili, previa intesa economica e salvaguardando la paternità storica e morale (Contatto: marfant7@gmail.com).
+                    <strong>Intellectual Property Notice</strong>{settings.language === "en" ? ": Please refer to the file " : ": Si rimanda al file "}<code className="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1 rounded">README.md</code> {settings.language === "en" ? ' for further details regarding intellectual property ("Intellectual Property Notice"), which states that the software architecture, parsing logic, and source code are the proprietary work of the author. Expressions of interest for the complete acquisition of commercial rights can be evaluated, subject to prior economic agreement and safeguarding historical and moral authorship (Contact: marfant7@gmail.com).' : ' per approfondimenti riguardo la proprietà intellettuale ("Intellectual Property Notice"), in cui si esplicita che l\'architettura software, la logica di parsing e il codice sorgente sono opera proprietaria dell\'autore. Manifestazioni di interesse per l\'acquisizione completa dei diritti commerciali sono valutabili, previa intesa economica e salvaguardando la paternità storica e morale (Contatto: marfant7@gmail.com).'}
                   </p>
                 </div>
               </div>
@@ -229,13 +231,13 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                   </div>
                   <div>
                     <div className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
-                      Progressive Web App (PWA)
+                      {settings.language === "en" ? "Progressive Web App (PWA)" : "Progressive Web App (PWA)"}
                     </div>
                     <div className="text-lg font-extrabold text-[var(--text-main)]">
-                      Installazione Ufficiale
+                      {settings.language === "en" ? "Official Installation" : "Installazione Ufficiale"}
                     </div>
                     <div className="text-xs text-[var(--text-muted)] mt-0.5">
-                      Installa Notula™ direttamente sul tuo dispositivo per un'esperienza nativa e offline.
+                      {settings.language === "en" ? "Install Notula™ directly on your device for a native and offline experience." : "Installa Notula™ direttamente sul tuo dispositivo per un'esperienza nativa e offline."}
                     </div>
                   </div>
                 </div>
@@ -246,10 +248,10 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-md transition"
-                    title="URL ufficiale per l'installazione della Web App (PWA)"
+                    title={settings.language === "en" ? "Official URL for Web App (PWA) installation" : "URL ufficiale per l'installazione della Web App (PWA)"}
                   >
                     <Download className="w-4 h-4" />
-                    <span>Installa Web App</span>
+                    <span>{settings.language === "en" ? "Install Web App" : "Installa Web App"}</span>
                     <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                   </a>
                 </div>
@@ -272,10 +274,10 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                   <div className="space-y-2">
                     <div className="flex items-center justify-center sm:justify-start gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-base">
                       <Sparkles className="w-5 h-5 shrink-0 text-amber-500" />
-                      <span>L'Emblema Notula™: Radici Storiche, Volatile di Apollo &amp; Astronomia</span>
+                      <span>{settings.language === "en" ? "The Notula™ Emblem: Historical Roots, Bird of Apollo & Astronomy" : "L'Emblema Notula™: Radici Storiche, Volatile di Apollo & Astronomia"}</span>
                     </div>
                     <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                      L'emblema visivo di Notula™ è stato disegnato e concepito dall'<strong>Ing. Mario Fantini</strong> per unire rigore ingegneristico, orientamento temporale e memoria storica. Non contiene riferimenti a loghi commerciali, ma affonda le sue radici nell'archetipo classico del calendario romano e della comunicazione:
+                      {settings.language === 'en' ? "The Notula™ visual emblem was designed and conceived by <strong>Ing. Mario Fantini</strong> to combine engineering rigor, temporal orientation and historical memory. It contains no references to commercial logos, but has its roots in the classic archetype of the Roman calendar and communication:" : "L'emblema visivo di Notula™ è stato disegnato e concepito dall'<strong>Ing. Mario Fantini</strong> per unire rigore ingegneristico, orientamento temporale e memoria storica. Non contiene riferimenti a loghi commerciali, ma affonda le sue radici nell'archetipo classico del calendario romano e della comunicazione:"}
                     </p>
                   </div>
                 </div>
@@ -285,30 +287,30 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                   <div className="p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2">
                     <div className="font-bold text-xs text-blue-500 flex items-center gap-1.5">
                       <span className="w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center text-[10px] font-bold border border-blue-500/20">1</span>
-                      <span>Tavoletta dei Fasti Romani</span>
+                      <span>{settings.language === "en" ? "Tablet of the Roman Fasti" : "Tavola dei Fasti Romani"}</span>
                     </div>
                     <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                      Rappresenta la <em>Tabula</em> in pietra incisa del calendario nell'Antica Roma, su cui venivano scolpite le scadenze legali, le festività e i giorni <em>Fasti</em> e <em>Nefasti</em>.
+                      {settings.language === "en" ? "Represents the " : "Rappresenta la "}<em>{settings.language === "en" ? "Tabula" : "Tabula"}</em> {settings.language === "en" ? "in engraved stone of the calendar in Ancient Rome, on which legal deadlines, holidays and days were carved" : "in pietra incisa del calendario nell'Antica Roma, su cui venivano scolpite le scadenze legali, le festività e i giorni"} <em>{settings.language === "en" ? "Fasti" : "Fasti"}</em>{settings.language === "en" ? " and " : " e "}<em>{settings.language === "en" ? "Nefasti" : "Nefasti"}</em>.
                     </p>
                   </div>
 
                   <div className="p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2">
                     <div className="font-bold text-xs text-indigo-500 flex items-center gap-1.5">
                       <span className="w-5 h-5 rounded-full bg-indigo-500/10 flex items-center justify-center text-[10px] font-bold border border-indigo-500/20">2</span>
-                      <span>L'Uccello Messaggero di Apollo</span>
+                      <span>{settings.language === "en" ? "The Messenger Bird of Apollo" : "L'Uccello Messaggero di Apollo"}</span>
                     </div>
                     <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                      Nobile volatile rapace, con becco dorato acuminato e coda a ventaglio. Simbolo araldico di tempestività e custodia delle memorie nel tempo.
+                      {settings.language === 'en' ? 'Noble bird of prey, with a sharp golden beak and a fan-shaped tail. Heraldic symbol of timeliness and custody of memories over time.' : 'Nobile volatile rapace, con becco dorato acuminato e coda a ventaglio. Simbolo araldico di tempestività e custodia delle memorie nel tempo.'}
                     </p>
                   </div>
 
                   <div className="p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2">
                     <div className="font-bold text-xs text-amber-500 flex items-center gap-1.5">
                       <span className="w-5 h-5 rounded-full bg-amber-500/10 flex items-center justify-center text-[10px] font-bold border border-amber-500/20">3</span>
-                      <span>Stelle di Orientamento</span>
+                      <span>{settings.language === "en" ? "Guiding Stars" : "Stelle di Orientamento"}</span>
                     </div>
                     <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                      I punti cardinali, la stella polare e le costellazioni che guidavano gli antichi romani nell'osservazione astronomica, nella navigazione e nella scansione ciclica delle stagioni.
+                      {settings.language === 'en' ? 'The cardinal points, the North Star and the constellations that guided the ancient Romans in astronomical observation, navigation and the cyclical scanning of the seasons.' : 'I punti cardinali, la stella polare e le costellazioni che guidavano gli antichi romani nell\'osservazione astronomica, nella navigazione e nella scansione ciclica delle stagioni.'}
                     </p>
                   </div>
                 </div>
@@ -331,7 +333,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  Tutte le Sezioni
+                  {settings.language === "en" ? "All Sections" : "Tutte le Sezioni"}
                 </button>
                 <button
                   type="button"
@@ -340,7 +342,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'intro' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  1. Cosa fa Notula™
+                  {settings.language === "en" ? "1. What Notula™ Does" : "1. Cosa fa Notula™"}
                 </button>
                 <button
                   type="button"
@@ -349,7 +351,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'features' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  2. Punti di Forza
+                  {settings.language === "en" ? "2. Core Strengths" : "2. Punti di Forza"}
                 </button>
                 <button
                   type="button"
@@ -358,7 +360,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'legend' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  3. Legenda &amp; Ricorrenze (groupID)
+                  {settings.language === "en" ? "3. Legend & Recurrences" : "3. Legenda & Ricorrenze (groupID)"}
                 </button>
                 <button
                   type="button"
@@ -367,7 +369,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'security' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  4. Sicurezza &amp; Passphrase
+                  {settings.language === "en" ? "4. Security & Passphrase" : "4. Sicurezza & Passphrase"}
                 </button>
                 <button
                   type="button"
@@ -376,7 +378,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'exports' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  5. Esportazioni &amp; PDF
+                  {settings.language === "en" ? "5. Exports & PDF" : "5. Esportazioni & PDF"}
                 </button>
                 <button
                   type="button"
@@ -385,7 +387,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'sync' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  6. Google™ Drive
+                  {settings.language === "en" ? "6. Google™ Drive" : "6. Google™ Drive"}
                 </button>
                 <button
                   type="button"
@@ -394,7 +396,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'daily' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  7. Funzioni Quotidiane
+                  {settings.language === "en" ? "7. Daily Features" : "7. Funzioni Quotidiane"}
                 </button>
                 <button
                   type="button"
@@ -403,7 +405,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     guideSection === 'cli' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
                   }`}
                 >
-                  8. Terminale CLI (edit/export/import)
+                  {settings.language === "en" ? "8. CLI Terminal (edit/export/import)" : "8. Terminale CLI (edit/export/import)"}
                 </button>
               </div>
 
@@ -414,36 +416,36 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 <div className="p-5 rounded-2xl border border-blue-500/30 bg-blue-500/5 space-y-3">
                   <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm">
                     <BookOpen className="w-5 h-5 shrink-0" />
-                    <span>1. Cosa Fa Notula™: Lo Schedario Ingegneristico Universale</span>
+                    <span>{settings.language === "en" ? "1. What Notula™ Does: The Universal Engineering Filing System" : "1. Cosa Fa Notula™: Lo Schedario Ingegneristico Universale"}</span>
                   </div>
                   <p className="text-xs text-[var(--text-main)] leading-relaxed">
-                    <strong>Notula™</strong> è una piattaforma avanzata per la gestione temporale di promemoria, scadenze critiche, adempimenti legali/fiscali, progetti professionali e note personali protette.
+                    <strong>Notula™</strong> {settings.language === "en" ? "is an advanced platform for the time management of reminders, critical deadlines, legal/tax compliances, professional projects and protected personal notes." : "è una piattaforma avanzata per la gestione temporale di promemoria, scadenze critiche, adempimenti legali/fiscali, progetti professionali e note personali protette."}
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                     <div className="p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1">
                       <div className="font-bold text-blue-500 text-xs flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span>Scadenze Puntuali</span>
+                        <span>{settings.language === "en" ? "One-time Deadlines" : "Scadenze Puntuali"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Impegni con una data esatta, contrassegnati da stati cromatici temporali (scaduto, oggi, futuro).
+                        {settings.language === "en" ? "Commitments with an exact date, marked by temporal chromatic states (expired, today, future)." : "Impegni con una data esatta, contrassegnati da stati cromatici temporali (scaduto, oggi, futuro)."}
                       </p>
                     </div>
 
                     <div className="p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1">
                       <div className="font-bold text-emerald-500 text-xs flex items-center gap-1.5">
                         <Repeat className="w-3.5 h-3.5" />
-                        <span>Ricorrenze Perpetue</span>
+                        <span>{settings.language === "en" ? "Perpetual Recurrences" : "Ricorrenze Perpetue"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Canoni, fatture, rinnovi, compleanni o tagliandi con ripetizione giornaliera, settimanale, mensile o annuale.
+                        {settings.language === "en" ? "Fees, invoices, renewals, birthdays or coupons with daily, weekly, monthly or yearly repetition." : "Canoni, fatture, rinnovi, compleanni o tagliandi con ripetizione giornaliera, settimanale, mensile o annuale."}
                       </p>
                     </div>
 
                     <div className="p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1">
                       <div className="font-bold text-purple-500 text-xs flex items-center gap-1.5">
                         <Shield className="w-3.5 h-3.5" />
-                        <span>Protezione Multi-Strato</span>
+                        <span>{settings.language === "en" ? "Multi-Layer Protection" : "Protezione Multi-Strato"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
                         Offuscamento visivo per sguardi indiscreti e cifratura hardware di livello militare AES-256.
@@ -460,47 +462,47 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 <div className="p-5 rounded-2xl border border-indigo-500/30 bg-indigo-500/5 space-y-3">
                   <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
                     <Sparkles className="w-5 h-5 shrink-0 text-amber-500" />
-                    <span>2. Peculiarità e Punti di Forza Unici di Notula™</span>
+                    <span>{settings.language === "en" ? "2. Unique Features and Strengths of Notula™" : "2. Peculiarità e Punti di Forza Unici di Notula™"}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1.5">
                       <div className="font-bold text-[var(--text-main)] flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Sovranità Assoluta sui Dati (Zero Cloud Terzo)</span>
+                        <span>{settings.language === "en" ? "Absolute Data Sovereignty (Zero Third-Party Cloud)" : "Sovranità Assoluta sui Dati (Zero Cloud Terzo)"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        A differenza delle comuni app SaaS commerciali, Notula™ non archivia nulla su server proprietari o database remoti. I dati appartengono solo all'utente.
+                        {settings.language === "en" ? "Unlike common commercial SaaS apps, Notula™ does not store anything on proprietary servers or remote databases. The data belongs solely to the user." : "A differenza delle comuni app SaaS commerciali, Notula™ non archivia nulla su server proprietari o database remoti. I dati appartengono solo all'utente."}
                       </p>
                     </div>
 
                     <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1.5">
                       <div className="font-bold text-[var(--text-main)] flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Architettura Offline-First &amp; Immediata</span>
+                        <span>{settings.language === "en" ? "Offline-First & Immediate Architecture" : "Architettura Offline-First & Immediata"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Funziona sempre, anche in assenza totale di connessione Internet. All'avvio carica istantaneamente l'archivio locale.
+                        {settings.language === "en" ? "Works always, even in total absence of Internet connection. Instantly loads the local archive on startup." : "Funziona sempre, anche in assenza totale di connessione Internet. All'avvio carica istantaneamente l'archivio locale."}
                       </p>
                     </div>
 
                     <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1.5">
                       <div className="font-bold text-[var(--text-main)] flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Aggiornamento Automatico Ricorrenze (groupID)</span>
+                        <span>{settings.language === "en" ? "Automatic Recurrence Update (groupID)" : "Aggiornamento Automatico Ricorrenze (groupID)"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Modificando un memo ricorrente legato a una serie, tutti gli altri memo della serie collegati da groupID vengono sincronizzati in automatico.
+                        {settings.language === "en" ? "By modifying a recurring memo linked to a series, all other memos of the series linked by groupID are automatically synchronized." : "Modificando un memo ricorrente legato a una serie, tutti gli altri memo della serie collegati da groupID vengono sincronizzati in automatico."}
                       </p>
                     </div>
 
                     <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1.5">
                       <div className="font-bold text-[var(--text-main)] flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Doppia Interfaccia: GUI &bull; CLI</span>
+                        <span>{settings.language === "en" ? "Dual Interface: GUI • CLI" : "Doppia Interfaccia: GUI • CLI"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Interfaccia grafica ad alta reattività con calendario interattivo unita a un potente terminale a riga di comando ingegneristico.
+                        {settings.language === "en" ? "High reactivity graphical interface with interactive calendar combined with a powerful engineering command line terminal." : "Interfaccia grafica ad alta reattività con calendario interattivo unita a un potente terminale a riga di comando ingegneristico."}
                       </p>
                     </div>
                   </div>
@@ -514,31 +516,31 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-4">
                   <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
                     <Layers className="w-5 h-5 shrink-0" />
-                    <span>3. Legenda Visiva del Calendario &amp; Gestione Ricorrenze con groupID</span>
+                    <span>{settings.language === "en" ? "3. Calendar Visual Legend & Recurrence Management with groupID" : "3. Legenda Visiva del Calendario & Gestione Ricorrenze con groupID"}</span>
                   </div>
 
                   <p className="text-xs text-[var(--text-main)]">
-                    Il calendario Notula™ adotta una semantica cromatica rigorosa per distinguere al colpo d'occhio la natura e l'urgenza di ciascun evento:
+                    {settings.language === 'en' ? "The Notula™ calendar adopts a rigorous color semantics to distinguish at a glance the nature and urgency of each event:" : "Il calendario Notula™ adotta una semantica cromatica rigorosa per distinguere al colpo d'occhio la natura e l'urgenza di ciascun evento:"}
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2">
                       <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
                         <span className="w-3.5 h-3.5 rounded border-2 border-red-500 bg-transparent shrink-0"></span>
-                        <span>Memo Puntuali (Bordo Cromatico Rettangolare)</span>
+                        <span>{settings.language === "en" ? "One-time Memos (Rectangular Color Border)" : "Memo Puntuali (Bordo Cromatico Rettangolare)"}</span>
                       </div>
                       <ul className="space-y-1.5 text-[11px] text-[var(--text-muted)] pl-1">
                         <li className="flex items-center gap-2">
                           <span className="w-3 h-3 rounded border-2 border-red-500 bg-transparent shrink-0"></span>
-                          <span><strong className="text-red-500">Bordo Rosso:</strong> Scaduto (la data è già passata).</span>
+                          <span><strong className="text-red-500">{settings.language === "en" ? "Red Border:" : "Bordo Rosso:"}</strong> {settings.language === "en" ? "Expired (the date has already passed)." : "Scaduto (la data è già passata)."}</span>
                         </li>
                         <li className="flex items-center gap-2">
                           <span className="w-3 h-3 rounded border-2 border-amber-500 bg-transparent shrink-0"></span>
-                          <span><strong className="text-amber-500">Bordo Arancione:</strong> In scadenza Oggi.</span>
+                          <span><strong className="text-amber-500">{settings.language === "en" ? "Orange Border:" : "Bordo Arancione:"}</strong> {settings.language === "en" ? "Expiring Today." : "In scadenza Oggi."}</span>
                         </li>
                         <li className="flex items-center gap-2">
                           <span className="w-3 h-3 rounded border-2 border-fuchsia-500 bg-transparent shrink-0"></span>
-                          <span><strong className="text-pink-500">Bordo Magenta/Viola:</strong> Scadenza futura nel mese.</span>
+                          <span><strong className="text-pink-500">{settings.language === "en" ? "Magenta/Purple Border:" : "Bordo Magenta/Viola:"}</strong> {settings.language === "en" ? "Future expiration in the month." : "Scadenza futura nel mese."}</span>
                         </li>
                       </ul>
                     </div>
@@ -546,23 +548,21 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2">
                       <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
-                        <span>Memo Ricorrenti (Pallino Pieno &bull;)</span>
+                        <span>{settings.language === "en" ? "Recurring Memos (Solid Dot •)" : "Memo Ricorrenti (Pallino Pieno •)"}</span>
                       </div>
                       <ul className="space-y-1 text-[11px] text-[var(--text-muted)] pl-2">
-                        <li><strong className="text-emerald-500">&bull; Verde:</strong> Ricorrente Annuale / Mensile.</li>
-                        <li><strong className="text-blue-500">&bull; Blu:</strong> Ricorrente Settimanale / Giornaliero.</li>
-                        <li><strong className="text-purple-500">&bull; Viola:</strong> Con Cifratura AES-256 attiva.</li>
+                        <li><strong className="text-emerald-500">{settings.language === "en" ? "• Green:" : "• Verde:"}</strong> {settings.language === "en" ? "Yearly / Monthly Recurring." : "Ricorrente Annuale / Mensile."}</li>
+                        <li><strong className="text-blue-500">{settings.language === "en" ? "• Blue:" : "• Blu:"}</strong> {settings.language === "en" ? "Weekly / Daily Recurring." : "Ricorrente Settimanale / Giornaliero."}</li>
+                        <li><strong className="text-purple-500">{settings.language === "en" ? "• Purple:" : "• Viola:"}</strong> {settings.language === "en" ? "With AES-256 Encryption active." : "Con Cifratura AES-256 attiva."}</li>
                       </ul>
                     </div>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-blue-500/30 text-[11px] text-[var(--text-muted)] space-y-1">
                     <div className="font-bold text-blue-600 dark:text-blue-400">
-                      Come funziona l'aggiornamento automatico con groupID:
+                      {settings.language === 'en' ? "How automatic update with groupID works:" : "Come funziona l'aggiornamento automatico con groupID:"}
                     </div>
-                    <p>
-                      Quando crei o cloni un memo ricorrente (es. per 15 giorni o 12 mesi), Notula™ assegna a tutti i memo della serie lo stesso <code>groupID</code>. Se modifichi il memo di oggi (titolo, note o livello di sicurezza), le modifiche vengono propagate <strong>automaticamente a tutti i memo collegati</strong>, preservando le rispettive date del calendario!
-                    </p>
+                    <p>{settings.language === "en" ? "When you create or clone a recurring memo (e.g., for 15 days or 12 months), Notula™ assigns the same " : "Quando crei o cloni un memo ricorrente (es. per 15 giorni o 12 mesi), Notula™ assegna a tutti i memo della serie lo stesso "}<code>groupID</code>{settings.language === "en" ? ". If you modify today's memo (title, notes, or security level), changes are " : ". Se modifichi il memo di oggi (titolo, note o livello di sicurezza), le modifiche vengono propagate "}<strong>{settings.language === "en" ? "automatically to all linked memos" : "automaticamente a tutti i memo collegati"}</strong>{settings.language === "en" ? ", preserving their respective calendar dates!" : ", preservando le rispettive date del calendario!"}</p>
                   </div>
                 </div>
               )}
@@ -574,37 +574,37 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 <div className="p-5 rounded-2xl border border-purple-500/30 bg-purple-500/5 space-y-4">
                   <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold text-sm">
                     <Shield className="w-5 h-5 shrink-0" />
-                    <span>4. I 3 Strati di Sicurezza Notula™ &amp; Gestione Passphrase</span>
+                    <span>{settings.language === "en" ? "4. The 3 Security Layers of Notula™ & Passphrase Management" : "4. I 3 Strati di Sicurezza Notula™ & Gestione Passphrase"}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-1">
                       <div className="font-bold text-xs text-amber-500 flex items-center gap-1.5">
                         <EyeOff className="w-4 h-4" />
-                        <span>Strato 1: Parziale</span>
+                        <span>{settings.language === "en" ? "Layer 1: Partial" : "Strato 1: Parziale"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Maschera i caratteri centrali con puntini (es. <code>IB•••401</code>), consentendo il riconoscimento a colpo d'occhio.
+                        {settings.language === "en" ? <>Masks the central characters with dots (e.g. <code>IB•••401</code>), allowing recognition at a glance.</> : <>Maschera i caratteri centrali con puntini (es. <code>IB•••401</code>), consentendo il riconoscimento a colpo d'occhio.</>}
                       </p>
                     </div>
 
                     <div className="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-1">
                       <div className="font-bold text-xs text-orange-500 flex items-center gap-1.5">
                         <Lock className="w-4 h-4" />
-                        <span>Strato 2: Totale</span>
+                        <span>{settings.language === "en" ? "Layer 2: Total" : "Strato 2: Totale"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Censura solida completa (<code>••••••••</code>). Il testo rimane occultato finché non si preme il tasto Privacy o Svela.
+                        {settings.language === "en" ? <>Complete solid censorship (<code>••••••••</code>). The text remains hidden until the Privacy or Reveal button is pressed.</> : <>Censura solida completa (<code>••••••••</code>). Il testo rimane occultato finché non si preme il tasto Privacy o Svela.</>}
                       </p>
                     </div>
 
                     <div className="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-1">
                       <div className="font-bold text-xs text-purple-500 flex items-center gap-1.5">
                         <KeyRound className="w-4 h-4" />
-                        <span>Strato 3: AES-256 E2E</span>
+                        <span>{settings.language === "en" ? "Layer 3: AES-256 E2E" : "Strato 3: AES-256 E2E"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Cifratura hardware Web Crypto API con 100.000 iterazioni PBKDF2 e AES-GCM 256-bit. I dati sono matematicamente inviolabili.
+                        {settings.language === "en" ? "Web Crypto API hardware encryption with 100,000 PBKDF2 iterations and AES-GCM 256-bit. The data is mathematically unbreakable." : "Cifratura hardware Web Crypto API con 100.000 iterazioni PBKDF2 e AES-GCM 256-bit. I dati sono matematicamente inviolabili."}
                       </p>
                     </div>
                   </div>
@@ -613,21 +613,21 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                   <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 space-y-2">
                     <div className="font-bold text-xs text-purple-600 dark:text-purple-300 flex items-center gap-2">
                       <KeyRound className="w-4 h-4" />
-                      <span>Come e Quando Cambiare la Master Passphrase</span>
+                      <span>{settings.language === "en" ? "How and When to Change the Master Passphrase" : "Come e Quando Cambiare la Master Passphrase"}</span>
                     </div>
                     <p className="text-xs text-[var(--text-main)]">
-                      <strong>La Master Passphrase può essere modificata liberamente in qualsiasi momento:</strong>
+                      <strong>{settings.language === "en" ? "The Master Passphrase can be changed freely at any time:" : "La Master Passphrase può essere modificata liberamente in qualsiasi momento:"}</strong>
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] pt-1">
                       <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)]">
-                        <strong>Dall'Interfaccia Grafica:</strong> Clicca sul pulsante <em>"AES-256"</em> nella barra in alto &rarr; nel riquadro <em>"Modifica / Cambia Passphrase"</em> inserisci la nuova parola chiave &rarr; clicca <em>"Aggiorna Passphrase"</em>.
+                        <strong>{settings.language === "en" ? "From the Graphical Interface:" : "Dall'Interfaccia Grafica:"}</strong>{settings.language === "en" ? " Click the button " : " Clicca sul pulsante "}<em>"AES-256"</em>{settings.language === "en" ? " in the top bar → in the box " : " nella barra in alto → nel riquadro "}<em>{settings.language === "en" ? "Edit / Change Passphrase" : "Modifica / Cambia Passphrase"}</em>{settings.language === "en" ? " enter the new keyword → click " : " inserisci la nuova parola chiave → clicca "}<em>{settings.language === "en" ? "Update Passphrase" : "Aggiorna Passphrase"}</em>.
                       </div>
                       <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)]">
-                        <strong>Da Terminale CLI:</strong> Apri il terminale (<kbd className="font-mono bg-[var(--bg-subtle)] px-1 rounded">Ctrl+Shift+P</kbd>) e digita: <code>passwd MiaNuovaPassword2026!</code>.
+                        <strong>{settings.language === "en" ? "From CLI Terminal:" : "Da Terminale CLI:"}</strong>{settings.language === "en" ? " Open the terminal (" : " Apri il terminale ("}<kbd className="font-mono bg-[var(--bg-subtle)] px-1 rounded">Ctrl+Shift+P</kbd>{settings.language === "en" ? ") and type: " : ") e digita: "}<code>passwd MiaNuovaPassword2026!</code>.
                       </div>
                     </div>
                     <p className="text-[11px] text-[var(--text-muted)] pt-1">
-                      <em>Effetto:</em> Notula™ ricalcola all'istante la chiave crittografica hardware; da quel momento tutti i nuovi memo cifrati, le modifiche e i file di sincronizzazione su Google™ Drive useranno la nuova Master Passphrase.
+                      <em>{settings.language === "en" ? "Effect:" : "Effetto:"}</em> Notula™ ricalcola all'istante la chiave crittografica hardware; da quel momento tutti i nuovi memo cifrati, le modifiche e i file di sincronizzazione su Google™ Drive useranno la nuova Master Passphrase.
                     </p>
                   </div>
                 </div>
@@ -640,11 +640,11 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 <div className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 space-y-3">
                   <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
                     <Download className="w-5 h-5 shrink-0" />
-                    <span>5. Esportazioni Multiformato (JSON, XML, MD, ICS, PDF, TXT)</span>
+                    <span>{settings.language === "en" ? "5. Multiformat Exports (JSON, XML, MD, ICS, PDF, TXT)" : "5. Esportazioni Multiformato (JSON, XML, MD, ICS, PDF, TXT)"}</span>
                   </div>
 
                   <p className="text-xs text-[var(--text-muted)]">
-                    Notula™ garantisce la totale libertà di esportazione senza vincoli proprietari. Clicca su <em>"Esporta Archivio"</em> nella barra laterale o nel sottomenu Elenco per scegliere tra:
+                    Notula™ garantisce la totale libertà di esportazione senza vincoli proprietari. Clicca su <em>"Esporta Archivio"</em> {settings.language === "en" ? "in the sidebar or in the List submenu to choose between:" : "nella barra laterale o nel sottomenu Elenco per scegliere tra:"}
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px]">
@@ -664,7 +664,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                         <span>XML (.xml)</span>
                       </div>
                       <p className="text-[var(--text-muted)]">
-                        Struttura universale gerarchica <code>&lt;notula&gt;&lt;memo&gt;</code> conforme per software documentali e archivi aziendali.
+                        {settings.language === "en" ? "Universal hierarchical structure" : "Struttura universale gerarchica"} <code>&lt;notula&gt;&lt;memo&gt;</code> {settings.language === "en" ? "compliant for document software and corporate archives." : "conforme per software documentali e archivi aziendali."}
                       </p>
                     </div>
 
@@ -694,7 +694,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                         <span>PDF Ink-Friendly A4</span>
                       </div>
                       <p className="text-[var(--text-muted)]">
-                        Scheda ufficiale Notula™ impaginata per la stampa su carta o archiviazione PDF a zero consumo d'inchiostro.
+                        {settings.language === "en" ? "Official Notula™ card typeset for paper printing or zero-ink PDF archiving." : "Scheda ufficiale Notula™ impaginata per la stampa su carta o archiviazione PDF a zero consumo d'inchiostro."}
                       </p>
                     </div>
 
@@ -704,7 +704,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                         <span>Testo Piano (.txt)</span>
                       </div>
                       <p className="text-[var(--text-muted)]">
-                        Scheda testuale pura leggibile da qualsiasi dispositivo senza software aggiuntivo.
+                        {settings.language === "en" ? "Pure textual card readable from any device without additional software." : "Scheda testuale pura leggibile da qualsiasi dispositivo senza software aggiuntivo."}
                       </p>
                     </div>
                   </div>
@@ -718,21 +718,21 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 <div className="p-5 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 space-y-3">
                   <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-bold text-sm">
                     <Cloud className="w-5 h-5 shrink-0" />
-                    <span>6. Sincronizzazione Google™ Drive: Indipendenza Totale dal Dispositivo</span>
+                    <span>{settings.language === "en" ? "6. Google™ Drive Sync: Total Device Independence" : "6. Sincronizzazione Google™ Drive: Indipendenza Totale dal Dispositivo"}</span>
                   </div>
 
                   <p className="text-xs text-[var(--text-main)] leading-relaxed">
-                    <strong>Sei libero e indipendente da qualsiasi dispositivo o sistema operativo!</strong>
+                    <strong>{settings.language === "en" ? "You are free and independent from any device or operating system!" : "Sei libero e indipendente da qualsiasi dispositivo o sistema operativo!"}</strong>
                   </p>
 
                   <div className="space-y-2 text-xs text-[var(--text-muted)]">
                     <p>
-                      Grazie all'architettura <strong>Google™ Drive-First</strong>, Notula™ archivia lo schedario nella cartella riservata <code>Notula/</code> del tuo account Google™. Questo significa che:
+                      Grazie all'architettura <strong>Google™ Drive-First</strong>{settings.language === "en" ? ", Notula™ archives the filing system in the reserved folder " : ", Notula™ archivia lo schedario nella cartella riservata "}<code>Notula/</code> {settings.language === "en" ? "of your Google™ account. This means that:" : "del tuo account Google™. Questo significa che:"}
                     </p>
                     <ul className="list-disc list-inside space-y-1 text-[11px] pl-2">
-                      <li>Puoi usare Notula™ su <strong>PC Windows, Mac, Linux, Tablet o Smartphone</strong>: aprendo l'app e cliccando su <em>"Scarica da Google™ Drive"</em> ritrovi tutti i tuoi memo sincronizzati.</li>
-                      <li>Se cambi computer o formatti il dispositivo, <strong>non perdi nulla</strong>: basta ricollegare il tuo account Google™ Drive e inserire la tua Master Passphrase.</li>
-                      <li><strong>Gestione Conflitti Intelligente:</strong> In caso di divergenza tra la memoria locale e Google™ Drive, Notula™ ti consente di risolvere il conflitto con facilità (Sostituisci [Y], Ignora [I], Duplica entrambi [M] o Applica a tutti [A]).</li>
+                      <li>{settings.language === "en" ? "You can use Notula™ on " : "Puoi usare Notula™ su "}<strong>{settings.language === "en" ? "Windows PC, Mac, Linux, Tablet or Smartphone" : "PC Windows, Mac, Linux, Tablet o Smartphone"}</strong>{settings.language === "en" ? ": open the app, click " : ": aprendo l'app e cliccando su "}<em>{settings.language === "en" ? "Download from Google™ Drive" : "Scarica da Google™ Drive"}</em>{settings.language === "en" ? " and find all your synchronized memos." : " ritrovi tutti i tuoi memo sincronizzati."}</li>
+                      <li>{settings.language === "en" ? "If you change computers or format the device, " : "Se cambi computer o formatti il dispositivo, "}<strong>{settings.language === "en" ? "you don\'t lose anything" : "non perdi nulla"}</strong>{settings.language === "en" ? ": simply reconnect your Google™ Drive account and enter your Master Passphrase." : ": basta ricollegare il tuo account Google™ Drive e inserire la tua Master Passphrase."}</li>
+                      <li><strong>{settings.language === "en" ? "Intelligent Conflict Management:" : "Gestione Conflitti Intelligente:"}</strong>{settings.language === "en" ? " In case of divergence between local memory and Google™ Drive, Notula™ allows you to easily resolve the conflict (Replace [Y], Ignore [I], Duplicate both [M] or Apply to all [A])." : " In caso di divergenza tra la memoria locale e Google™ Drive, Notula™ ti consente di risolvere il conflitto con facilità (Sostituisci [Y], Ignora [I], Duplica entrambi [M] o Applica a tutti [A])."}</li>
                     </ul>
                   </div>
                 </div>
@@ -745,47 +745,43 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 <div className="p-5 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-subtle)] space-y-3">
                   <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm">
                     <Layers className="w-5 h-5 shrink-0" />
-                    <span>7. Funzionalità Quotidiane &amp; Scorciatoie Pratiche</span>
+                    <span>{settings.language === "en" ? "7. Daily Features & Practical Shortcuts" : "7. Funzionalità Quotidiane & Scorciatoie Pratiche"}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
                     <div className="p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1">
                       <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
                         <Search className="w-3.5 h-3.5 text-blue-500" />
-                        <span>Ricerca Globale Multi-Criterio</span>
+                        <span>{settings.language === "en" ? "Multi-Criteria Global Search" : "Ricerca Globale Multi-Criterio"}</span>
                       </div>
-                      <p className="text-[var(--text-muted)]">
-                        Premi il pulsante <em>"Cerca"</em> per filtrare per testo, per data esatta, per ID memo o per categoria (solo puntuali, solo ricorrenti, solo scaduti).
-                      </p>
+                      <p className="text-[var(--text-muted)]">{settings.language === "en" ? "Press the " : "Premi il pulsante "}<em>"Cerca"</em>{settings.language === "en" ? " button to filter by text, exact date, memo ID, or category (only one-time, only recurring, only expired)." : " per filtrare per testo, per data esatta, per ID memo o per categoria (solo puntuali, solo ricorrenti, solo scaduti)."}</p>
                     </div>
 
                     <div className="p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1">
                       <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
                         <EyeOff className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Modalità Privacy Istantanea</span>
+                        <span>{settings.language === "en" ? "Instant Privacy Mode" : "Modalità Privacy Istantanea"}</span>
                       </div>
                       <p className="text-[var(--text-muted)]">
-                        Cliccando sull'icona dell'occhio nella barra superiore, puoi mascherare all'istante tutti i contenuti sullo schermo se qualcuno si avvicina.
+                        {settings.language === 'en' ? "By clicking the eye icon in the top bar, you can instantly mask all on-screen content if someone approaches." : "Cliccando sull'icona dell'occhio nella barra superiore, puoi mascherare all'istante tutti i contenuti sullo schermo se qualcuno si avvicina."}
                       </p>
                     </div>
 
                     <div className="p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1">
                       <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
                         <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                        <span>Eliminazione Mirata e Pulizia</span>
+                        <span>{settings.language === "en" ? "Targeted Deletion and Cleanup" : "Eliminazione Mirata e Pulizia"}</span>
                       </div>
-                      <p className="text-[var(--text-muted)]">
-                        Nel sottomenu <em>"Elimina"</em> puoi cancellare memo per singolo ID, per intero anno, per mese, per data, per ricorrenza o solo quelli già scaduti.
-                      </p>
+                      <p className="text-[var(--text-muted)]">{settings.language === "en" ? "In the " : "Nel sottomenu "}<em>"Elimina"</em>{settings.language === "en" ? " submenu, you can delete memos by single ID, whole year, month, date, recurrence, or just expired ones." : " puoi cancellare memo per singolo ID, per intero anno, per mese, per data, per ricorrenza o solo quelli già scaduti."}</p>
                     </div>
 
                     <div className="p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1">
                       <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-purple-500" />
-                        <span>Navigazione Rapida &bull; Tasto "Oggi"</span>
+                        <span>{settings.language === "en" ? "Quick Navigation • Key (Today)" : "Navigazione Rapida • Tasto (Oggi)"}</span>
                       </div>
                       <p className="text-[var(--text-muted)]">
-                        In qualunque mese o anno tu sia nel calendario, con un solo clic sul pulsante <em>"Oggi"</em> ritorni istantaneamente alla data corrente.
+                        In qualunque mese o anno tu sia nel calendario, con un solo clic sul pulsante <em>(Oggi)</em> ritorni istantaneamente alla data corrente.
                       </p>
                     </div>
                   </div>
@@ -800,11 +796,11 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                     <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
                       <Terminal className="w-5 h-5 shrink-0" />
-                      <span>8. Terminale CLI per Utenti Avanzati &amp; Power Users</span>
+                      <span>{settings.language === "en" ? "8. CLI Terminal for Advanced & Power Users" : "8. Terminale CLI per Utenti Avanzati & Power Users"}</span>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-mono text-[10px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 px-2.5 py-1 rounded-md border border-emerald-500/30 font-bold">
-                        Scorciatoia: Ctrl+Shift+P
+                        {settings.language === "en" ? "Shortcut: Ctrl+Shift+P" : "Scorciatoia: Ctrl+Shift+P"}
                       </span>
                       <button
                         type="button"
@@ -818,7 +814,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                         className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-lg shadow-xs flex items-center gap-1.5 transition cursor-pointer"
                       >
                         <BookOpen className="w-3.5 h-3.5" />
-                        <span>Apri Manuale Ufficiale CLI</span>
+                        <span>{settings.language === "en" ? "Open Official CLI Manual" : "Apri Manuale Ufficiale CLI"}</span>
                       </button>
                     </div>
                   </div>
@@ -828,10 +824,10 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-xs font-bold text-[var(--text-main)]">
                         <Code2 className="w-4 h-4 text-emerald-500" />
-                        <span>Manuale Ufficiale NOTULA™ CLI v2.2 (Edizione Ingegneristica)</span>
+                        <span>{settings.language === "en" ? "Official NOTULA™ CLI v2.2 Manual (Engineering Edition)" : "Manuale Ufficiale NOTULA™ CLI v2.2 (Edizione Ingegneristica)"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        Documentazione completa dei 17 comandi con sintassi POSIX, opzioni, esempi reali, architettura <code className="font-mono text-emerald-500">groupID</code> e sorgente <span className="font-mono font-semibold">LaTeX (.tex)</span> accademico.
+                        Documentazione completa dei 17 comandi con sintassi POSIX, opzioni, esempi reali, architettura <code className="font-mono text-emerald-500">groupID</code>{settings.language === "en" ? " and source " : " e sorgente "}<span className="font-mono font-semibold">LaTeX (.tex)</span> accademico.
                       </p>
                     </div>
 
@@ -847,37 +843,35 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                       className="px-4 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1.5 shrink-0 self-start sm:self-auto cursor-pointer"
                     >
                       <BookOpen className="w-4 h-4" />
-                      <span>Consulta Manuale Completo</span>
+                      <span>{settings.language === "en" ? "Consult Full Manual" : "Consulta Manuale Completo"}</span>
                     </button>
                   </div>
 
                   <p className="text-xs text-[var(--text-muted)]">
-                    Per ingegneri, amministratori di sistema e amanti della tastiera, Notula™ include una shell interattiva completa con supporto a comandi per creazione, <strong>modifica (`edit`)</strong> con sincronizzazione automatica dei gruppi (`groupID`), <strong>esportazione multiformato (`export` / `pdf`)</strong> e <strong>importazione (`import`)</strong>.
+                    {settings.language === "en" ? "For engineers, sysadmins, and keyboard lovers, Notula™ includes a full interactive shell with support for commands for creation," : "Per ingegneri, amministratori di sistema e amanti della tastiera, Notula™ include una shell interattiva completa con supporto a comandi per creazione,"} <strong>{settings.language === "en" ? "edit (`edit`)" : "modifica (`edit`)"}</strong>{settings.language === "en" ? " with automatic group synchronization (`groupID`), " : " con sincronizzazione automatica dei gruppi (`groupID`), "}<strong>{settings.language === "en" ? "multiformat export (`export` / `pdf`)" : "esportazione multiformato (`export` / `pdf`)"}</strong>{settings.language === "en" ? " and " : " e "}<strong>{settings.language === "en" ? "import (`import`)" : "importazione (`import`)"}</strong>.
                   </p>
 
                   {/* Tabella Comandi Principali CLI */}
                   <div className="bg-[#0d1117] text-gray-200 font-mono text-[11px] p-4 rounded-xl border border-[#30363d] space-y-3 overflow-x-auto">
                     
                     <div>
-                      <div className="text-emerald-400 font-bold pb-1 border-b border-gray-700">
-                        1. CREAZIONE &amp; MODIFICA MEMO (add &bull; edit)
-                      </div>
+                      <div className="text-emerald-400 font-bold pb-1 border-b border-gray-700">{settings.language === "en" ? "1. CREATE & EDIT MEMOS (add • edit)" : "1. CREAZIONE & MODIFICA MEMO (add • edit)"}</div>
                       <div className="mt-1 space-y-1">
-                        <div><span className="text-cyan-300">add --title "Udienza" --date 2026-09-20</span> <span className="text-gray-400 text-[10px]">&bull; Singola scadenza</span></div>
-                        <div><span className="text-cyan-300">add --title "Server" --date 2026-09-01 --repeat monthly --desc "Fattura 88" --encrypt</span> <span className="text-gray-400 text-[10px]">&bull; Ricorrente cifrato AES-256</span></div>
-                        <div><span className="text-cyan-300">edit --id n_12345 --title "Udienza Rinviata" --date 2026-10-15</span> <span className="text-gray-400 text-[10px]">&bull; Modifica memo (aggiorna in automatico tutti i memo con lo stesso groupID)</span></div>
+                        <div><span className="text-cyan-300">add --title "Udienza" --date 2026-09-20</span> <span className="text-gray-400 text-[10px]">• Singola scadenza</span></div>
+                        <div><span className="text-cyan-300">add --title "Server" --date 2026-09-01 --repeat monthly --desc "Fattura 88" --encrypt</span> <span className="text-gray-400 text-[10px]">• Ricorrente cifrato AES-256</span></div>
+                        <div><span className="text-cyan-300">edit --id n_12345 --title "Udienza Rinviata" --date 2026-10-15</span> <span className="text-gray-400 text-[10px]">• Modifica memo (aggiorna in automatico tutti i memo con lo stesso groupID)</span></div>
                       </div>
                     </div>
 
                     <div>
                       <div className="text-emerald-400 font-bold pb-1 border-b border-gray-700">
-                        2. ESPORTAZIONI MULTIFORMATO &amp; GENERAZIONE PDF (export &bull; pdf)
+                        2. ESPORTAZIONI MULTIFORMATO & GENERAZIONE PDF (export • pdf)
                       </div>
                       <div className="mt-1 space-y-1">
-                        <div><span className="text-amber-300">export --id n_12345 --format json|xml|md|ics|pdf|txt</span> <span className="text-gray-400 text-[10px]">&bull; Esporta singolo memo nel formato indicato</span></div>
-                        <div><span className="text-amber-300">export --all --format json|xml|md|ics|txt</span> <span className="text-gray-400 text-[10px]">&bull; Esporta l'intero archivio</span></div>
-                        <div><span className="text-amber-300">export --year 2026 --format ics</span> <span className="text-gray-400 text-[10px]">&bull; Esporta scadenze dell'anno in iCalendar (.ics)</span></div>
-                        <div><span className="text-amber-300">pdf --id n_12345</span> <span className="text-gray-400 text-[10px]">&bull; Genera e scarica all'istante il PDF A4 Ink-Friendly</span></div>
+                        <div><span className="text-amber-300">export --id n_12345 --format json|xml|md|ics|pdf|txt</span> <span className="text-gray-400 text-[10px]">• Esporta singolo memo nel formato indicato</span></div>
+                        <div><span className="text-amber-300">export --all --format json|xml|md|ics|txt</span> <span className="text-gray-400 text-[10px]">• Esporta l'intero archivio</span></div>
+                        <div><span className="text-amber-300">export --year 2026 --format ics</span> <span className="text-gray-400 text-[10px]">• Esporta scadenze dell'anno in iCalendar (.ics)</span></div>
+                        <div><span className="text-amber-300">pdf --id n_12345</span> <span className="text-gray-400 text-[10px]">• Genera e scarica all'istante il PDF A4 Ink-Friendly</span></div>
                       </div>
                     </div>
 
@@ -886,21 +880,19 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                         3. IMPORTAZIONE DATI (import)
                       </div>
                       <div className="mt-1 space-y-1">
-                        <div><span className="text-purple-300">import --json '[&#123;"title":"...","expirationDate":"2026-09-01"&#125;]'</span> <span className="text-gray-400 text-[10px]">&bull; Importa array JSON da testo</span></div>
-                        <div><span className="text-purple-300">import --xml '&lt;notula&gt;&lt;memos&gt;...&lt;/memos&gt;&lt;/notula&gt;'</span> <span className="text-gray-400 text-[10px]">&bull; Importa XML da testo</span></div>
-                        <div><span className="text-purple-300">import</span> <span className="text-gray-400 text-[10px]">&bull; Apre la finestra di dialogo grafica per selezionare file .json o .xml</span></div>
+                        <div><span className="text-purple-300">import --json '[&#123;"title":"...","expirationDate":"2026-09-01"&#125;]'</span> <span className="text-gray-400 text-[10px]">• Importa array JSON da testo</span></div>
+                        <div><span className="text-purple-300">import --xml '&lt;notula&gt;&lt;memos&gt;...&lt;/memos&gt;&lt;/notula&gt;'</span> <span className="text-gray-400 text-[10px]">• Importa XML da testo</span></div>
+                        <div><span className="text-purple-300">import</span> <span className="text-gray-400 text-[10px]">• Apre la finestra di dialogo grafica per selezionare file .json o .xml</span></div>
                       </div>
                     </div>
 
                     <div>
-                      <div className="text-emerald-400 font-bold pb-1 border-b border-gray-700">
-                        4. VISUALIZZAZIONE ED ELENCO MEMO (ls &bull; list)
-                      </div>
+                      <div className="text-emerald-400 font-bold pb-1 border-b border-gray-700">{settings.language === "en" ? "4. VIEW AND LIST MEMOS (ls • list)" : "4. VISUALIZZAZIONE ED ELENCO MEMO (ls • list)"}</div>
                       <div className="mt-1 space-y-1">
-                        <div><span className="text-yellow-300">ls</span> <span className="text-gray-400 text-[10px]">&bull; Mostra tutti i memo presenti</span></div>
-                        <div><span className="text-yellow-300">ls --year 2026</span> <span className="text-gray-400 text-[10px]">&bull; Filtra per anno (solo puntuali)</span></div>
-                        <div><span className="text-yellow-300">ls --group grp_12345</span> <span className="text-gray-400 text-[10px]">&bull; Mostra tutti i memo della serie collegata</span></div>
-                        <div><span className="text-yellow-300">ls --expired</span> <span className="text-gray-400 text-[10px]">&bull; Mostra esclusivamente i memo scaduti</span></div>
+                        <div><span className="text-yellow-300">ls</span> <span className="text-gray-400 text-[10px]">• Mostra tutti i memo presenti</span></div>
+                        <div><span className="text-yellow-300">ls --year 2026</span> <span className="text-gray-400 text-[10px]">• Filtra per anno (solo puntuali)</span></div>
+                        <div><span className="text-yellow-300">ls --group grp_12345</span> <span className="text-gray-400 text-[10px]">• Mostra tutti i memo della serie collegata</span></div>
+                        <div><span className="text-yellow-300">ls --expired</span> <span className="text-gray-400 text-[10px]">• Mostra esclusivamente i memo scaduti</span></div>
                       </div>
                     </div>
 
@@ -909,24 +901,24 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                         5. LE 9 MODALITÀ DI ELIMINAZIONE MIRATA (rm / remove)
                       </div>
                       <div className="mt-1 space-y-1">
-                        <div><span className="text-red-400">rm --id n_12345</span> <span className="text-gray-400 text-[10px]">&bull; 1. Elimina singolo memo per ID</span></div>
-                        <div><span className="text-red-400">rm --group grp_12345</span> <span className="text-gray-400 text-[10px]">&bull; Elimina l'intera serie ricorrente legata da groupID</span></div>
-                        <div><span className="text-red-400">rm --title "Udienza"</span> <span className="text-gray-400 text-[10px]">&bull; Elimina per corrispondenza del titolo</span></div>
-                        <div><span className="text-red-400">rm --expired</span> <span className="text-gray-400 text-[10px]">&bull; Elimina tutti i memo scaduti</span></div>
-                        <div><span className="text-red-400">rm --all</span> <span className="text-gray-400 text-[10px]">&bull; Elimina TUTTI i memo (pulizia totale)</span></div>
+                        <div><span className="text-red-400">rm --id n_12345</span> <span className="text-gray-400 text-[10px]">• 1. Elimina singolo memo per ID</span></div>
+                        <div><span className="text-red-400">rm --group grp_12345</span> <span className="text-gray-400 text-[10px]">• Elimina l'intera serie ricorrente legata da groupID</span></div>
+                        <div><span className="text-red-400">rm --title "Udienza"</span> <span className="text-gray-400 text-[10px]">• Elimina per corrispondenza del titolo</span></div>
+                        <div><span className="text-red-400">rm --expired</span> <span className="text-gray-400 text-[10px]">• Elimina tutti i memo scaduti</span></div>
+                        <div><span className="text-red-400">rm --all</span> <span className="text-gray-400 text-[10px]">• Elimina TUTTI i memo (pulizia totale)</span></div>
                       </div>
                     </div>
 
                     <div>
                       <div className="text-emerald-400 font-bold pb-1 border-b border-gray-700">
-                        6. UTILITY, SICUREZZA &amp; GOOGLE™ DRIVE
+                        6. UTILITY, SICUREZZA & GOOGLE™ DRIVE
                       </div>
                       <div className="mt-1 space-y-1">
-                        <div><span className="text-blue-300">passwd NuovaPassword2026!</span> <span className="text-gray-400 text-[10px]">&bull; Modifica/imposta Master Passphrase AES-256</span></div>
-                        <div><span className="text-blue-300">find --title "progetto"</span> <span className="text-gray-400 text-[10px]">&bull; Ricerca testuale rapida</span></div>
-                        <div><span className="text-blue-300">info n_12345</span> <span className="text-gray-400 text-[10px]">&bull; Scheda diagnostica completa con groupID</span></div>
-                        <div><span className="text-blue-300">sync</span> <span className="text-gray-400 text-[10px]">&bull; Avvia sincronizzazione da Google™ Drive</span></div>
-                        <div><span className="text-blue-300">cloud-test</span> <span className="text-gray-400 text-[10px]">&bull; Diagnostica di connessione Google™ Drive</span></div>
+                        <div><span className="text-blue-300">passwd NuovaPassword2026!</span> <span className="text-gray-400 text-[10px]">• Modifica/imposta Master Passphrase AES-256</span></div>
+                        <div><span className="text-blue-300">find --title "progetto"</span> <span className="text-gray-400 text-[10px]">• Ricerca testuale rapida</span></div>
+                        <div><span className="text-blue-300">info n_12345</span> <span className="text-gray-400 text-[10px]">• Scheda diagnostica completa con groupID</span></div>
+                        <div><span className="text-blue-300">sync</span> <span className="text-gray-400 text-[10px]">• Avvia sincronizzazione da Google™ Drive</span></div>
+                        <div><span className="text-blue-300">cloud-test</span> <span className="text-gray-400 text-[10px]">• Diagnostica di connessione Google™ Drive</span></div>
                       </div>
                     </div>
 
@@ -943,7 +935,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
         <div className="bg-[var(--bg-subtle)] border-t border-[var(--border-color)] px-6 py-3.5 flex items-center justify-between gap-4 shrink-0">
           <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-1.5 font-mono">
             <span>&copy; 2026 Ing. Mario Fantini</span>
-            <span>&bull;</span>
+            <span>•</span>
             <a href="https://mariofantini.eu" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
               mariofantini.eu
             </a>
@@ -954,7 +946,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-md transition cursor-pointer"
           >
-            Chiudi Guida
+            {settings.language === "en" ? "Close Guide" : "Chiudi Guida"}
           </button>
         </div>
 

@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { MemoItem } from '../types';
 import { exportSingleMemo, exportAllMemos } from '../utils/exportImport';
 import { Download, FileText, Code2, Calendar, FileCode, X, Check, Sparkles, Layers, Shield } from 'lucide-react';
@@ -24,6 +25,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   singleMemo,
   masterPassword = null,
 }) => {
+  const { settings } = useSettings();
   const [selectedFormat, setSelectedFormat] = useState<'json' | 'xml' | 'md' | 'ics' | 'pdf' | 'txt'>('json');
   const [isExporting, setIsExporting] = useState(false);
   const [doneMsg, setDoneMsg] = useState<string | null>(null);
@@ -37,8 +39,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     {
       id: 'json' as const,
       label: 'JSON (.json)',
-      badge: 'Backup Completo',
-      desc: 'Formato dati nativo completo. Ideale per backup, ripristino o migrazione crittografata AES-256.',
+      badge: (settings.language === "en" ? 'Complete Backup' : 'Backup Completo'),
+      desc: (settings.language === "en" ? 'Complete native data format. Ideal for backup, restore or AES-256 encrypted migration.' : 'Formato dati nativo completo. Ideale per backup, ripristino o migrazione crittografata AES-256.'),
       icon: <Code2 className="w-5 h-5 text-blue-500" />,
       color: 'border-blue-500/40 bg-blue-500/5 hover:bg-blue-500/10',
     },
@@ -46,7 +48,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       id: 'xml' as const,
       label: 'XML (.xml)',
       badge: 'Standard Notula™',
-      desc: 'Struttura ad albero gerarchica con tag <notula> e <memo>, compatibile con database e archivi legacy.',
+      desc: (settings.language === "en" ? 'Hierarchical tree structure with <notula> and <memo> tags, compatible with legacy databases and archives.' : 'Struttura ad albero gerarchica con tag <notula> e <memo>, compatibile con database e archivi legacy.'),
       icon: <FileCode className="w-5 h-5 text-indigo-500" />,
       color: 'border-indigo-500/40 bg-indigo-500/5 hover:bg-indigo-500/10',
     },
@@ -54,7 +56,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       id: 'md' as const,
       label: 'Markdown (.md)',
       badge: 'Editor & Note',
-      desc: 'Testo formattato con intestazioni e metadati per Obsidian, Notion, GitHub o editor Markdown.',
+      desc: (settings.language === "en" ? 'Formatted text with headers and metadata for Obsidian, Notion, GitHub or Markdown editors.' : 'Testo formattato con intestazioni e metadati per Obsidian, Notion, GitHub o editor Markdown.'),
       icon: <FileText className="w-5 h-5 text-purple-500" />,
       color: 'border-purple-500/40 bg-purple-500/5 hover:bg-purple-500/10',
     },
@@ -62,7 +64,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       id: 'ics' as const,
       label: 'iCalendar (.ics)',
       badge: 'Google™ Calendar & Outlook',
-      desc: 'Eventi e scadenze conformi allo standard RFC 5545, importabili in Google™ Calendar, Apple e Outlook.',
+      desc: (settings.language === "en" ? 'Events and deadlines compliant with the RFC 5545 standard, importable into Google™ Calendar, Apple and Outlook.' : 'Eventi e scadenze conformi allo standard RFC 5545, importabili in Google™ Calendar, Apple e Outlook.'),
       icon: <Calendar className="w-5 h-5 text-emerald-500" />,
       color: 'border-emerald-500/40 bg-emerald-500/5 hover:bg-emerald-500/10',
     },
@@ -117,7 +119,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             </div>
             <div>
               <h2 className="font-bold text-base sm:text-lg text-[var(--text-main)]">
-                Esporta Dati Notula™
+                {settings.language === "en" ? "Export Notula™ Data" : "Esporta Dati Notula™"}
               </h2>
               <p className="text-xs text-[var(--text-muted)]">
                 {isSingle 
@@ -204,9 +206,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             type="button"
             onClick={onClose}
             className="px-4 py-2 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
-          >
-            Annulla
-          </button>
+          >{settings.language === "en" ? "Cancel" : "Annulla"}</button>
           <button
             type="button"
             onClick={handleExecuteExport}

@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { DriveConfig } from '../types';
 import { 
   getStoredDriveConfig, 
@@ -34,6 +35,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
   syncStatusMsg,
   totalMemos,
 }) => {
+  const { settings } = useSettings();
   const [config, setConfig] = useState<DriveConfig>(getStoredDriveConfig());
   const [clientIdInput, setClientIdInput] = useState(config.clientId);
   const [authStatus, setAuthStatus] = useState<'not_connected' | 'connected' | 'error'>('not_connected');
@@ -102,8 +104,8 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               <Cloud className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-lg text-[var(--text-main)]">Sincronizzazione Cloud & Google™ Drive</h2>
-              <p className="text-xs text-[var(--text-muted)]">Salvataggio automatico trasparente su Google™ Drive e download remoto</p>
+              <h2 className="font-bold text-lg text-[var(--text-main)]">{settings.language === 'en' ? 'Cloud & Google™ Drive Sync' : 'Sincronizzazione Cloud & Google™ Drive'}</h2>
+              <p className="text-xs text-[var(--text-muted)]">{settings.language === "en" ? "Transparent automatic save on Google™ Drive and remote download" : "Salvataggio automatico trasparente su Google™ Drive e download remoto"}</p>
             </div>
           </div>
           <button
@@ -124,10 +126,10 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               </div>
               <div>
                 <div className="font-bold text-xs text-[var(--text-main)]">
-                  Stato Connessione: {authStatus === 'connected' ? 'Attivo & Autenticato' : 'Non connesso / In attesa'}
+                  {settings.language === 'en' ? 'Connection Status: ' : 'Stato Connessione: '}{authStatus === 'connected' ? (settings.language === 'en' ? 'Active & Authenticated' : 'Attivo & Autenticato') : (settings.language === 'en' ? 'Not connected / Waiting' : 'Non connesso / In attesa')}
                 </div>
                 <div className="text-[11px] text-[var(--text-muted)]">
-                  {totalMemos} memo in archivio locale • Cartella remota: <strong>/Notula</strong>
+                  {totalMemos} {settings.language === 'en' ? 'memos in local archive • Remote folder:' : 'memo in archivio locale • Cartella remota:'} <strong>/Notula</strong>
                 </div>
               </div>
             </div>
@@ -136,9 +138,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               <button
                 onClick={handleDisconnect}
                 className="text-xs text-red-500 hover:underline px-2 py-1"
-              >
-                Disconnetti
-              </button>
+              >{settings.language === "en" ? "Disconnect" : "Disconnetti"}</button>
             )}
           </div>
 
@@ -146,10 +146,10 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
           <div className="p-3.5 rounded-xl border border-purple-500/30 bg-purple-500/5 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-[var(--text-main)]">
               <Key className="w-4 h-4 text-purple-500" />
-              <span>Cifratura Cloud: <strong>{masterPassword ? 'ATTIVA (Protetto con PBKDF2/AES-256-GCM)' : 'Disattivata (Plain JSON)'}</strong></span>
+              <span>{settings.language === 'en' ? 'Cloud Encryption: ' : 'Cifratura Cloud: '}<strong>{masterPassword ? (settings.language === 'en' ? 'ACTIVE (Protected with PBKDF2/AES-256-GCM)' : 'ATTIVA (Protetto con PBKDF2/AES-256-GCM)') : (settings.language === 'en' ? 'Disabled (Plain JSON)' : 'Disattivata (Plain JSON)')}</strong></span>
             </div>
             {!masterPassword && (
-              <span className="text-[11px] text-amber-500 font-medium">Consigliata</span>
+              <span className="text-[11px] text-amber-500 font-medium">{settings.language === "en" ? "Recommended" : "Consigliata"}</span>
             )}
           </div>
 
@@ -157,21 +157,21 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
           <div className="space-y-3">
             <div>
               <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 flex items-center justify-between">
-                <span>Integrazione Google™ Drive API</span>
+                <span>{settings.language === "en" ? "Google™ Drive API Integration" : "Integrazione Google™ Drive API"}</span>
               </label>
               <p className="text-[11px] text-[var(--text-muted)]">
-                Notula utilizza lo standard OAuth 2.0 per accedere in modo sicuro ai tuoi file.
+                {settings.language === "en" ? "Notula uses the OAuth 2.0 standard to securely access your files." : "Notula utilizza lo standard OAuth 2.0 per accedere in modo sicuro ai tuoi file."}
               </p>
               <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                Ambito di autorizzazione: <code>https://www.googleapis.com/auth/drive.file</code> (accesso ristretto alla sola cartella <code>/Notula</code>).
+                {settings.language === "en" ? "Authorization scope:" : "Ambito di autorizzazione:"} <code>https://www.googleapis.com/auth/drive.file</code> (accesso ristretto alla sola cartella <code>/Notula</code>).
               </p>
             </div>
 
             {/* Auto-Sync Toggle */}
             <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-color)]">
               <div>
-                <span className="text-xs font-semibold text-[var(--text-main)]">Sincronizzazione Automatica</span>
-                <p className="text-[11px] text-[var(--text-muted)]">Salva su Google™ Drive ad ogni aggiunta/modifica/eliminazione</p>
+                <span className="text-xs font-semibold text-[var(--text-main)]">{settings.language === "en" ? "Automatic Synchronization" : "Sincronizzazione Automatica"}</span>
+                <p className="text-[11px] text-[var(--text-muted)]">{settings.language === "en" ? "Save to Google™ Drive on every add/edit/delete" : "Salva su Google™ Drive ad ogni aggiunta/modifica/eliminazione"}</p>
               </div>
               <input
                 type="checkbox"
@@ -201,7 +201,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               className="flex-1 py-2.5 px-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] hover:bg-[var(--border-color)] text-xs font-semibold text-[var(--text-main)] transition flex items-center justify-center gap-2"
             >
               <ShieldCheck className="w-4 h-4 text-blue-500" />
-              <span>{isTesting ? 'Verifica in corso...' : 'Verifica e Connetti Google™ Drive'}</span>
+              <span>{isTesting ? 'Verifica in corso...' : (settings.language === "en" ? 'Verify and Connect Google™ Drive' : 'Verifica e Connetti Google™ Drive')}</span>
             </button>
 
             <button
@@ -213,7 +213,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition flex items-center justify-center gap-2"
             >
               <CloudDownload className="w-4 h-4" />
-              <span>{isSyncing ? 'Sincronizzazione...' : 'Scarica da Google™ Drive'}</span>
+              <span>{isSyncing ? 'Sincronizzazione...' : (settings.language === 'en' ? 'Download from Google™ Drive' : 'Scarica da Google™ Drive')}</span>
             </button>
           </div>
         </div>
@@ -224,9 +224,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
           <button
             onClick={onClose}
             className="font-semibold text-[var(--text-main)] hover:underline"
-          >
-            Chiudi
-          </button>
+          >{settings.language === "en" ? "Close" : "Chiudi"}</button>
         </div>
       </div>
     </div>

@@ -5,7 +5,8 @@
  */
 
 import React, { useState } from 'react';
-import { MemoItem, REPEAT_LABELS_IT } from '../types';
+import { useSettings } from '../contexts/SettingsContext';
+import { MemoItem, REPEAT_LABELS_IT, REPEAT_LABELS_EN } from '../types';
 import { memoToPlainText, generateMemoPDF } from '../utils/exportImport';
 import { FileText, Download, X, Copy, Check, Sparkles, Shield, Repeat, Layers } from 'lucide-react';
 
@@ -20,6 +21,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
   onClose,
   memo,
 }) => {
+  const { settings } = useSettings();
   const [copied, setCopied] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
@@ -27,7 +29,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
   const recurrenceLabel = memo.repeatType === 'none' 
     ? 'Puntuale (Singola Scadenza)' 
-    : `Ricorrente (${REPEAT_LABELS_IT[memo.repeatType] || memo.repeatType})`;
+    : (settings.language === 'en' ? `Recurring (${REPEAT_LABELS_EN[memo.repeatType] || memo.repeatType})` : `Ricorrente (${REPEAT_LABELS_IT[memo.repeatType] || memo.repeatType})`);
 
   const obfuscationLabel = memo.obfuscation === 'full' 
     ? 'Strato 2: Totale (Maschera Solida)' 
@@ -67,18 +69,15 @@ export const PrintModal: React.FC<PrintModalProps> = ({
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-base sm:text-lg text-[var(--text-main)]">
-                Esportazione Documento PDF Ink-Friendly
-              </h2>
-              <p className="text-xs text-[var(--text-muted)]">
-                Scheda di dettaglio per memo ID: <code className="font-mono font-bold text-blue-500">{memo.id}</code>
+              <h2 className="font-bold text-base sm:text-lg text-[var(--text-main)]">{settings.language === 'en' ? 'Ink-Friendly PDF Export' : 'Esportazione Documento PDF Ink-Friendly'}</h2>
+              <p className="text-xs text-[var(--text-muted)]">{settings.language === "en" ? "Detail card for memo ID:" : "Scheda di dettaglio per memo ID:"}<code className="font-mono font-bold text-blue-500">{memo.id}</code>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-card)] transition"
-            title="Chiudi"
+            title={settings.language === "en" ? "Close" : "Chiudi"}
           >
             <X className="w-5 h-5" />
           </button>
@@ -93,13 +92,13 @@ export const PrintModal: React.FC<PrintModalProps> = ({
               <div>
                 <div className="text-[10px] uppercase tracking-widest font-extrabold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>NOTULA MEMORANDUM &bull; SCHEDA UFFICIALE</span>
+                  <span>NOTULA MEMORANDUM • SCHEDA UFFICIALE</span>
                 </div>
                 <h3 className="font-extrabold text-lg text-[var(--text-main)] mt-0.5">
                   {memo.title}
                 </h3>
                 <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                  Ideazione &amp; Sviluppo Ing. Mario Fantini &bull; <span className="font-mono">https://mariofantini.eu</span>
+                  Ideazione & Sviluppo Ing. Mario Fantini • <span className="font-mono">https://mariofantini.eu</span>
                 </p>
               </div>
 
@@ -118,35 +117,35 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             {/* Griglia Metadati */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-color)] text-xs">
               <div>
-                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">Data Scadenza</span>
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">{settings.language === 'en' ? 'Expiration Date' : 'Data Scadenza'}</span>
                 <span className="font-mono font-bold text-[var(--text-main)] text-sm">{memo.expirationDate}</span>
               </div>
 
               <div>
-                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">Tipologia</span>
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">{settings.language === "en" ? "Type" : "Tipologia"}</span>
                 <span className="font-medium text-[var(--text-main)]">{recurrenceLabel}</span>
               </div>
 
               <div>
-                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">Offuscamento</span>
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">{settings.language === "en" ? "Obfuscation" : "Offuscamento"}</span>
                 <span className="font-medium text-[var(--text-main)]">{obfuscationLabel}</span>
               </div>
 
               <div>
-                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">Crittografia Hardware</span>
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">{settings.language === "en" ? "Hardware Encryption" : "Crittografia Hardware"}</span>
                 <span className="font-mono font-medium text-purple-600 dark:text-purple-400">
                   {memo.isEncrypted ? 'AES-256-GCM Attiva' : 'In chiaro'}
                 </span>
               </div>
 
               <div>
-                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">Data Creazione</span>
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">{settings.language === "en" ? "Creation Date" : "Data Creazione"}</span>
                 <span className="text-[var(--text-muted)]">{new Date(memo.createdAt).toLocaleDateString('it-IT')}</span>
               </div>
 
               {memo.groupId && (
                 <div>
-                  <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">Gruppo Correlato</span>
+                  <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block">{settings.language === "en" ? "Related Group" : "Gruppo Correlato"}</span>
                   <span className="font-mono text-blue-500 text-[11px] truncate block">{memo.groupId}</span>
                 </div>
               )}
@@ -155,7 +154,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             {/* Note & Descrizione */}
             <div>
               <span className="text-xs font-bold text-[var(--text-main)] block mb-1.5 uppercase tracking-wide">
-                Descrizione &amp; Contenuto:
+                Descrizione & Contenuto:
               </span>
               <div className="p-3.5 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-main)] whitespace-pre-wrap leading-relaxed min-h-[70px]">
                 {memo.description || '(Nessuna nota descrittiva inserita)'}
@@ -165,7 +164,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             {/* Footer Anteprima (Senza sovrapposizione) */}
             <div className="pt-3 border-t border-[var(--border-color)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-[10px] text-[var(--text-muted)]">
               <div>
-                <span>Documento generato da Notula™ Memo Engine &bull; Ing. Mario Fantini</span>
+                <span>{settings.language === "en" ? "Document generated by Notula™ Memo Engine • Eng. Mario Fantini" : "Documento generato da Notula™ Memo Engine • Ing. Mario Fantini"}</span>
                 <div className="text-blue-500 font-mono">https://mariofantini.eu</div>
               </div>
               <div className="text-right sm:self-end">
@@ -190,9 +189,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
             <button
               onClick={onClose}
               className="px-4 py-2 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
-            >
-              Chiudi
-            </button>
+            >{settings.language === "en" ? "Close" : "Chiudi"}</button>
             <button
               onClick={handleDownloadPDF}
               disabled={isGeneratingPdf}

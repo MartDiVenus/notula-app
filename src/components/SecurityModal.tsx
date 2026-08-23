@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { 
   Shield, 
   Key, 
@@ -39,6 +40,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
   privacyMode,
   onTogglePrivacy,
 }) => {
+  const { settings } = useSettings();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
@@ -83,7 +85,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
     onSetMasterPassword(null);
     setNewPassword('');
     setConfirmPassword('');
-    setSuccessMsg("Master Passphrase rimossa. La crittografia hardware E2E è disattivata.");
+    setSuccessMsg(settings.language === "en" ? "Master Passphrase removed. E2E hardware encryption is disabled." : "Master Passphrase rimossa. La crittografia hardware E2E è disattivata.");
   };
 
   const handleTestEncryption = async () => {
@@ -123,10 +125,10 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
             </div>
             <div>
               <h2 className="font-bold text-base sm:text-lg text-[var(--text-main)]">
-                Sicurezza &amp; Master Passphrase
+                {settings.language === 'en' ? 'Security & Master Passphrase' : 'Sicurezza & Master Passphrase'}
               </h2>
               <p className="text-xs text-[var(--text-muted)]">
-                Crittografia hardware AES-256 GCM (PBKDF2 100.000 cicli)
+                {settings.language === 'en' ? 'AES-256 GCM Hardware Encryption (100,000 PBKDF2 cycles)' : 'Crittografia hardware AES-256 GCM (PBKDF2 100.000 cicli)'}
               </p>
             </div>
           </div>
@@ -156,12 +158,12 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-bold text-sm text-[var(--text-main)] flex items-center justify-between">
-                <span>Stato Vault: {masterPassword ? '🔒 Protetto con AES-256' : '🔓 Non protetto (In chiaro)'}</span>
+                <span>{settings.language === "en" ? "Vault Status: " : "Stato Vault: "}{masterPassword ? (settings.language === 'en' ? '🔒 Protected with AES-256' : '🔒 Protetto con AES-256') : (settings.language === 'en' ? '🔓 Unprotected (Clear text)' : '🔓 Non protetto (In chiaro)')}</span>
               </div>
               <p className="text-xs text-[var(--text-muted)] mt-1">
                 {masterPassword
                   ? 'I memo contrassegnati e i pacchetti di sincronizzazione su Google™ Drive sono protetti con chiave crittografica PBKDF2 a 256-bit.'
-                  : 'Nessuna Master Passphrase attiva. I memo sono memorizzati localmente in chiaro.'}
+                  : (settings.language === 'en' ? 'No Master Passphrase active. Memos are stored locally in clear text.' : 'Nessuna Master Passphrase attiva. I memo sono memorizzati localmente in chiaro.')}
               </p>
             </div>
           </div>
@@ -190,7 +192,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)] flex items-center gap-1.5">
                 <Key className="w-3.5 h-3.5 text-purple-500" />
-                <span>{masterPassword ? 'Modifica / Cambia Passphrase' : 'Crea Nuova Master Passphrase'}</span>
+                <span>{masterPassword ? (settings.language === 'en' ? 'Edit / Change Passphrase' : 'Modifica / Cambia Passphrase') : (settings.language === 'en' ? 'CREATE NEW MASTER PASSPHRASE' : 'Crea Nuova Master Passphrase')}</span>
               </h3>
 
               <button
@@ -199,7 +201,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                 className="text-[11px] text-blue-500 hover:underline flex items-center gap-1"
               >
                 <HelpCircle className="w-3 h-3" />
-                <span>Come funziona il cambio?</span>
+                <span>{settings.language === "en" ? "How does the change work?" : "Come funziona il cambio?"}</span>
               </button>
             </div>
 
@@ -210,12 +212,12 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                   ℹ️ Come funziona il cambio della Passphrase in Notula:
                 </div>
                 <p>
-                  <strong>Sì, la passphrase si può cambiare in qualunque momento:</strong>
+                  <strong>{settings.language === "en" ? "Yes, the passphrase can be changed at any time:" : "Sì, la passphrase si può cambiare in qualunque momento:"}</strong>
                 </p>
                 <ul className="list-disc list-inside space-y-0.5 text-[var(--text-muted)]">
-                  <li>Inserendo una nuova passphrase qui sotto o tramite comando CLI <code>notula passwd &lt;nuova_password&gt;</code>, Notula ricalcola istantaneamente le chiavi crittografiche hardware AES-GCM (100.000 iterazioni PBKDF2).</li>
-                  <li>La nuova passphrase viene impiegata per tutti i nuovi salvataggi, cifrature locali ed esportazioni protette.</li>
-                  <li>Per disattivare temporaneamente la richiesta di cifratura puoi fare clic su <em>"Disattiva Passphrase"</em>.</li>
+                  <li>{settings.language === "en" ? "By entering a new passphrase below or via CLI command " : "Inserendo una nuova passphrase qui sotto o tramite comando CLI "}<code>notula passwd &lt;nuova_password&gt;</code>{settings.language === "en" ? ", Notula instantly recalculates the hardware AES-GCM cryptographic keys (100,000 PBKDF2 iterations)." : ", Notula ricalcola istantaneamente le chiavi crittografiche hardware AES-GCM (100.000 iterazioni PBKDF2)."}</li>
+                  <li>{settings.language === "en" ? "The new passphrase is used for all new saves, local encryptions and protected exports." : "La nuova passphrase viene impiegata per tutti i nuovi salvataggi, cifrature locali ed esportazioni protette."}</li>
+                  <li>{settings.language === "en" ? "To temporarily disable the encryption request you can click on " : "Per disattivare temporaneamente la richiesta di cifratura puoi fare clic su "}<em>{settings.language === "en" ? "Disable Passphrase" : "Disattiva Passphrase"}</em>.</li>
                 </ul>
               </div>
             )}
@@ -224,7 +226,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               <div className="relative">
                 <input
                   type={showPwd ? 'text' : 'password'}
-                  placeholder={masterPassword ? "Inserisci la NUOVA passphrase..." : "Inserisci nuova passphrase..."}
+                  placeholder={masterPassword ? (settings.language === "en" ? "Enter NEW passphrase..." : "Inserisci la NUOVA passphrase...") : (settings.language === "en" ? "Enter new passphrase..." : "Inserisci nuova passphrase...")}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full px-3.5 py-2.5 pr-10 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -240,7 +242,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
 
               <input
                 type={showPwd ? 'text' : 'password'}
-                placeholder="Conferma nuova passphrase..."
+                placeholder={settings.language === "en" ? "Confirm new passphrase..." : "Conferma nuova passphrase..."}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -254,7 +256,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                   onClick={handleRemovePassword}
                   className="text-xs text-red-500 hover:underline font-semibold"
                 >
-                  Disattiva Passphrase
+                  {settings.language === "en" ? "Disable Passphrase" : "Disattiva Passphrase"}
                 </button>
               ) : <div />}
 
@@ -263,7 +265,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                 className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 active:scale-95"
               >
                 <Check className="w-3.5 h-3.5" />
-                <span>{masterPassword ? 'Aggiorna Passphrase' : 'Salva Passphrase'}</span>
+                <span>{masterPassword ? (settings.language === 'en' ? 'Update Passphrase' : 'Aggiorna Passphrase') : (settings.language === 'en' ? 'Save Passphrase' : 'Salva Passphrase')}</span>
               </button>
             </div>
           </form>
@@ -274,8 +276,8 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               <div className="flex items-center gap-2.5">
                 {privacyMode ? <EyeOff className="w-4 h-4 text-amber-500" /> : <Eye className="w-4 h-4 text-blue-500" />}
                 <div>
-                  <div className="text-xs font-bold text-[var(--text-main)]">Offuscamento Rapido a Schermo</div>
-                  <div className="text-[11px] text-[var(--text-muted)]">Maschera visivamente i testi dei memo per proteggerli da occhiate indiscrete</div>
+                  <div className="text-xs font-bold text-[var(--text-main)]">{settings.language === "en" ? "Quick On-Screen Obfuscation" : "Offuscamento Rapido a Schermo"}</div>
+                  <div className="text-[11px] text-[var(--text-muted)]">{settings.language === "en" ? "Visually masks memo texts to protect them from prying eyes" : "Maschera visivamente i testi dei memo per proteggerli da occhiate indiscrete"}</div>
                 </div>
               </div>
               <button
@@ -287,7 +289,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                     : 'bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-main)]'
                 }`}
               >
-                {privacyMode ? 'Attivo (Nascosto)' : 'Disattivato'}
+                {privacyMode ? (settings.language === 'en' ? 'Active (Hidden)' : 'Attivo (Nascosto)') : (settings.language === 'en' ? 'Disabled' : 'Disattivato')}
               </button>
             </div>
 
@@ -299,7 +301,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                 className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] hover:bg-[var(--bg-card)] text-xs text-[var(--text-main)] font-semibold transition"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-purple-500 ${isTesting ? 'animate-spin' : ''}`} />
-                <span>Esegui Test Crittografico AES-256-GCM</span>
+                <span>{settings.language === "en" ? "Run AES-256-GCM Cryptographic Test" : "Esegui Test Crittografico AES-256-GCM"}</span>
               </button>
             )}
           </div>
@@ -314,9 +316,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
             type="button"
             onClick={onClose}
             className="px-4 py-1.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition"
-          >
-            Chiudi
-          </button>
+          >{settings.language === "en" ? "Close" : "Chiudi"}</button>
         </div>
 
       </div>

@@ -37,7 +37,7 @@ export const NotulaLogo: React.FC<NotulaLogoProps> = ({
       {/* Emblema Vettoriale: Fasti Romani + Volatile Messaggero di Apollo (2 ali piumate) + Stelle */}
       <div 
         className={`relative flex items-center justify-center rounded-xl bg-gradient-to-b from-[#1e293b] via-[#0f172a] to-[#020617] text-white shadow-lg shadow-blue-950/40 border border-blue-400/30 shrink-0 ${sizeClasses[size]}`}
-        title="Notula™: Fasti Romani, Uccello Messaggero di Apollo (2 ali) &amp; Stelle di Orientamento - Ing. Mario Fantini"
+        title="Notula™: Fasti Romani, Uccello Messaggero di Apollo (2 ali) & Stelle di Orientamento - Ing. Mario Fantini"
       >
         <svg
           viewBox="0 0 100 100"

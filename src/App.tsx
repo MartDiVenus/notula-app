@@ -60,8 +60,14 @@ import {
   Minimize2,
   Info,
   BookOpen,
-  Smartphone
+  Smartphone,
+  Settings2
 } from 'lucide-react';
+
+import { useSettings } from './contexts/SettingsContext';
+import { translations } from './i18n/translations';
+import { SettingsModal } from './components/SettingsModal';
+import { useTodayNotifications } from './hooks/useTodayNotifications';
 
 const STORAGE_KEY = 'notula_db_v2';
 const THEME_KEY = 'notula_theme_v2';
@@ -71,10 +77,16 @@ const SIDEBAR_MODE_KEY = 'notula_sidebar_mode';
 type SidebarMode = 'normal' | 'collapsed' | 'expanded';
 
 export default function App() {
+  const { settings } = useSettings();
+  const t = translations[settings.language].sidebar;
+
   // Initialize Core Database Engine
   const coreRef = useRef<NotulaCore>(new NotulaCore([]));
   const [, setRenderTrigger] = useState<number>(0);
   const forceUpdate = () => setRenderTrigger((prev) => prev + 1);
+
+  // Notifications
+  useTodayNotifications(coreRef.current);
 
   // Calendar State
   const today = useMemo(() => new Date(), []);
@@ -108,6 +120,7 @@ export default function App() {
   const [isCloudSyncOpen, setIsCloudSyncOpen] = useState<boolean>(false);
   const [isSecurityOpen, setIsSecurityOpen] = useState<boolean>(false);
   const [isPrintOpen, setIsPrintOpen] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
   const [exportTargetMemo, setExportTargetMemo] = useState<MemoItem | null>(null);
   const [isInfoGuideOpen, setIsInfoGuideOpen] = useState<boolean>(false);
@@ -152,8 +165,8 @@ export default function App() {
       const starterMemos: MemoItem[] = [
         {
           id: 'n_1724000001-01',
-          title: 'Benvenuto in Notula (Memo Puntuale)',
-          description: 'Questo è un memo puntuale (non ricorrente). Nel calendario i memo puntuali sono evidenziati con bordi colorati: rosso se scaduto, arancio se oggi, magenta se futuro.',
+          title: settings.language === 'en' ? 'Welcome to Notula (One-time Memo)' : 'Benvenuto in Notula (Memo Puntuale)',
+          description: settings.language === 'en' ? 'This is a one-time (non-recurring) memo. In the calendar, one-time memos are highlighted with colored borders: red if expired, orange if today, magenta if future.' : 'Questo è un memo puntuale (non ricorrente). Nel calendario i memo puntuali sono evidenziati con bordi colorati: rosso se scaduto, arancio se oggi, magenta se futuro.',
           expirationDate: todayIso,
           year: String(today.getFullYear()),
           month: String(today.getMonth() + 1).padStart(2, '0'),
@@ -164,7 +177,7 @@ export default function App() {
         },
         {
           id: 'n_1724000002-02',
-          title: 'Notula Backup Automatico (Memo Ricorrente)',
+          title: settings.language === 'en' ? 'Notula Automatic Backup (Recurring Memo)' : 'Notula Backup Automatico (Memo Ricorrente)',
           description: 'Questo è un memo ricorrente. Nel calendario i memo ricorrenti sono evidenziati con pallini colorati.',
           expirationDate: todayIso,
           year: String(today.getFullYear()),
@@ -183,7 +196,7 @@ export default function App() {
     // Setup Online/Offline Network Listeners
     const handleOnline = () => {
       setIsOnline(true);
-      setSyncStatusMsg("Connessione ripristinata: avvio sincronizzazione Google™ Drive...");
+      setSyncStatusMsg((settings.language === "en" ? "Connection restored: starting Google™ Drive sync..." : "Connessione ripristinata: avvio sincronizzazione Google™ Drive..."));
       triggerDriveSyncOnConnect();
     };
 
@@ -220,10 +233,10 @@ export default function App() {
         const { memos } = await downloadFromDrive(masterPassword, false);
         if (memos && memos.length > 0) {
           await mergeMemosWithConflictCheck(memos, false);
-          setSyncStatusMsg("Sincronizzazione Google™ Drive in background completata");
+          setSyncStatusMsg((settings.language === "en" ? "Background Google™ Drive synchronization completed" : "Sincronizzazione Google™ Drive in background completata"));
         } else {
           await autoSyncToDrive(coreRef.current.getMemos(), masterPassword, false);
-          setSyncStatusMsg("Memo locali sincronizzati su Google™ Drive");
+          setSyncStatusMsg((settings.language === "en" ? "Local memos synchronized to Google™ Drive" : "Memo locali sincronizzati su Google™ Drive"));
         }
       } catch (err: any) {
         console.log("Drive background sync:", err.message || err);
@@ -231,7 +244,7 @@ export default function App() {
         setIsSyncing(false);
       }
     } else {
-      setSyncStatusMsg("Google™ Drive pronto");
+      setSyncStatusMsg((settings.language === "en" ? "Google™ Drive ready" : "Google™ Drive pronto"));
     }
   };
 
@@ -246,7 +259,7 @@ export default function App() {
         setIsSyncing(true);
         autoSyncToDrive(memos, masterPassword).then((res) => {
           if (res.success) {
-            setSyncStatusMsg("Sincronizzato su Google™ Drive con massima priorità");
+            setSyncStatusMsg((settings.language === "en" ? "Synchronized to Google™ Drive with high priority" : "Sincronizzato su Google™ Drive con massima priorità"));
           }
         }).catch((err) => {
           console.warn("Drive auto-sync error:", err);
@@ -373,7 +386,7 @@ export default function App() {
     try {
       const importedMemos = await parseImportFile(file, masterPassword);
       if (importedMemos.length === 0) {
-        alert("Nessun memo valido trovato nel file.");
+        alert((settings.language === "en" ? "No valid memos found in the file." : (settings.language === "en" ? "No valid memos found in the file." : (settings.language === "en" ? "No valid memos found in the file." : "Nessun memo valido trovato nel file."))));
         return;
       }
 
@@ -388,18 +401,18 @@ export default function App() {
   // Google™ Drive Download Handler with True Smart Sync
   const handleDownloadFromDrive = async () => {
     setIsSyncing(true);
-    setSyncStatusMsg("Connessione e download in corso da Google™ Drive...");
+    setSyncStatusMsg((settings.language === "en" ? "Connecting and downloading from Google™ Drive..." : "Connessione e download in corso da Google™ Drive..."));
     try {
       const { memos } = await downloadFromDrive(masterPassword, true);
       if (memos.length === 0) {
-        setSyncStatusMsg("Nessun memo trovato nel backup Google™ Drive.");
+        setSyncStatusMsg((settings.language === "en" ? "No memos found in Google™ Drive backup." : (settings.language === "en" ? "No memos found in Google™ Drive backup." : (settings.language === "en" ? "No memos found in Google™ Drive backup." : "Nessun memo trovato nel backup Google™ Drive."))));
         return;
       }
       await mergeMemosWithConflictCheck(memos, true);
       setSyncStatusMsg(`Sincronizzazione completata con successo (${memos.length} memo elaborati)`);
     } catch (err: any) {
       setSyncStatusMsg("Errore: " + err.message);
-      alert("Errore sincronizzazione Google™ Drive: " + err.message);
+      alert((settings.language === "en" ? "Google™ Drive synchronization error: " : "Errore sincronizzazione Google™ Drive: ") + err.message);
     } finally {
       setIsSyncing(false);
     }
@@ -546,7 +559,7 @@ export default function App() {
               }
             }}
             className="p-1.5 sm:p-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-blue-500/50 transition flex items-center gap-1"
-            title={`Menu Laterale: ${sidebarMode === 'collapsed' ? 'Mostra Barra' : 'Nascondi Barra'} (Ctrl+B)`}
+            title={settings.language === 'en' ? `Sidebar: ${sidebarMode === 'collapsed' ? 'Show Bar' : 'Hide Bar'} (Ctrl+B)` : `Menu Laterale: ${sidebarMode === 'collapsed' ? 'Mostra Barra' : 'Nascondi Barra'} (Ctrl+B)`}
           >
             <span className="md:hidden">
               <Menu className="w-4 h-4" />
@@ -573,10 +586,10 @@ export default function App() {
               setIsFormOpen(true);
             }}
             className="py-1.5 px-2.5 sm:px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-xs transition flex items-center gap-1"
-            title="Crea Nuovo Memo (o seleziona un giorno dal calendario)"
+            title={settings.language === "en" ? "Create New Memo (or select a day from the calendar)" : "Crea Nuovo Memo (o seleziona un giorno dal calendario)"}
           >
             <Plus className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline sm:inline">Nuovo</span>
+            <span className="hidden xs:inline sm:inline">{settings.language === "en" ? "New" : "Nuovo"}</span>
           </button>
 
           {/* Cloud Sync Active Indicator (Streamlined, no CLOUD-FIRST clutter) */}
@@ -589,7 +602,7 @@ export default function App() {
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:border-emerald-500' 
                   : 'bg-amber-500/10 border-amber-500/30 text-amber-500 hover:border-amber-500'
             }`}
-            title={isOnline ? 'Google™ Drive Sync Attivo. Clicca per gestire backup e sincronizzazione.' : 'Offline: Salvataggio locale attivo.'}
+            title={isOnline ? (settings.language === "en" ? 'Google™ Drive Sync Active. Click to manage backup and synchronization.' : 'Google™ Drive Sync Attivo. Clicca per gestire backup e sincronizzazione.') : (settings.language === 'en' ? 'Offline: Local saving active.' : 'Offline: Salvataggio locale attivo.')}
           >
             <div className={`w-2 h-2 rounded-full ${
               isSyncing 
@@ -611,7 +624,7 @@ export default function App() {
                 ? 'bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400 font-bold shadow-xs'
                 : 'bg-[var(--bg-subtle)] border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-purple-500/40'
             }`}
-            title={masterPassword ? 'Cifratura AES-256 Attiva (Clicca per gestire Master Password)' : 'Imposta Cifratura Forte AES-256 (Clicca per configurare)'}
+            title={masterPassword ? (settings.language === 'en' ? 'AES-256 Encryption Active (Click to manage Master Password)' : 'Cifratura AES-256 Attiva (Clicca per gestire Master Password)') : (settings.language === "en" ? 'Set Strong AES-256 Encryption (Click to configure)' : 'Imposta Cifratura Forte AES-256 (Clicca per configurare)')}
           >
             {masterPassword ? <Lock className="w-3.5 h-3.5 text-purple-500" /> : <Unlock className="w-3.5 h-3.5" />}
             <span className="hidden md:inline">AES-256</span>
@@ -625,7 +638,7 @@ export default function App() {
                 ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400'
                 : 'bg-[var(--bg-subtle)] border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
-            title={privacyMode ? 'Disattiva Privacy Mode (Mostra descrizioni protette)' : 'Attiva Privacy Mode (Sfoca e maschera contenuti)'}
+            title={privacyMode ? (settings.language === 'en' ? 'Deactivate Privacy Mode (Show protected descriptions)' : 'Disattiva Privacy Mode (Mostra descrizioni protette)') : (settings.language === "en" ? 'Activate Privacy Mode (Blur and mask content)' : 'Attiva Privacy Mode (Sfoca e maschera contenuti)')}
           >
             {privacyMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -634,7 +647,7 @@ export default function App() {
           <button
             onClick={toggleTheme}
             className="p-1.5 sm:p-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-blue-500/50 transition flex items-center"
-            title={`Tema: ${themeMode} (Clicca per cambiare)`}
+            title={settings.language === 'en' ? `Theme: ${themeMode} (Click to change)` : `Tema: ${themeMode} (Clicca per cambiare)`}
           >
             {themeMode === 'light' ? (
               <Sun className="w-4 h-4 text-amber-500" />
@@ -652,7 +665,7 @@ export default function App() {
               setIsInfoGuideOpen(true);
             }}
             className="p-1.5 sm:p-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-blue-500 hover:border-blue-500/50 transition flex items-center justify-center"
-            title="Informazioni Autore (Ing. Mario Fantini), Copyright & Guida Notula"
+            title={settings.language === "en" ? "Author Information (Ing. Mario Fantini), Copyright & Notula Guide" : "Informazioni Autore (Ing. Mario Fantini), Copyright & Guida Notula"}
           >
             <Info className="w-4 h-4" />
           </button>
@@ -665,7 +678,7 @@ export default function App() {
                 ? 'bg-emerald-600 border-emerald-500 text-white shadow-xs'
                 : 'bg-[#161b22] border-[#30363d] text-emerald-400 hover:border-emerald-500/50'
             }`}
-            title="Apri Terminale CLI (Ctrl+Shift+P)"
+            title={settings.language === "en" ? "Open CLI Terminal (Ctrl+Shift+P)" : "Apri Terminale CLI (Ctrl+Shift+P)"}
           >
             <Terminal className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">CLI</span>
@@ -690,7 +703,7 @@ export default function App() {
               className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.3)] transition flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              <span>Nuovo Memo</span>
+              <span>{settings.language === 'en' ? 'New Memo' : 'Nuovo Memo'}</span>
             </button>
 
             {/* Sidebar Width Quick Switcher */}
@@ -701,7 +714,7 @@ export default function App() {
                 localStorage.setItem(SIDEBAR_MODE_KEY, nextMode);
               }}
               className="p-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
-              title={sidebarMode === 'expanded' ? 'Riduci larghezza colonna (Standard)' : 'Estendi larghezza colonna (Espansa)'}
+              title={sidebarMode === 'expanded' ? (settings.language === 'en' ? 'Reduce column width (Standard)' : 'Riduci larghezza colonna (Standard)') : (settings.language === 'en' ? 'Extend column width (Expanded)' : 'Estendi larghezza colonna (Espansa)')}
             >
               {sidebarMode === 'expanded' ? <Minimize2 className="w-4 h-4 text-blue-500" /> : <Maximize2 className="w-4 h-4" />}
             </button>
@@ -712,7 +725,7 @@ export default function App() {
                 localStorage.setItem(SIDEBAR_MODE_KEY, 'collapsed');
               }}
               className="p-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
-              title="Nascondi colonna e centra il calendario a tutto schermo"
+              title={settings.language === "en" ? "Hide column and center full-screen calendar" : "Nascondi colonna e centra il calendario a tutto schermo"}
             >
               <PanelLeftClose className="w-4 h-4" />
             </button>
@@ -721,7 +734,7 @@ export default function App() {
           {/* Navigation Menu */}
           <div className="space-y-1">
             <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-2 mb-2">
-              Organizzazione
+              {settings.language === "en" ? "Organization" : "Organizzazione"}
             </div>
 
             <button
@@ -730,7 +743,7 @@ export default function App() {
             >
               <div className="flex items-center gap-2.5">
                 <Layers className="w-4 h-4" />
-                <span>Tutti i Memo</span>
+                <span>{settings.language === 'en' ? 'All Memos' : (settings.language === 'en' ? 'All Memos' : 'Tutti i Memo')}</span>
               </div>
               <span className="font-mono text-[11px] bg-blue-500/20 px-1.5 py-0.5 rounded font-bold">
                 {totalMemosCount}
@@ -743,7 +756,7 @@ export default function App() {
             >
               <div className="flex items-center gap-2.5">
                 <FolderLock className="w-4 h-4 text-emerald-500" />
-                <span>Memo Ricorrenti</span>
+                <span>{settings.language === 'en' ? 'Recurring Memos' : (settings.language === 'en' ? 'Recurring Memos' : 'Memo Ricorrenti')}</span>
               </div>
               <span className="font-mono text-[11px]">
                 {recurringCount}
@@ -756,7 +769,7 @@ export default function App() {
             >
               <div className="flex items-center gap-2.5">
                 <Trash2 className="w-4 h-4 text-red-500" />
-                <span>Memo Scaduti</span>
+                <span>{settings.language === 'en' ? 'Expired Memos' : (settings.language === 'en' ? 'Expired Memos' : 'Memo Scaduti')}</span>
               </div>
               <span className="font-mono text-[11px] text-red-500">
                 {expiredCount}
@@ -766,16 +779,14 @@ export default function App() {
 
           {/* GEM Operations Menu */}
           <div className="space-y-1">
-            <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-2 mb-2">
-              Funzioni GEM Notula
-            </div>
+            <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-2 mb-2">{settings.language === 'en' ? 'GEM Notula Functions' : (settings.language === "en" ? "Notula GEM Functions" : "Funzioni GEM Notula")}</div>
 
             <button
               onClick={() => setIsSearchOpen(true)}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] rounded-lg transition text-left"
             >
               <Search className="w-4 h-4 text-blue-500" />
-              <span>Cerca (Data/Titolo/ID)</span>
+              <span>{settings.language === 'en' ? 'Search (Date/Title/ID)' : (settings.language === 'en' ? 'Search (Date/Title/ID)' : 'Cerca (Data/Titolo/ID)')}</span>
             </button>
 
             <button
@@ -783,7 +794,7 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] rounded-lg transition text-left"
             >
               <ListFilter className="w-4 h-4 text-purple-500" />
-              <span>Elenco Memo (a-g)</span>
+              <span>{settings.language === 'en' ? 'Memo List (a-g)' : (settings.language === 'en' ? 'Memo List (a-g)' : 'Elenco Memo (a-g)')}</span>
             </button>
 
             <button
@@ -791,14 +802,14 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-red-500 rounded-lg transition text-left"
             >
               <Trash2 className="w-4 h-4 text-red-500" />
-              <span>Elimina Memo (1-9)</span>
+              <span>{settings.language === 'en' ? 'Delete Memo (1-9)' : (settings.language === 'en' ? 'Delete Memo (1-9)' : 'Elimina Memo (1-9)')}</span>
             </button>
           </div>
 
           {/* Backup & Cloud Actions */}
           <div className="space-y-1">
             <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-2 mb-2">
-              Cloud &amp; Archivio
+              {settings.language === 'en' ? 'Cloud & Archive' : 'Cloud & Archivio'}
             </div>
 
             <button
@@ -806,7 +817,7 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] rounded-lg transition text-left"
             >
               <CloudDownload className="w-4 h-4 text-cyan-500" />
-              <span>Scarica da Google™ Drive</span>
+              <span>{settings.language === 'en' ? 'Download from Google™ Drive' : (settings.language === 'en' ? 'Download from Google™ Drive' : 'Scarica da Google™ Drive')}</span>
             </button>
 
             <button
@@ -814,7 +825,7 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] rounded-lg transition text-left"
             >
               <Upload className="w-4 h-4 text-emerald-500" />
-              <span>Importa File (JSON / XML)</span>
+              <span>{settings.language === 'en' ? 'Import File (JSON / XML)' : (settings.language === 'en' ? 'Import File (JSON / XML)' : 'Importa File (JSON / XML)')}</span>
             </button>
 
             <button
@@ -825,16 +836,15 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] rounded-lg transition text-left"
             >
               <Download className="w-4 h-4 text-amber-500" />
-              <span>Esporta (XML, MD, ICS, JSON, PDF)</span>
+              <span>{settings.language === 'en' ? 'Export (XML, MD, ICS, JSON, PDF)' : (settings.language === 'en' ? 'Export (XML, MD, ICS, JSON, PDF)' : 'Esporta (XML, MD, ICS, JSON, PDF)')}</span>
             </button>
           </div>
 
           {/* About & Guide Section */}
           <div className="space-y-1">
             <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-2 mb-2">
-              Informazioni &amp; Supporto
+              {t.infoSupport}
             </div>
-
             <button
               onClick={() => {
                 setInfoGuideTab('info');
@@ -843,7 +853,7 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-blue-500 rounded-lg transition text-left"
             >
               <Info className="w-4 h-4 text-blue-500" />
-              <span>Autore, Contatti, Copyright</span>
+              <span>{t.author}</span>
             </button>
 
             <button
@@ -854,7 +864,7 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-blue-500 rounded-lg transition text-left"
             >
               <Smartphone className="w-4 h-4 text-blue-500" />
-              <span>Installazione, Emblema</span>
+              <span>{t.install}</span>
             </button>
 
             <button
@@ -865,7 +875,21 @@ export default function App() {
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-purple-500 rounded-lg transition text-left"
             >
               <BookOpen className="w-4 h-4 text-purple-500" />
-              <span>Guida Funzionale, Manuale d'Uso</span>
+              <span>{t.guide}</span>
+            </button>
+          </div>
+
+          {/* Settings Section */}
+          <div className="space-y-1">
+            <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-2 mb-2">
+              {t.settings}
+            </div>
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-indigo-500 rounded-lg transition text-left"
+            >
+              <Settings2 className="w-4 h-4 text-indigo-500" />
+              <span>{t.settings}</span>
             </button>
           </div>
 
@@ -873,14 +897,14 @@ export default function App() {
           <div className="mt-auto p-3 bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] text-xs">
             <div className="flex items-center justify-between font-semibold mb-1">
               <span className="text-[var(--text-main)]">
-                <span className="hidden sm:inline">Cartella Google™ Drive</span>
-                <span className="sm:hidden">Cartella Cloud</span>
+                <span className="hidden sm:inline">{settings.language === 'en' ? 'Google™ Drive Folder' : 'Cartella Google™ Drive'}</span>
+                <span className="sm:hidden">{settings.language === 'en' ? 'Cloud Folder' : 'Cartella Cloud'}</span>
               </span>
               <span className="text-blue-500 font-mono text-[10px]">v1.1</span>
             </div>
             <div className="text-[11px] text-[var(--text-muted)] space-y-0.5">
-              <div>Memo Totali: <strong>{totalMemosCount}</strong></div>
-              <div>Cifratura: <span className="font-mono text-blue-400">{masterPassword ? 'AES-256 E2E' : 'Standard'}</span></div>
+              <div>{settings.language === 'en' ? 'Total Memos:' : (settings.language === "en" ? "Total Memos:" : "Memo Totali:")}<strong>{totalMemosCount}</strong></div>
+              <div>{settings.language === 'en' ? 'Encryption:' : (settings.language === "en" ? "Encryption:" : "Cifratura:")}<span className="font-mono text-blue-400">{masterPassword ? 'AES-256 E2E' : 'Standard'}</span></div>
             </div>
           </div>
         </aside>
@@ -920,7 +944,7 @@ export default function App() {
             className="w-full py-3 px-4 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            <span>Nuovo Memo</span>
+            <span>{settings.language === 'en' ? 'New Memo' : 'Nuovo Memo'}</span>
           </button>
 
           <div className="space-y-1 overflow-y-auto flex-1">
@@ -928,7 +952,7 @@ export default function App() {
               onClick={() => { setIsMobileDrawerOpen(false); setIsListOpen(true); }}
               className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left"
             >
-              <div className="flex items-center gap-2.5"><Layers className="w-4 h-4 text-blue-500" /><span>Tutti i Memo</span></div>
+              <div className="flex items-center gap-2.5"><Layers className="w-4 h-4 text-blue-500" /><span>{settings.language === 'en' ? 'All Memos' : (settings.language === 'en' ? 'All Memos' : 'Tutti i Memo')}</span></div>
               <span className="font-mono text-[11px] bg-blue-500/20 px-1.5 py-0.5 rounded">{totalMemosCount}</span>
             </button>
 
@@ -936,14 +960,14 @@ export default function App() {
               onClick={() => { setIsMobileDrawerOpen(false); setIsSearchOpen(true); }}
               className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left"
             >
-              <Search className="w-4 h-4 text-blue-500" /><span>Cerca nei Memo</span>
+              <Search className="w-4 h-4 text-blue-500" /><span>{settings.language === 'en' ? 'Search Memos' : (settings.language === 'en' ? 'Search Memos' : 'Cerca nei Memo')}</span>
             </button>
 
             <button
               onClick={() => { setIsMobileDrawerOpen(false); setIsDeleteOpen(true); }}
               className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-red-500"
             >
-              <Trash2 className="w-4 h-4" /><span>Elimina Memo (1-9)</span>
+              <Trash2 className="w-4 h-4" /><span>{settings.language === 'en' ? 'Delete Memo (1-9)' : (settings.language === 'en' ? 'Delete Memo (1-9)' : 'Elimina Memo (1-9)')}</span>
             </button>
 
             <button
@@ -957,7 +981,7 @@ export default function App() {
               onClick={() => { setIsMobileDrawerOpen(false); handleTriggerImport(); }}
               className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left"
             >
-              <Upload className="w-4 h-4 text-emerald-500" /><span>Importa File (JSON / XML)</span>
+              <Upload className="w-4 h-4 text-emerald-500" /><span>{settings.language === 'en' ? 'Import File (JSON / XML)' : (settings.language === 'en' ? 'Import File (JSON / XML)' : 'Importa File (JSON / XML)')}</span>
             </button>
 
             <button
@@ -968,8 +992,10 @@ export default function App() {
               }}
               className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-amber-500"
             >
-              <Download className="w-4 h-4" /><span>Esporta (XML, MD, ICS, JSON, PDF)</span>
+              <span>{settings.language === 'en' ? 'Export (XML, MD, ICS, JSON, PDF)' : (settings.language === 'en' ? 'Export (XML, MD, ICS, JSON, PDF)' : 'Esporta (XML, MD, ICS, JSON, PDF)')}</span>
             </button>
+          </div>
+
 
             <div className="pt-2 border-t border-[var(--border-color)]">
               <button
@@ -980,7 +1006,7 @@ export default function App() {
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-blue-500"
               >
-                <Info className="w-4 h-4" /><span>Autore, Contatti, Copyright</span>
+                <Info className="w-4 h-4" /><span>{t.author}</span>
               </button>
 
               <button
@@ -991,7 +1017,7 @@ export default function App() {
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-blue-500"
               >
-                <Smartphone className="w-4 h-4" /><span>Installazione, Emblema</span>
+                <Smartphone className="w-4 h-4" /><span>{t.install}</span>
               </button>
 
               <button
@@ -1002,10 +1028,21 @@ export default function App() {
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-purple-500"
               >
-                <BookOpen className="w-4 h-4" /><span>Guida Funzionale, Manuale d'Uso</span>
+                <BookOpen className="w-4 h-4" /><span>{t.guide}</span>
               </button>
             </div>
-          </div>
+
+            <div className="pt-2 border-t border-[var(--border-color)]">
+              <button
+                onClick={() => {
+                  setIsMobileDrawerOpen(false);
+                  setIsSettingsOpen(true);
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-semibold rounded-lg hover:bg-[var(--bg-card)] text-left text-indigo-500"
+              >
+                <Settings2 className="w-4 h-4" /><span>{t.settings}</span>
+              </button>
+            </div>
         </aside>
 
         {/* Main Content Area: Calendar View centered and responsive */}
@@ -1014,8 +1051,8 @@ export default function App() {
           {sidebarMode === 'collapsed' && (
             <div className="hidden md:flex items-center justify-between mb-3 p-2 bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] text-xs shadow-xs">
               <div className="flex items-center gap-2 text-[var(--text-muted)]">
-                <span className="font-semibold text-[var(--text-main)]">Calendario Notula™ (Vista Principale)</span>
-                <span>&bull;</span>
+                <span className="font-semibold text-[var(--text-main)]">{settings.language === "en" ? "Notula™ Calendar (Main View)" : "Calendario Notula™ (Vista Principale)"}</span>
+                <span>•</span>
                 <span>{totalMemosCount} promemoria</span>
               </div>
 
@@ -1027,7 +1064,7 @@ export default function App() {
                 className="px-3 py-1 bg-[var(--bg-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-xs flex items-center gap-1.5 transition text-[var(--text-main)]"
               >
                 <PanelLeftOpen className="w-3.5 h-3.5 text-blue-500" />
-                <span>Mostra Menu Laterale</span>
+                <span>{settings.language === 'en' ? 'Show Sidebar' : (settings.language === 'en' ? 'Show Sidebar' : 'Mostra Menu Laterale')}</span>
               </button>
             </div>
           )}
@@ -1252,7 +1289,7 @@ export default function App() {
       {memoToDelete && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
           <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl w-full max-w-sm shadow-2xl p-6">
-            <h3 className="text-lg font-bold text-[var(--text-main)] mb-2">Elimina Memo</h3>
+            <h3 className="text-lg font-bold text-[var(--text-main)] mb-2">{settings.language === "en" ? "Delete Memo" : "Elimina Memo"}</h3>
             <p className="text-sm text-[var(--text-muted)] mb-6">
               Sei sicuro di voler eliminare definitivamente questo promemoria? Questa azione non può essere annullata.
             </p>
@@ -1260,9 +1297,7 @@ export default function App() {
               <button
                 onClick={() => setMemoToDelete(null)}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:bg-[var(--bg-subtle)] transition"
-              >
-                Annulla
-              </button>
+              >{settings.language === "en" ? "Cancel" : (settings.language === "en" ? "Cancel" : (settings.language === "en" ? "Cancel" : "Annulla"))}</button>
               <button
                 onClick={confirmDeleteMemo}
                 className="px-4 py-2 rounded-xl text-xs font-semibold bg-red-600 text-white hover:bg-red-700 shadow-[0_0_15px_rgba(220,38,38,0.4)] transition"
@@ -1279,6 +1314,17 @@ export default function App() {
         isOpen={isInfoGuideOpen}
         onClose={() => setIsInfoGuideOpen(false)}
         initialTab={infoGuideTab}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        theme={themeMode}
+        setTheme={(newTheme) => {
+          setThemeMode(newTheme);
+          applyTheme(newTheme);
+        }}
       />
     </div>
   );

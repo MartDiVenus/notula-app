@@ -7,6 +7,14 @@
 export type RepeatType = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly';
 export type ObfuscationLevel = 'none' | 'partial' | 'full';
 
+export const REPEAT_LABELS_EN: Record<RepeatType, string> = {
+  none: 'one-time',
+  daily: 'daily',
+  weekly: 'weekly',
+  monthly: 'monthly',
+  yearly: 'yearly',
+};
+
 export const REPEAT_LABELS_IT: Record<RepeatType, string> = {
   none: 'puntuale',
   daily: 'giornaliero',
