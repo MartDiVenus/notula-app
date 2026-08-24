@@ -41,10 +41,17 @@ export const useTodayNotifications = (core: NotulaCore, renderTrigger: number) =
       const analysis = core.analyzeDay(today.getFullYear(), today.getMonth(), today.getDate(), todayStr);
       
       // Find new memos we haven't notified about yet FOR TODAY
-      const unnotifiedMemos = analysis.memos.filter(m => !notifiedEvents.current.has(`${todayStr}_${m.id}`));
+            const unnotifiedMemos = analysis.memos.filter(m => !notifiedEvents.current.has(`${todayStr}_${m.id}`));
+      
+      console.log(`[Notula Notification Engine] Triggered. Today: ${todayStr}, Total Memos: ${analysis.memos.length}, Unnotified: ${unnotifiedMemos.length}`);
 
       if (unnotifiedMemos.length > 0) {
         const title = settings.language === 'en' ? 'Notula: Memos Today' : 'Notula: Promemoria Odierni';
+        
+        // Dispatch In-App Toast event
+        window.dispatchEvent(new CustomEvent('notula-toast', { 
+           detail: { title, body } 
+        }));
         const body = settings.language === 'en' 
           ? `You have ${analysis.memos.length} memo(s) scheduled for today.`
           : `Hai ${analysis.memos.length} promemoria in programma per oggi.`;
@@ -53,14 +60,31 @@ export const useTodayNotifications = (core: NotulaCore, renderTrigger: number) =
         if (settings.notifications && 'Notification' in window) {
           if (Notification.permission === 'granted') {
             try {
-              new Notification(title, {
+              // Try standard web notification
+              const notif = new Notification(title, {
                 body,
                 icon: '/icon-512.png',
-                tag: 'notula-daily', // Prevents infinite stacking of popups
+                tag: `notula-daily-${Date.now()}`,
               });
+              
+              notif.onerror = (e) => {
+                 console.error("[Notula] Notification API onerror fired", e);
+              };
             } catch (err) {
-              console.warn('Notification failed', err);
+              console.warn('[Notula] Standard Notification constructor failed, trying Service Worker...', err);
+              // Fallback to Service Worker for strict environments
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                  registration.showNotification(title, {
+                    body,
+                    icon: '/icon-512.png',
+                    tag: `notula-daily-${Date.now()}`
+                  }).catch(swErr => console.error('[Notula] SW Notification failed', swErr));
+                });
+              }
             }
+          } else {
+             console.warn("[Notula] Notification permission is not 'granted'. Current state:", Notification.permission);
           }
         }
 

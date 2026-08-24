@@ -61,7 +61,9 @@ import {
   Info,
   BookOpen,
   Smartphone,
-  Settings2
+  Settings2,
+  Bell,
+  X,
 } from 'lucide-react';
 
 import { useSettings } from './contexts/SettingsContext';
@@ -96,6 +98,16 @@ export default function App() {
 
   // App Configuration & Security
   const [themeMode, setThemeMode] = useState<ThemeMode>('dark');
+  const [toastNotif, setToastNotif] = useState<{title: string, body: string} | null>(null);
+
+  useEffect(() => {
+    const handleToast = (e: any) => {
+      setToastNotif({ title: e.detail.title, body: e.detail.body });
+      setTimeout(() => setToastNotif(null), 8000);
+    };
+    window.addEventListener('notula-toast', handleToast);
+    return () => window.removeEventListener('notula-toast', handleToast);
+  }, []);
   const [privacyMode, setPrivacyMode] = useState<boolean>(false);
   const [masterPassword, setMasterPassword] = useState<string | null>(null);
 
@@ -1326,6 +1338,23 @@ export default function App() {
           applyTheme(newTheme);
         }}
       />
+      {/* Global In-App Toast Fallback */}
+      {toastNotif && (
+        <div className="fixed bottom-6 right-6 z-[100] max-w-sm w-full bg-[var(--bg-card)] border border-[var(--border-color)] shadow-2xl rounded-2xl p-4 animate-in slide-in-from-bottom-5 fade-in duration-300">
+           <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 shrink-0">
+                 <Bell className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                 <div className="font-bold text-[var(--text-main)] text-sm">{toastNotif.title}</div>
+                 <div className="text-[var(--text-muted)] text-xs mt-1 leading-relaxed">{toastNotif.body}</div>
+              </div>
+              <button onClick={() => setToastNotif(null)} className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-main)] transition">
+                 <X className="w-4 h-4" />
+              </button>
+           </div>
+        </div>
+      )}
     </div>
   );
 }
