@@ -82,11 +82,11 @@ export default function App() {
 
   // Initialize Core Database Engine
   const coreRef = useRef<NotulaCore>(new NotulaCore([]));
-  const [, setRenderTrigger] = useState<number>(0);
+  const [renderTrigger, setRenderTrigger] = useState<number>(0);
   const forceUpdate = () => setRenderTrigger((prev) => prev + 1);
 
   // Notifications
-  useTodayNotifications(coreRef.current);
+  useTodayNotifications(coreRef.current, renderTrigger);
 
   // Calendar State
   const today = useMemo(() => new Date(), []);
