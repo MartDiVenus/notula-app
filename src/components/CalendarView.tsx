@@ -8,10 +8,12 @@ import { useSettings } from '../contexts/SettingsContext';
 import { MemoItem, DayAnalysis, REPEAT_LABELS_IT, REPEAT_LABELS_EN } from '../types';
 import { NotulaCore } from '../utils/notulaCore';
 import { getObfuscatedDisplay } from '../utils/obfuscation';
+import { downloadIcs, addToGoogleCalendar } from '../utils/ics';
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Calendar as CalendarIcon, 
+  Calendar as CalendarIcon,
+  CalendarPlus, 
   Download, 
   FileText,
   Printer, 
@@ -437,8 +439,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       </span>
 
                       {/* Memo Title */}
-                      <h4 className="text-xs sm:text-sm font-bold text-[var(--text-main)] truncate">
+                      <h4 className="text-xs sm:text-sm font-bold text-[var(--text-main)] truncate flex items-center gap-1.5">
                         {memo.title}
+                        {memo.time && (
+                           <span className="inline-block px-1.5 py-0.5 rounded bg-[var(--bg-main)] text-[9px] font-mono text-[var(--text-muted)] border border-[var(--border-color)]">
+                             {memo.time}
+                           </span>
+                        )}
                       </h4>
 
                       {/* Layer 1: Partial Obfuscation Badge */}
@@ -558,22 +565,22 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           </div>
 
                           <div className="flex items-center gap-1">
+                          
+
+                          
                           <button
                             onClick={(e) => { e.stopPropagation(); onExportMemo(memo); }}
-                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-emerald-600 hover:bg-emerald-500/10 transition"
+                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
                             title={settings.language === "en" ? "Export single memo" : "Esporta singolo memo"}
                           >
                             <Download className="w-4 h-4" />
                           </button>
-
-                          <button
-                            onClick={(e) => { e.stopPropagation(); onPrintMemo(memo); }}
-                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
-                            title={settings.language === "en" ? "Generate & Export PDF Document" : "Genera & Esporta Documento PDF"}
+                          <button onClick={(e) => { e.stopPropagation(); downloadIcs(memo); }}
+                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-emerald-600 hover:bg-emerald-500/10 transition"
+                            title={settings.language === "en" ? "Download .ics file" : "Scarica file .ics"}
                           >
-                            <FileText className="w-4 h-4 text-blue-500" />
+                            <CalendarPlus className="w-4 h-4" />
                           </button>
-
                           <button
                             onClick={(e) => { e.stopPropagation(); onEditMemo(memo); }}
                             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"

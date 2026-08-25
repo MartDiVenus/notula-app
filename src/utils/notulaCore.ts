@@ -44,10 +44,15 @@ export class NotulaCore {
     title: string;
     description?: string;
     expirationDate: string; // YYYY-MM-DD
+    time?: string; // HH:MM
     repeatType?: RepeatType;
     obfuscation?: ObfuscationLevel;
     isEncrypted?: boolean;
     groupId?: string;
+    gCalSync?: boolean;
+    alertDaysBefore?: number;
+    alertTime?: string;
+    gCalEventId?: string;
   }): MemoItem {
     if (!params.title || !params.title.trim()) {
       throw new Error("Il titolo del memo è obbligatorio.");
@@ -76,6 +81,10 @@ export class NotulaCore {
       repeatType: params.repeatType || 'none',
       obfuscation: params.obfuscation || 'none',
       isEncrypted: !!params.isEncrypted,
+      gCalSync: params.gCalSync,
+      alertDaysBefore: params.alertDaysBefore,
+      alertTime: params.alertTime,
+      gCalEventId: params.gCalEventId,
       createdAt: new Date().toISOString(),
     };
 
@@ -314,6 +323,7 @@ export class NotulaCore {
     title?: string;
     description?: string;
     expirationDate?: string;
+    time?: string;
     repeatType?: RepeatType;
     obfuscation?: ObfuscationLevel;
     isEncrypted?: boolean;
@@ -332,6 +342,7 @@ export class NotulaCore {
       title: params.title !== undefined ? params.title.trim() : current.title,
       description: params.description !== undefined ? params.description.trim() : current.description,
       expirationDate: expDate,
+      time: params.time !== undefined ? params.time : current.time,
       year: year || current.year,
       month: (month ? month.padStart(2, '0') : current.month),
       day: (day ? day.padStart(2, '0') : current.day),

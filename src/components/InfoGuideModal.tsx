@@ -6,44 +6,39 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSettings } from '../contexts/SettingsContext';
-import { 
-  Info, 
-  X, 
-  ShieldCheck, 
-  Lock, 
-  Cloud, 
-  Terminal, 
-  Calendar, 
-  FileText, 
-  Globe, 
-  ExternalLink, 
-  Copyright, 
-  BookOpen, 
-  CheckCircle2, 
-  Sparkles, 
-  Layers, 
-  Eye, 
-  EyeOff,
-  HardDrive,
-  RefreshCw,
+import {
   Award,
-  KeyRound,
-  Download,
-  HelpCircle,
-  Hash,
-  Filter,
-  Trash2,
-  Search,
-  Repeat,
-  Smartphone,
-  Laptop,
-  Check,
-  Shield,
-  Palette,
+  BookOpen,
+  Calendar,
+  CalendarPlus,
+  CheckCircle2,
   Clock,
-  ArrowRight,
+  Cloud,
   Code2,
-  FileCode
+  Copyright,
+  Download,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  FileCode,
+  FileText,
+  Globe,
+  Check,
+  HardDrive,
+  Info,
+  KeyRound,
+  Layers,
+  Lock,
+  RefreshCw,
+  Repeat,
+  Search,
+  Shield,
+  ShieldCheck,
+  Smartphone,
+  Sparkles,
+  Terminal,
+  Trash2,
+  X
 } from 'lucide-react';
 import { NotulaLogo } from './NotulaBrand';
 import { CliManualModal } from './CliManualModal';
@@ -65,7 +60,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
   const [activeTab, setActiveTab] = useState<'info' | 'guide'>(initialTab);
   const [isCliManualOpen, setIsCliManualOpen] = useState<boolean>(false);
   const [guideSection, setGuideSection] = useState<
-    'all' | 'intro' | 'features' | 'legend' | 'security' | 'exports' | 'sync' | 'daily' | 'cli'
+    'all' | 'intro' | 'features' | 'legend' | 'security' | 'exports' | 'sync' | 'calendar' | 'daily' | 'cli'
   >('all');
 
   // Ensure activeTab matches initialTab whenever modal opens or tab prop changes
@@ -391,12 +386,21 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 </button>
                 <button
                   type="button"
+                  onClick={() => setGuideSection('calendar')}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                    guideSection === 'calendar' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                  }`}
+                >
+                  {settings.language === "en" ? "7. Native Calendar" : "7. Calendario Nativo"}
+                </button>
+                <button
+                  type="button"
                   onClick={() => setGuideSection('daily')}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
                     guideSection === 'daily' ? 'bg-blue-600 text-white shadow-xs' : 'bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
                   }`}
                 >
-                  {settings.language === "en" ? "7. Daily Features" : "7. Funzioni Quotidiane"}
+                  {settings.language === "en" ? "8. Daily Features" : "8. Funzioni Quotidiane"}
                 </button>
                 <button
                   type="button"
@@ -503,6 +507,16 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
                         {settings.language === "en" ? "High reactivity graphical interface with interactive calendar combined with a powerful engineering command line terminal." : "Interfaccia grafica ad alta reattività con calendario interattivo unita a un potente terminale a riga di comando ingegneristico."}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1.5">
+                      <div className="font-bold text-[var(--text-main)] flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span>{settings.language === "en" ? "Optional Native OS Notifications" : "Notifiche OS Native Opzionali"}</span>
+                      </div>
+                      <p className="text-[11px] text-[var(--text-muted)]">
+                        {settings.language === "en" ? "Follows a conscious consultation philosophy (Calendar-First), but allows enabling push notifications fully integrated with your operating system (Windows, macOS, Linux, Android)." : "Adotta una filosofia a consultazione consapevole (Calendar-First), ma permette di attivare notifiche push perfettamente integrate con il sistema operativo (Windows, macOS, Linux, Android)."}
                       </p>
                     </div>
                   </div>
@@ -684,7 +698,9 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                         <span>iCalendar (.ics)</span>
                       </div>
                       <p className="text-[var(--text-muted)]">
-                        Eventi e scadenze importabili direttamente in Google™ Calendar, Apple Calendar e Microsoft Outlook.
+                        Eventi e scadenze importabili direttamente in Google™ Calendar,
+  CalendarPlus,
+  Download, Apple Calendar e Microsoft Outlook.
                       </p>
                     </div>
 
@@ -739,13 +755,87 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
               )}
 
               {/* ------------------------------------------------------------- */}
-              {/* 7. ALTRE FUNZIONALITÀ UTILI PER UTENTI NORMALI */}
+                            {/* ------------------------------------------------------------- */}
+              {/* 7. CALENDARIO NATIVO / NOTIFICHE */}
+              {/* ------------------------------------------------------------- */}
+              {(guideSection === 'all' || guideSection === 'calendar') && (
+                <div className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 space-y-3">
+                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                    <Calendar className="w-5 h-5 shrink-0" />
+                    <span>{settings.language === "en" ? "7. Native Calendar Sync & Notifications" : "7. Sincronizzazione Calendario Nativo e Notifiche"}</span>
+                  </div>
+                  
+                  <div className="space-y-3 text-xs text-[var(--text-muted)]">
+                    <p>
+                      {settings.language === "en" 
+                        ? "To guarantee infallible notifications even when Notula™ is completely closed (especially on mobile devices without background processes), the app directly integrates with " 
+                        : "Per garantire l'infallibilità delle notifiche anche quando Notula™ è completamente chiusa (specialmente sui dispositivi mobile privi di processi in background), l'app si integra direttamente con "}
+                      <strong>Google Calendar</strong>. 
+                      {settings.language === "en"
+                        ? " You can automatically sync any memo with a single click, completely bypassing the manual download of .ics files. "
+                        : " Puoi sincronizzare in automatico qualsiasi memo con un solo clic, bypassando completamente lo scaricamento manuale dei file .ics. "}
+                    </p>
+                    <p className="mt-2 p-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20 rounded-lg">
+                      {settings.language === "en"
+                        ? "Important: To receive offline notifications on your smartphone, you must have the Google Calendar app installed and avoid clearing its cache. When you use Notula's 'Cloud' sync button to restore backups from Google Drive on a new device, Notula will automatically repopulate your Google Calendar with all your active memos!"
+                        : "Importante: per ricevere le notifiche offline sullo smartphone, devi avere l'app Google Calendar installata e non svuotarne la cache. Quando usi il pulsante di sincronizzazione 'Cloud' per ripristinare il backup da Google Drive su un nuovo dispositivo, Notula ripopolerà automaticamente anche il tuo Google Calendar in un colpo solo!"}
+                    </p>
+                    
+                    <div className="grid grid-cols-1 gap-3 mt-2">
+                      <div className="p-3 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl">
+                        <h4 className="font-bold text-[#4285F4] flex items-center gap-1.5 mb-2">
+                          <CalendarPlus className="w-4 h-4" />
+                          {settings.language === "en" ? "Automated Sync & Notifications" : "Notifiche e Sincronizzazione Automatica"}
+                        </h4>
+                        <p className="text-[11px] leading-relaxed mb-2">
+                          {settings.language === "en" 
+                            ? "While creating or editing a memo, simply activate the 'Notifications & Sync with Google Calendar' switch. Notula™ will let you choose exactly how many days before you want to be alerted and at what time. Once saved, Notula™ will beam the data directly to your calendar, and Google will reliably wake up your phone or send you an email at the exact minute."
+                            : "Durante la creazione o modifica di un memo, attiva semplicemente l'interruttore 'Notifiche e Sync con Google Calendar'. Notula™ ti permetterà di scegliere quanti giorni prima essere avvisato e a che ora. Al salvataggio, Notula™ invierà i dati direttamente al calendario e l'infrastruttura Google si occuperà in totale sicurezza di farti suonare il telefono al minuto esatto."}
+                        </p>
+                        
+                        <div className="mt-3 pt-3 border-t border-[var(--border-color)]">
+                          <h4 className="font-bold text-[var(--text-main)] flex items-center gap-1.5 mb-1 text-[11px]">
+                            <CalendarPlus className="w-3.5 h-3.5 text-emerald-500" />
+                            {settings.language === "en" ? "Desktop OS Notifications (Windows, Mac, Linux)" : "Notifiche su Desktop (Windows, Mac, Linux)"}
+                          </h4>
+                          <p className="text-[10px] leading-relaxed mb-2">
+                            {settings.language === "en"
+                              ? "To receive Google Calendar notifications on a Desktop PC without keeping the browser open, you must link your Google Account directly in your Operating System settings:"
+                              : "Per ricevere le notifiche di Google Calendar su PC Desktop senza tenere il browser aperto, devi collegare il tuo Account Google direttamente nelle impostazioni del tuo Sistema Operativo:"}
+                          </p>
+                          <ul className="list-disc pl-4 text-[10px] text-[var(--text-muted)] space-y-1 mb-2">
+                            <li><strong>Windows:</strong> {settings.language === "en" ? "Settings > Accounts > Email & accounts > Add Google account. (Notifications appear via Windows Calendar)." : "Impostazioni > Account > E-mail e account > Aggiungi account Google. (Le notifiche appariranno tramite il Calendario di Windows)."}</li>
+                            <li><strong>macOS:</strong> {settings.language === "en" ? "System Settings > Internet Accounts > Google." : "Impostazioni di Sistema > Account Internet > Google."}</li>
+                            <li><strong>Linux (Debian/Ubuntu):</strong> {settings.language === "en" ? "Settings > Online Accounts > Google. (GNOME will handle notifications natively)." : "Impostazioni > Account Online > Google. (GNOME gestirà le notifiche nativamente)."}</li>
+                          </ul>
+                          <p className="text-[10px] leading-relaxed mb-2">
+                            {settings.language === "en"
+                              ? "Fallback: Notula also programs Google Calendar to send an Email reminder. If you have an email client (like Thunderbird) open, you will receive the alert there!"
+                              : "Fallback: Notula programma Google Calendar per inviare anche un promemoria via Email. Se hai un client di posta (es. Thunderbird) aperto, riceverai l'avviso lì!"}
+                          </p>
+                          <h4 className="font-bold text-[var(--text-main)] flex items-center gap-1.5 mb-1 text-[11px] mt-3">
+                            <Check className="w-3.5 h-3.5 text-emerald-500" />
+                            {settings.language === "en" ? "What about .ics export and native executables?" : "E l'esportazione .ics e i vecchi eseguibili?"}
+                          </h4>
+                          <p className="text-[10px] leading-relaxed">
+                            {settings.language === "en"
+                              ? "The manual .ics download is still available (green icon) as a fallback for offline systems. Also, since Notula functions perfectly as a web cache with Cloud sync, native executables (.exe, .deb) have been permanently removed to keep the code clean."
+                              : "Lo scaricamento manuale .ics è ancora disponibile (icona verde) come fallback per i sistemi offline. Inoltre, poiché Notula funziona perfettamente tramite cache web e sync Cloud, i vecchi eseguibili nativi (.exe, .deb) sono stati rimossi in via definitiva per mantenere l'app pulita e leggera."}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 8. ALTRE FUNZIONALITÀ UTILI PER UTENTI NORMALI */}
               {/* ------------------------------------------------------------- */}
               {(guideSection === 'all' || guideSection === 'daily') && (
                 <div className="p-5 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-subtle)] space-y-3">
                   <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm">
                     <Layers className="w-5 h-5 shrink-0" />
-                    <span>{settings.language === "en" ? "7. Daily Features & Practical Shortcuts" : "7. Funzionalità Quotidiane & Scorciatoie Pratiche"}</span>
+                    <span>{settings.language === "en" ? "8. Daily Features & Practical Shortcuts" : "8. Funzionalità Quotidiane & Scorciatoie Pratiche"}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
@@ -789,7 +879,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
               )}
 
               {/* ------------------------------------------------------------- */}
-              {/* 8. TERMINALE CLI (RIGOROSAMENTE ALLA FINE PER UTENTI AVANZATI) */}
+              {/* 9. TERMINALE CLI (RIGOROSAMENTE ALLA FINE PER UTENTI AVANZATI) */}
               {/* ------------------------------------------------------------- */}
               {(guideSection === 'all' || guideSection === 'cli') && (
                 <div className="p-5 rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/5 space-y-4">

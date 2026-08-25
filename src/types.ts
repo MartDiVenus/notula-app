@@ -29,6 +29,7 @@ export interface MemoItem {
   title: string;
   description?: string;
   expirationDate: string; // YYYY-MM-DD
+  time?: string; // HH:MM
   year: string;
   month: string;
   day: string;
@@ -38,6 +39,10 @@ export interface MemoItem {
   updatedAt?: string;
   tags?: string[];
   isEncrypted?: boolean;
+  gCalEventId?: string;
+  gCalSync?: boolean;
+  alertDaysBefore?: number;
+  alertTime?: string;
 }
 
 export type ThemeMode = 'system' | 'light' | 'dark';

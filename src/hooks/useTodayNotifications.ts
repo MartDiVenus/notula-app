@@ -48,10 +48,6 @@ export const useTodayNotifications = (core: NotulaCore, renderTrigger: number) =
       if (unnotifiedMemos.length > 0) {
         const title = settings.language === 'en' ? 'Notula: Memos Today' : 'Notula: Promemoria Odierni';
         
-        // Dispatch In-App Toast event
-        window.dispatchEvent(new CustomEvent('notula-toast', { 
-           detail: { title, body } 
-        }));
         const body = settings.language === 'en' 
           ? `You have ${analysis.memos.length} memo(s) scheduled for today.`
           : `Hai ${analysis.memos.length} promemoria in programma per oggi.`;
@@ -65,6 +61,7 @@ export const useTodayNotifications = (core: NotulaCore, renderTrigger: number) =
                 body,
                 icon: '/icon-512.png',
                 tag: `notula-daily-${Date.now()}`,
+                requireInteraction: true,
               });
               
               notif.onerror = (e) => {
@@ -78,7 +75,8 @@ export const useTodayNotifications = (core: NotulaCore, renderTrigger: number) =
                   registration.showNotification(title, {
                     body,
                     icon: '/icon-512.png',
-                    tag: `notula-daily-${Date.now()}`
+                    tag: `notula-daily-${Date.now()}`,
+                    requireInteraction: true
                   }).catch(swErr => console.error('[Notula] SW Notification failed', swErr));
                 });
               }
@@ -123,13 +121,7 @@ export const useTodayNotifications = (core: NotulaCore, renderTrigger: number) =
         // Track all current memos as notified FOR TODAY
         analysis.memos.forEach(m => notifiedEvents.current.add(`${todayStr}_${m.id}`));
 
-        // Persist to local storage to survive page reloads during the same day
-        try {
-           localStorage.setItem(LS_NOTIFIED_KEY, JSON.stringify({
-              date: todayStr,
-              ids: Array.from(notifiedEvents.current)
-           }));
-        } catch (e) {}
+
       }
     };
 

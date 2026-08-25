@@ -141,7 +141,7 @@ function setupTokenClient(
     
     const config: any = {
       client_id: clientId.trim(),
-      scope: 'https://www.googleapis.com/auth/drive.file',
+      scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar.events',
       callback: (resp: any) => {
         if (resp.error !== undefined) {
           onError(resp);
@@ -177,10 +177,10 @@ if (typeof window !== 'undefined') {
   }
 }
 
-export function requestDriveAuth(promptConsent: boolean = false, silentOnly: boolean = false): Promise<string> {
+export function requestDriveAuth(promptConsent: boolean = false, silentOnly: boolean = false, force: boolean = false): Promise<string> {
   return new Promise((resolve, reject) => {
     const currentToken = getDriveAccessToken();
-    if (currentToken) {
+    if (currentToken && !force) {
       return resolve(currentToken);
     }
 

@@ -3,15 +3,32 @@ import re
 with open('src/App.tsx', 'r', encoding='utf-8') as f:
     content = f.read()
 
-content = content.replace(
-    "const [, setRenderTrigger] = useState<number>(0);",
-    "const [renderTrigger, setRenderTrigger] = useState<number>(0);"
-)
+old_app = '''        try {
+          const eventId = await syncMemoToGoogleCalendar(savedMemo);
+          if (eventId) {
+            coreRef.current.updateMemo({
+              id: savedMemo.id,
+              gCalEventId: eventId
+            });
+          }
+        } catch (e) {
+          console.error("Failed to sync to GCal", e);
+        }'''
 
-content = content.replace(
-    "useTodayNotifications(coreRef.current);",
-    "useTodayNotifications(coreRef.current, renderTrigger);"
-)
+new_app = '''        try {
+          const eventId = await syncMemoToGoogleCalendar(savedMemo);
+          if (eventId) {
+            coreRef.current.updateMemo({
+              id: savedMemo.id,
+              gCalEventId: eventId
+            });
+          }
+        } catch (e) {
+          console.error("Failed to sync to GCal", e);
+          throw e;
+        }'''
+
+content = content.replace(old_app, new_app)
 
 with open('src/App.tsx', 'w', encoding='utf-8') as f:
     f.write(content)

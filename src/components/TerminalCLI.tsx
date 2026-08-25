@@ -232,6 +232,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
         case 'create': {
           const title = getFlag(args, '--title');
           const date = getFlag(args, '--date');
+          const time = getFlag(args, '--time');
           const desc = getFlag(args, '--desc') || '';
           const repeatRaw = getFlag(args, '--repeat');
           const obfuscate = (getFlag(args, '--obfuscate') as ObfuscationLevel) || 'none';
@@ -273,6 +274,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
             title,
             description: desc,
             expirationDate: date,
+            time,
             repeatType: repeatType,
             obfuscation: obfuscate,
             isEncrypted,
@@ -542,6 +544,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
           log(`ℹ️ DETTAGLI MEMO [${m.id}]:`);
           log(`   Titolo: ${m.title}`);
           log(`   Data Scadenza: ${m.expirationDate}`);
+          if (m.time) log(`   Orario: ${m.time}`);
           if (m.groupId) log(`   GroupID (Serie): ${m.groupId}`);
           log(`   Tipologia Ricorrenza: ${m.repeatType}`);
           log(`   Livello Offuscamento: ${m.obfuscation}`);

@@ -1,3 +1,4 @@
+import { syncMemoToGoogleCalendar, deleteMemoFromGoogleCalendar } from "./utils/googleCalendar";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -63,7 +64,6 @@ import {
   Smartphone,
   Settings2,
   Bell,
-  X,
 } from 'lucide-react';
 
 import { useSettings } from './contexts/SettingsContext';
@@ -98,16 +98,7 @@ export default function App() {
 
   // App Configuration & Security
   const [themeMode, setThemeMode] = useState<ThemeMode>('dark');
-  const [toastNotif, setToastNotif] = useState<{title: string, body: string} | null>(null);
 
-  useEffect(() => {
-    const handleToast = (e: any) => {
-      setToastNotif({ title: e.detail.title, body: e.detail.body });
-      setTimeout(() => setToastNotif(null), 8000);
-    };
-    window.addEventListener('notula-toast', handleToast);
-    return () => window.removeEventListener('notula-toast', handleToast);
-  }, []);
   const [privacyMode, setPrivacyMode] = useState<boolean>(false);
   const [masterPassword, setMasterPassword] = useState<string | null>(null);
 
@@ -345,29 +336,59 @@ export default function App() {
   };
 
   // --- 5. MEMO CREATION & UPDATES ---
-  const handleSaveMemoForm = (data: {
+  const handleSaveMemoForm = async (data: {
     title: string;
     description: string;
     expirationDate: string;
+    time?: string;
     repeatType: any;
     obfuscation: any;
     isEncrypted?: boolean;
     updateEntireGroup?: boolean;
+    gCalSync?: boolean;
+    alertDaysBefore?: number;
+    alertTime?: string;
   }) => {
+    let savedMemo;
     if (editingMemo) {
-      coreRef.current.updateMemo({
+      const updated = coreRef.current.updateMemo({
         id: editingMemo.id,
         title: data.title,
         description: data.description,
         expirationDate: data.expirationDate,
+        time: data.time,
         repeatType: data.repeatType,
         obfuscation: data.obfuscation,
         isEncrypted: data.isEncrypted,
         updateEntireGroup: data.updateEntireGroup,
+        gCalSync: data.gCalSync,
+        alertDaysBefore: data.alertDaysBefore,
+        alertTime: data.alertTime
       });
+      savedMemo = updated.find(m => m.id === editingMemo.id);
     } else {
-      coreRef.current.createMemo(data);
+      savedMemo = coreRef.current.createMemo({
+        ...data,
+      });
     }
+
+    if (savedMemo) {
+      if (data.gCalSync) {
+        try {
+          const eventId = await syncMemoToGoogleCalendar(savedMemo);
+          if (eventId) {
+            coreRef.current.updateMemo({
+              id: savedMemo.id,
+              gCalEventId: eventId
+            });
+          }
+        } catch (e) {
+          console.error("Failed to sync to GCal", e);
+          throw e;
+        }
+      }
+    }
+
     persistMemos(coreRef.current.getMemos());
     setEditingMemo(null);
   };
@@ -378,6 +399,10 @@ export default function App() {
 
   const confirmDeleteMemo = () => {
     if (memoToDelete) {
+      const memoObj = coreRef.current.getMemos().find(m => m.id === memoToDelete);
+      if (memoObj && memoObj.gCalEventId) {
+         deleteMemoFromGoogleCalendar(memoObj.gCalEventId);
+      }
       coreRef.current.removeByIds([memoToDelete]);
       persistMemos(coreRef.current.getMemos());
       // Also delete single memo file on Google Drive in background
@@ -502,6 +527,29 @@ export default function App() {
     const updatedList = Array.from(existingMap.values());
     coreRef.current.setMemos(updatedList);
     persistMemos(updatedList);
+
+    // GCal background sync per i memo importati che lo richiedono
+    (async () => {
+      let gCalChanged = false;
+      for (const memo of updatedList) {
+        if (memo.gCalSync) {
+          try {
+            // syncMemoToGoogleCalendar restituisce null o ID. Non far fallire tutto per uno.
+            const eventId = await syncMemoToGoogleCalendar(memo, true);
+            if (eventId && memo.gCalEventId !== eventId) {
+              memo.gCalEventId = eventId;
+              gCalChanged = true;
+            }
+          } catch (e) {
+            console.warn(`Silenced GCal sync error for memo ${memo.id}`, e);
+          }
+        }
+      }
+      if (gCalChanged) {
+         coreRef.current.setMemos(updatedList);
+         persistMemos(updatedList);
+      }
+    })();
   };
 
   // --- 7. EXPORT HELPERS (JSON, XML, MD, ICS, PDF, TXT) ---
@@ -1338,23 +1386,6 @@ export default function App() {
           applyTheme(newTheme);
         }}
       />
-      {/* Global In-App Toast Fallback */}
-      {toastNotif && (
-        <div className="fixed bottom-6 right-6 z-[100] max-w-sm w-full bg-[var(--bg-card)] border border-[var(--border-color)] shadow-2xl rounded-2xl p-4 animate-in slide-in-from-bottom-5 fade-in duration-300">
-           <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 shrink-0">
-                 <Bell className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                 <div className="font-bold text-[var(--text-main)] text-sm">{toastNotif.title}</div>
-                 <div className="text-[var(--text-muted)] text-xs mt-1 leading-relaxed">{toastNotif.body}</div>
-              </div>
-              <button onClick={() => setToastNotif(null)} className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-main)] rounded-lg hover:bg-[var(--bg-main)] transition">
-                 <X className="w-4 h-4" />
-              </button>
-           </div>
-        </div>
-      )}
     </div>
   );
 }

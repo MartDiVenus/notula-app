@@ -202,7 +202,7 @@ Notula™ is optimized for standalone use:
 
 ## 🏛️ Visione & Filosofia di Progetto
 
-**Notula™** è un motore di promemoria e organizzazione temporale concepito secondo il principio **"Calendar-First"**. A differenza dei comuni task manager basati su notifiche push intrusive, Notula™ adotta una filosofia a **consultazione consapevole**: è l'utente a visionare il calendario e a interagire attivamente con i propri impegni.
+**Notula™** è un motore di promemoria e organizzazione temporale concepito secondo il principio **"Calendar-First"**. Notula™ adotta primariamente una filosofia a **consultazione consapevole**, dove è l'utente a visionare il calendario e a interagire attivamente con i propri impegni. Tuttavia, per garantire un supporto completo, integra un sistema **opzionale di Notifiche Push Native**: interfacciandosi direttamente con il sistema operativo del dispositivo (Windows Action Center, macOS Notification Center, Linux DE o Android Notification Shade), permette all'utente di scegliere se ricevere allarmi tempestivi, perfettamente integrati con l'ambiente desktop e mobile.
 
 L'applicazione garantisce:
 - **Sovranità Assoluta dei Dati**: Cifratura locale a 3 strati con derivazione di chiave PBKDF2 e cifratura simmetrica AES-256-GCM.

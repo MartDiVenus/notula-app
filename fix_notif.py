@@ -1,11 +1,15 @@
-import re
-
 with open('src/hooks/useTodayNotifications.ts', 'r', encoding='utf-8') as f:
     content = f.read()
 
-# We need to remove the custom event dispatcher completely
+bad = """        // Dispatch In-App Toast event
+        window.dispatchEvent(new CustomEvent('notula-toast', { 
+           detail: { title, body } 
+        }));
+        const body = settings.language === 'en' 
+          ? `You have ${analysis.memos.length} memo(s) scheduled for today.`
+          : `Hai ${analysis.memos.length} promemoria in programma per oggi.`;"""
 
-bad = """        const body = settings.language === 'en' 
+good = """        const body = settings.language === 'en' 
           ? `You have ${analysis.memos.length} memo(s) scheduled for today.`
           : `Hai ${analysis.memos.length} promemoria in programma per oggi.`;
           
@@ -13,10 +17,6 @@ bad = """        const body = settings.language === 'en'
         window.dispatchEvent(new CustomEvent('notula-toast', { 
            detail: { title, body } 
         }));"""
-
-good = """        const body = settings.language === 'en' 
-          ? `You have ${analysis.memos.length} memo(s) scheduled for today.`
-          : `Hai ${analysis.memos.length} promemoria in programma per oggi.`;"""
 
 content = content.replace(bad, good)
 

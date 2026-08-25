@@ -8,7 +8,8 @@ import { useSettings } from '../contexts/SettingsContext';
 import { MemoItem, REPEAT_LABELS_IT, REPEAT_LABELS_EN } from '../types';
 import { NotulaCore, getLocalYYYYMMDD } from '../utils/notulaCore';
 import { getObfuscatedDisplay } from '../utils/obfuscation';
-import { ListFilter, Calendar, Download, FileText, Printer, Edit3, Trash2, X, ArrowRight, Repeat, Lock, Shield, Eye, EyeOff } from 'lucide-react';
+import { downloadIcs, addToGoogleCalendar } from '../utils/ics';
+import { ListFilter, Calendar, Download, FileText, Printer, Edit3, Trash2, X, ArrowRight, CalendarPlus, Repeat, Lock, Shield, Eye, EyeOff } from 'lucide-react';
 
 interface ListSubmenuProps {
   isOpen: boolean;
@@ -310,8 +311,13 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                         )}
                       </div>
 
-                      <h4 className="font-bold text-base text-[var(--text-main)] mb-1">
+                      <h4 className="font-bold text-base text-[var(--text-main)] mb-1 flex items-center gap-2">
                         {memo.title}
+                        {memo.time && (
+                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--bg-main)] text-[10px] font-mono text-[var(--text-muted)] border border-[var(--border-color)]">
+                             {memo.time}
+                           </span>
+                        )}
                       </h4>
 
                       {memo.description && (() => {
@@ -384,22 +390,22 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                         <ArrowRight className="w-4 h-4" />
                       </button>
 
+                      
+
+                      
                       <button
                         onClick={() => onExportMemo(memo)}
-                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-emerald-600 hover:bg-emerald-500/10 transition"
+                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
                         title={settings.language === "en" ? "Export single memo" : "Esporta singolo memo"}
                       >
                         <Download className="w-4 h-4" />
                       </button>
-
-                      <button
-                        onClick={() => onPrintMemo(memo)}
-                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
-                        title={settings.language === "en" ? "Generate & Export PDF Card" : "Genera & Esporta Scheda PDF"}
+                      <button onClick={() => downloadIcs(memo)}
+                        className="p-1.5 rounded-lg text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 transition"
+                        title={settings.language === "en" ? "Download .ics file" : "Scarica file .ics"}
                       >
-                        <FileText className="w-4 h-4 text-blue-500" />
+                        <CalendarPlus className="w-4 h-4" />
                       </button>
-
                       <button
                         onClick={() => onEditMemo(memo)}
                         className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-600 hover:bg-blue-500/10 transition"
