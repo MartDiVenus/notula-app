@@ -70,7 +70,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
 
           {remainingConflicts > 1 && (
             <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 shrink-0">
-              +{remainingConflicts - 1} altri conflitti
+              +{remainingConflicts - 1} {settings.language === "en" ? "other conflicts" : "altri conflitti"}
             </span>
           )}
         </div>
@@ -78,7 +78,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
         {/* Content Comparison Body */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
           <div className="text-xs text-[var(--text-muted)] leading-relaxed">
-            È stata rilevata una discrepanza tra la versione attualmente presente nel database locale e quella in arrivo. Seleziona come procedere:
+            {settings.language === "en" ? "A discrepancy was detected between the local database version and the incoming one. Choose how to proceed:" : "È stata rilevata una discrepanza tra la versione attualmente presente nel database locale e quella in arrivo. Seleziona come procedere:"}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -88,17 +88,17 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
               <div className="px-4 py-2.5 bg-blue-500/10 border-b border-blue-500/20 flex items-center justify-between">
                 <span className="font-bold text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                  Versione Locale (Attuale)
+                  {settings.language === "en" ? "Local Version (Current)" : "Versione Locale (Attuale)"}
                 </span>
                 <span className="text-[10px] font-mono text-[var(--text-muted)]">
-                  {existingMemo.updatedAt ? new Date(existingMemo.updatedAt).toLocaleTimeString('it-IT') : 'Locale'}
+                  {existingMemo.updatedAt ? new Date(existingMemo.updatedAt).toLocaleTimeString('it-IT') : (settings.language === "en" ? 'Local' : 'Locale')}
                 </span>
               </div>
 
               <div className="p-4 space-y-3 flex-1 flex flex-col justify-between text-xs">
                 <div>
                   <div className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-0.5">
-                    Titolo:
+                    {settings.language === "en" ? "Title:" : "Titolo:"}
                   </div>
                   <div className={`font-bold text-sm text-[var(--text-main)] ${isTitleDiff ? 'text-blue-600 dark:text-blue-400' : ''}`}>
                     {existingMemo.title}
@@ -115,7 +115,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                   <div>
                     <span className="text-[var(--text-muted)] block text-[10px]">{settings.language === "en" ? "Recurrence:" : "Ricorrenza:"}</span>
                     <span className="font-semibold text-[var(--text-main)]">
-                      {existingMemo.repeatType === 'none' ? 'Puntuale' : settings.language === 'en' ? REPEAT_LABELS_EN[existingMemo.repeatType] : REPEAT_LABELS_IT[existingMemo.repeatType] || existingMemo.repeatType}
+                      {existingMemo.repeatType === 'none' ? (settings.language === "en" ? 'One-time' : 'Puntuale') : settings.language === 'en' ? REPEAT_LABELS_EN[existingMemo.repeatType] : REPEAT_LABELS_IT[existingMemo.repeatType] || existingMemo.repeatType}
                     </span>
                   </div>
                 </div>
@@ -148,17 +148,17 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
               <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between">
                 <span className="font-bold text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                  Versione in Arrivo (Google™ Drive / File)
+                  {settings.language === "en" ? "Incoming Version (Google™ Drive / File)" : "Versione in Arrivo (Google™ Drive / File)"}
                 </span>
                 <span className="text-[10px] font-mono text-[var(--text-muted)]">
-                  {incomingMemo.updatedAt ? new Date(incomingMemo.updatedAt).toLocaleTimeString('it-IT') : 'In arrivo'}
+                  {incomingMemo.updatedAt ? new Date(incomingMemo.updatedAt).toLocaleTimeString('it-IT') : (settings.language === "en" ? 'Incoming' : 'In arrivo')}
                 </span>
               </div>
 
               <div className="p-4 space-y-3 flex-1 flex flex-col justify-between text-xs">
                 <div>
                   <div className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-0.5">
-                    Titolo:
+                    {settings.language === "en" ? "Title:" : "Titolo:"}
                   </div>
                   <div className={`font-bold text-sm text-[var(--text-main)] ${isTitleDiff ? 'text-amber-600 dark:text-amber-400 font-extrabold' : ''}`}>
                     {incomingMemo.title}
@@ -175,7 +175,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
                   <div>
                     <span className="text-[var(--text-muted)] block text-[10px]">{settings.language === "en" ? "Recurrence:" : "Ricorrenza:"}</span>
                     <span className="font-semibold text-[var(--text-main)]">
-                      {incomingMemo.repeatType === 'none' ? 'Puntuale' : settings.language === 'en' ? REPEAT_LABELS_EN[incomingMemo.repeatType] : REPEAT_LABELS_IT[incomingMemo.repeatType] || incomingMemo.repeatType}
+                      {incomingMemo.repeatType === 'none' ? (settings.language === "en" ? 'One-time' : 'Puntuale') : settings.language === 'en' ? REPEAT_LABELS_EN[incomingMemo.repeatType] : REPEAT_LABELS_IT[incomingMemo.repeatType] || incomingMemo.repeatType}
                     </span>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
           </div>
 
           <div className="mt-3 text-[11px] text-center text-[var(--text-muted)] font-mono">
-            Scorciatoie da tastiera: <strong className="text-blue-500">Y</strong> (Sostituisci) &bull; <strong className="text-amber-500">A</strong> (Tutti) &bull; <strong className="text-red-500">I</strong> (Ignora) &bull; <strong className="text-emerald-500">M</strong> (Copia)
+            {settings.language === "en" ? "Keyboard shortcuts:" : "Scorciatoie da tastiera:"} <strong className="text-blue-500">Y</strong> ({settings.language === "en" ? "Replace" : "Sostituisci"}) &bull; <strong className="text-amber-500">A</strong> ({settings.language === "en" ? "All" : "Tutti"}) &bull; <strong className="text-red-500">I</strong> ({settings.language === "en" ? "Ignore" : "Ignora"}) &bull; <strong className="text-emerald-500">M</strong> ({settings.language === "en" ? "Copy" : "Copia"})
           </div>
         </div>
 
