@@ -13,6 +13,7 @@ import { ListFilter, Calendar, Download, FileText, Printer, Edit3, Trash2, X, Ar
 
 interface ListSubmenuProps {
   isOpen: boolean;
+  initialCategory?: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i';
   onClose: () => void;
   core: NotulaCore;
   privacyMode: boolean;
@@ -26,6 +27,7 @@ interface ListSubmenuProps {
 
 export const ListSubmenu: React.FC<ListSubmenuProps> = ({
   isOpen,
+  initialCategory,
   onClose,
   core,
   privacyMode,
@@ -37,8 +39,14 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
   onExportBatch,
 }) => {
   const { settings } = useSettings();
-  const [listCategory, setListCategory] = useState<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g'>('a');
+  const [listCategory, setListCategory] = useState<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i'>('a');
   const [revealedMemoIds, setRevealedMemoIds] = useState<Set<string>>(new Set());
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setListCategory(initialCategory || 'a');
+    }
+  }, [isOpen, initialCategory]);
 
   const toggleRevealMemo = (id: string) => {
     setRevealedMemoIds(prev => {
@@ -57,16 +65,20 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
       case 'a':
         return core.listAll();
       case 'b':
-        return core.listByYearNonEternal(yearVal);
+        return core.listPunctualByYear(yearVal);
       case 'c':
-        return core.listByYearAndMonthNonEternal(yearVal, monthVal);
+        return core.listPunctualByYearMonth(yearVal, monthVal);
       case 'd':
-        return core.listByMonthEternal(monthVal);
+        return core.listPunctualByDate(yearVal, monthVal, dayVal);
       case 'e':
-        return core.listByExactDateNonEternal(yearVal, monthVal, dayVal);
+        return core.listAllRecurring();
       case 'f':
-        return core.listByMonthAndDayEternal(monthVal, dayVal);
+        return core.listYearlyRecurringByMonth(monthVal);
       case 'g':
+        return core.listMonthlyRecurringByDay(dayVal);
+      case 'h':
+        return core.listWeeklyDailyRecurring();
+      case 'i':
         return core.listExpiredNonEternal();
       default:
         return core.listAll();
@@ -85,7 +97,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
               <ListFilter className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-lg text-[var(--text-main)]">{settings.language === "en" ? "Memo List (GEM a-z)" : 'Elenco Memo (GEM a-g)'}</h2>
+              <h2 className="font-bold text-lg text-[var(--text-main)]">{settings.language === "en" ? "Memo List (GEM a-i)" : 'Elenco Memo (GEM a-i)'}</h2>
               <p className="text-xs text-[var(--text-muted)]">{settings.language === "en" ? "View and filter memos by category" : "Visualizza e filtra i memo per categoria"}</p>
             </div>
           </div>
@@ -97,9 +109,9 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
           </button>
         </div>
 
-        {/* Tab Selector for categories a-g */}
+        {/* Tab Selector for categories a-i */}
         <div className="p-6 pb-2 space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 bg-[var(--bg-subtle)] p-1.5 rounded-xl border border-[var(--border-color)] text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 bg-[var(--bg-subtle)] p-1.5 rounded-xl border border-[var(--border-color)] text-[11px] xl:text-xs">
             <button
               onClick={() => setListCategory('a')}
               className={`p-2 rounded-lg font-semibold transition text-center ${
@@ -108,9 +120,8 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              {settings.language === "en" ? "a. All" : "a. Tutti"}
+              {settings.language === "en" ? "a. All Memos" : "a. Tutti"}
             </button>
-
             <button
               onClick={() => setListCategory('b')}
               className={`p-2 rounded-lg font-semibold transition text-center ${
@@ -119,9 +130,8 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              {settings.language === "en" ? "b. Year (One-time)" : "b. Anno (Puntuali)"}
+              {settings.language === "en" ? "b. Year (Punctual)" : "b. Anno (Puntuali)"}
             </button>
-
             <button
               onClick={() => setListCategory('c')}
               className={`p-2 rounded-lg font-semibold transition text-center ${
@@ -130,9 +140,8 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              {settings.language === "en" ? "c. Year & Month" : "c. Anno & Mese"}
+              {settings.language === "en" ? "c. Y/M (Punctual)" : "c. A/M (Puntuali)"}
             </button>
-
             <button
               onClick={() => setListCategory('d')}
               className={`p-2 rounded-lg font-semibold transition text-center ${
@@ -141,49 +150,65 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              {settings.language === "en" ? "d. Month (Recurring)" : "d. Mese (Ricorrenti)"}
+              {settings.language === "en" ? "d. Y/M/D (Punctual)" : "d. A/M/G (Puntuali)"}
             </button>
-
             <button
               onClick={() => setListCategory('e')}
               className={`p-2 rounded-lg font-semibold transition text-center ${
                 listCategory === 'e'
-                  ? 'bg-[var(--bg-card)] text-blue-600 dark:text-blue-400 shadow-sm border border-[var(--border-color)]'
+                  ? 'bg-[var(--bg-card)] text-emerald-600 dark:text-emerald-400 shadow-sm border border-[var(--border-color)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              {settings.language === "en" ? "e. Y/M/D (One-time)" : "e. A/M/G (Puntuali)"}
+              {settings.language === "en" ? "e. All Recurring" : "e. Tutti i Ricorrenti"}
             </button>
-
             <button
               onClick={() => setListCategory('f')}
               className={`p-2 rounded-lg font-semibold transition text-center ${
                 listCategory === 'f'
-                  ? 'bg-[var(--bg-card)] text-blue-600 dark:text-blue-400 shadow-sm border border-[var(--border-color)]'
+                  ? 'bg-[var(--bg-card)] text-emerald-600 dark:text-emerald-400 shadow-sm border border-[var(--border-color)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              {settings.language === "en" ? "f. M/D (Recurring)" : "f. M/G (Ricorrenti)"}
+              {settings.language === "en" ? "f. Month (Yearly)" : "f. Mese (Annuali)"}
             </button>
-
             <button
               onClick={() => setListCategory('g')}
               className={`p-2 rounded-lg font-semibold transition text-center ${
                 listCategory === 'g'
+                  ? 'bg-[var(--bg-card)] text-emerald-600 dark:text-emerald-400 shadow-sm border border-[var(--border-color)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+            >
+              {settings.language === "en" ? "g. Day (Monthly)" : "g. Giorno (Mensili)"}
+            </button>
+            <button
+              onClick={() => setListCategory('h')}
+              className={`p-2 rounded-lg font-semibold transition text-center ${
+                listCategory === 'h'
+                  ? 'bg-[var(--bg-card)] text-emerald-600 dark:text-emerald-400 shadow-sm border border-[var(--border-color)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+            >
+              {settings.language === "en" ? "h. Weekly/Daily" : "h. Sett./Giorn."}
+            </button>
+            <button
+              onClick={() => setListCategory('i')}
+              className={`p-2 rounded-lg font-semibold transition text-center ${
+                listCategory === 'i'
                   ? 'bg-[var(--bg-card)] text-red-600 dark:text-red-400 shadow-sm border border-[var(--border-color)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              {settings.language === "en" ? "g. Expired" : "g. Scaduti"}
+              {settings.language === "en" ? "i. Expired" : "i. Scaduti"}
             </button>
           </div>
-
           {/* Conditional Filters depending on category */}
-          {['b', 'c', 'd', 'e', 'f'].includes(listCategory) && (
+          {['b', 'c', 'd', 'f', 'g'].includes(listCategory) && (
             <div className="flex flex-wrap gap-3 items-center bg-[var(--bg-subtle)] p-3 rounded-xl border border-[var(--border-color)] text-xs">
               <span className="font-semibold text-[var(--text-muted)]">{settings.language === "en" ? "Parametric Filters:" : "Filtri Parametrici:"}</span>
 
-              {['b', 'c', 'e'].includes(listCategory) && (
+              {['b', 'c', 'd'].includes(listCategory) && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[var(--text-muted)]">{settings.language === "en" ? "Year:" : "Anno:"}</span>
                   <input
@@ -195,7 +220,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                 </div>
               )}
 
-              {['c', 'd', 'e', 'f'].includes(listCategory) && (
+              {['c', 'd', 'f'].includes(listCategory) && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[var(--text-muted)]">{settings.language === "en" ? "Month:" : "Mese:"}</span>
                   <select
@@ -215,7 +240,7 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                 </div>
               )}
 
-              {['e', 'f'].includes(listCategory) && (
+              {['d', 'g'].includes(listCategory) && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[var(--text-muted)]">{settings.language === "en" ? "Day:" : "Giorno:"}</span>
                   <input

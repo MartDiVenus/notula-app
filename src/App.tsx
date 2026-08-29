@@ -119,6 +119,7 @@ export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [isListOpen, setIsListOpen] = useState<boolean>(false);
+  const [initialListCategory, setInitialListCategory] = useState<"a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"|"i">("a");
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [isCloudSyncOpen, setIsCloudSyncOpen] = useState<boolean>(false);
   const [isSecurityOpen, setIsSecurityOpen] = useState<boolean>(false);
@@ -798,7 +799,7 @@ export default function App() {
             </div>
 
             <button
-              onClick={() => setIsListOpen(true)}
+              onClick={() => { setInitialListCategory('a'); setIsListOpen(true); }}
               className="w-full flex items-center justify-between px-3 py-2 bg-blue-600/10 text-blue-600 dark:text-blue-400 rounded-lg border border-blue-600/20 text-xs font-semibold hover:bg-blue-600/20 transition text-left"
             >
               <div className="flex items-center gap-2.5">
@@ -811,7 +812,7 @@ export default function App() {
             </button>
 
             <button
-              onClick={() => setIsListOpen(true)}
+              onClick={() => { setInitialListCategory('e'); setIsListOpen(true); }}
               className="w-full flex items-center justify-between px-3 py-2 text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] rounded-lg transition text-xs font-semibold text-left"
             >
               <div className="flex items-center gap-2.5">
@@ -824,7 +825,7 @@ export default function App() {
             </button>
 
             <button
-              onClick={() => setIsListOpen(true)}
+              onClick={() => { setInitialListCategory('i'); setIsListOpen(true); }}
               className="w-full flex items-center justify-between px-3 py-2 text-[var(--text-muted)] hover:bg-[var(--bg-card)] hover:text-[var(--text-main)] rounded-lg transition text-xs font-semibold text-left"
             >
               <div className="flex items-center gap-2.5">
@@ -1222,6 +1223,7 @@ export default function App() {
       {/* List Submenu Modal (a-g GEM Modes) */}
       <ListSubmenu
         isOpen={isListOpen}
+        initialCategory={initialListCategory}
         onClose={() => setIsListOpen(false)}
         core={coreRef.current}
         privacyMode={privacyMode}

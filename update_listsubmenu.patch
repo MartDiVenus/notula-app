@@ -1,0 +1,58 @@
+--- src/components/ListSubmenu.tsx
++++ src/components/ListSubmenu.tsx
+@@ -12,6 +12,7 @@
+ interface ListSubmenuProps {
+   isOpen: boolean;
++  initialCategory?: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+   onClose: () => void;
+   core: NotulaCore;
+@@ -38,7 +39,13 @@
+ }) => {
+   const { settings } = useSettings();
+-  const [listCategory, setListCategory] = useState<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g'>('a');
++  const [listCategory, setListCategory] = useState<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'>('a');
+   const [revealedMemoIds, setRevealedMemoIds] = useState<Set<string>>(new Set());
+ 
++  React.useEffect(() => {
++    if (isOpen && initialCategory) {
++      setListCategory(initialCategory);
++    }
++  }, [isOpen, initialCategory]);
++
+   const toggleRevealMemo = (id: string) => {
+@@ -75,6 +82,8 @@
+       case 'g':
+         return core.listExpiredNonEternal();
++      case 'h':
++        return core.getMemos().filter(m => m.repeatType !== 'none');
+       default:
+         return core.listAll();
+@@ -98,11 +107,11 @@
+ 
+-        {/* Tab Selector for categories a-g */}
++        {/* Tab Selector for categories a-h */}
+         <div className="p-6 pb-2 space-y-4">
+-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 bg-[var(--bg-subtle)] p-1.5 rounded-xl border border-[var(--border-color)] text-xs">
++          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-[var(--bg-subtle)] p-1.5 rounded-xl border border-[var(--border-color)] text-[11px] xl:text-xs">
+             <button
+               onClick={() => setListCategory('a')}
+               className={`p-2 rounded-lg font-semibold transition text-center ${
+                 listCategory === 'a'
+                   ? 'bg-[var(--bg-card)] text-blue-600 dark:text-blue-400 shadow-sm border border-[var(--border-color)]'
+                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+@@ -176,6 +185,15 @@
+             >
+               {settings.language === "en" ? "g. Expired" : "g. Scaduti"}
+             </button>
++            <button
++              onClick={() => setListCategory('h')}
++              className={`p-2 rounded-lg font-semibold transition text-center ${
++                listCategory === 'h'
++                  ? 'bg-[var(--bg-card)] text-emerald-600 dark:text-emerald-400 shadow-sm border border-[var(--border-color)]'
++                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
++              }`}
++            >
++              {settings.language === "en" ? "h. All Recurring" : "h. Tutti i Ricorrenti"}
++            </button>
+           </div>
+ 
