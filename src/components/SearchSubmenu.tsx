@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import Fuse from 'fuse.js';
 import { useSettings } from '../contexts/SettingsContext';
 import { MemoItem, RepeatType, ObfuscationLevel, REPEAT_LABELS_IT, REPEAT_LABELS_EN } from '../types';
 import { getLocalYYYYMMDD } from '../utils/notulaCore';
@@ -40,6 +41,7 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
   const [idQuery, setIdQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'punctual' | 'recurring' | 'expired'>('all');
   const [revealedMemoIds, setRevealedMemoIds] = useState<Set<string>>(new Set());
+  const [exactMatch, setExactMatch] = useState<boolean>(false);
 
   const toggleRevealMemo = (id: string) => {
     setRevealedMemoIds(prev => {
@@ -57,11 +59,18 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
 
     // Filter by mode
     if (searchMode === 'text' && textQuery.trim()) {
-      const q = textQuery.toLowerCase().trim();
-      list = list.filter(m =>
-        m.title.toLowerCase().includes(q) ||
-        (m.description && m.description.toLowerCase().includes(q))
-      );
+      if (exactMatch) {
+        const q = textQuery.toLowerCase().trim();
+        list = list.filter(m => m.title.toLowerCase() === q);
+      } else {
+        const fuse = new Fuse(list, {
+          keys: ['title', 'description'],
+          threshold: 0.4,
+          ignoreLocation: true,
+        });
+        const fuseResults = fuse.search(textQuery.trim());
+        list = fuseResults.map(result => result.item);
+      }
     } else if (searchMode === 'date' && dateQuery.trim()) {
       const target = dateQuery.trim();
       list = list.filter(m => {
@@ -91,7 +100,7 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
     }
 
     return list;
-  }, [memos, searchMode, textQuery, dateQuery, idQuery, filterType, todayStr]);
+  }, [memos, searchMode, textQuery, dateQuery, idQuery, filterType, todayStr, exactMatch]);
 
   if (!isOpen) return null;
 
@@ -224,7 +233,22 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
             </div>
           </div>
 
-          <div className="text-xs text-[var(--text-muted)] flex justify-between items-center px-1">
+          {searchMode === 'text' && (
+            <div className="flex items-center gap-2 mt-2 px-1">
+              <input
+                type="checkbox"
+                id="exactMatch"
+                checked={exactMatch}
+                onChange={(e) => setExactMatch(e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-[var(--border-color)] text-blue-600 focus:ring-blue-500 bg-[var(--bg-card)] cursor-pointer"
+              />
+              <label htmlFor="exactMatch" className="text-xs text-[var(--text-muted)] cursor-pointer select-none">
+                {settings.language === 'en' ? 'Exact title/text match (disable fuzzy search)' : 'Titolo esatto (disabilita ricerca fuzzy)'}
+              </label>
+            </div>
+          )}
+
+          <div className="text-xs text-[var(--text-muted)] flex justify-between items-center px-1 mt-4">
             <span>{settings.language === "en" ? "Found " : "Trovati "}<strong>{results.length}</strong>{settings.language === "en" ? " matching memos" : " memo corrispondenti"}</span>
             {(textQuery || dateQuery || idQuery || filterType !== 'all') && (
               <button
