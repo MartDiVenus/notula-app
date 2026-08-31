@@ -128,7 +128,7 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
 
         {/* Search Mode Tabs */}
         <div className="p-6 pb-2 space-y-4">
-          <div className="grid grid-cols-3 gap-2 bg-[var(--bg-subtle)] p-1.5 rounded-xl border border-[var(--border-color)]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-[var(--bg-subtle)] p-1.5 rounded-xl border border-[var(--border-color)]">
             <button
               onClick={() => setSearchMode('text')}
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition ${
@@ -167,7 +167,7 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
           </div>
 
           {/* Active Search Input Field */}
-          <div className="flex gap-3 items-center">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
             <div className="relative flex-1">
               {searchMode === 'text' && (
                 <input
@@ -175,8 +175,8 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
                   placeholder={settings.language === "en" ? "Type title or content keywords..." : "Digita parole chiave del titolo o contenuto..."}
                   value={textQuery}
                   onChange={(e) => setTextQuery(e.target.value)}
-                  autoFocus
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-sans"
+                  
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-sans"
                 />
               )}
 
@@ -185,8 +185,8 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
                   type="date"
                   value={dateQuery}
                   onChange={(e) => setDateQuery(e.target.value)}
-                  autoFocus
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-mono"
+                  
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-mono"
                 />
               )}
 
@@ -196,8 +196,8 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
                   placeholder={settings.language === "en" ? "E.g. n_1724000000-12" : "Es. n_1724000000-12"}
                   value={idQuery}
                   onChange={(e) => setIdQuery(e.target.value)}
-                  autoFocus
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-mono"
+                  
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-mono"
                 />
               )}
 
@@ -218,12 +218,12 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
             </div>
 
             {/* Quick Category Filter */}
-            <div className="flex items-center gap-1 bg-[var(--bg-subtle)] p-1 rounded-xl border border-[var(--border-color)]">
+            <div className="flex items-center gap-1 bg-[var(--bg-subtle)] p-1 rounded-xl border border-[var(--border-color)] w-full sm:w-auto">
               <Filter className="w-3.5 h-3.5 ml-2 text-[var(--text-muted)]" />
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value as any)}
-                className="bg-transparent text-xs text-[var(--text-main)] font-semibold py-1.5 px-2 focus:outline-none cursor-pointer"
+                className="bg-transparent text-base sm:text-xs text-[var(--text-main)] font-semibold py-1.5 px-2 focus:outline-none cursor-pointer flex-1 w-full"
               >
                 <option value="all">Tutti ({memos.length})</option>
                 <option value="punctual">{settings.language === "en" ? "Only One-time (Non-recurring)" : "Solo Puntuali (Non ricorrenti)"}</option>
