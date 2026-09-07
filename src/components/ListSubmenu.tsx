@@ -212,10 +212,14 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                 <div className="flex items-center gap-1.5">
                   <span className="text-[var(--text-muted)]">{settings.language === "en" ? "Year:" : "Anno:"}</span>
                   <input
+                    id="list_filter_year"
+                    name="list_filter_year"
                     type="number"
                     value={yearVal}
                     onChange={(e) => setYearVal(e.target.value)}
-                    className="w-20 px-2 py-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg font-mono"
+                    autoComplete="off"
+                    data-form-type="other"
+                    className="w-20 px-2 py-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg font-mono text-base sm:text-xs"
                   />
                 </div>
               )}
@@ -244,12 +248,16 @@ export const ListSubmenu: React.FC<ListSubmenuProps> = ({
                 <div className="flex items-center gap-1.5">
                   <span className="text-[var(--text-muted)]">{settings.language === "en" ? "Day:" : "Giorno:"}</span>
                   <input
+                    id="list_filter_day"
+                    name="list_filter_day"
                     type="number"
                     min={1}
                     max={31}
                     value={dayVal}
                     onChange={(e) => setDayVal(e.target.value.padStart(2, '0'))}
-                    className="w-16 px-2 py-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg font-mono"
+                    autoComplete="off"
+                    data-form-type="other"
+                    className="w-16 px-2 py-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg font-mono text-base sm:text-xs"
                   />
                 </div>
               )}

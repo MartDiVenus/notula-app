@@ -723,18 +723,26 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
         </div>
 
         {/* Terminal Input Form */}
-        <form onSubmit={handleCommand} className="bg-[#161b22] border-t border-[#30363d] p-2.5 flex items-center gap-2">
+        <form onSubmit={handleCommand} autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} data-form-type="other" className="bg-[#161b22] border-t border-[#30363d] p-2.5 flex items-center gap-2">
           <span className="text-emerald-400 font-bold pl-2 text-xs select-none">notula&gt;</span>
           <input
             ref={inputRef}
+            id="notula_cli_command"
+            name="notula_cli_command"
             type="text"
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={settings.language === "en" ? "Type command (e.g. 'help', 'man', 'edit --id ...', 'export --all --format xml', 'pdf --id ...')..." : "Digita comando (es. 'help', 'man', 'edit --id ...', 'export --all --format xml', 'pdf --id ...')..."}
-            className="flex-1 bg-transparent border-none outline-none text-white text-xs font-mono placeholder:text-gray-600 focus:ring-0"
+            className="flex-1 bg-transparent border-none outline-none text-white text-base sm:text-xs font-mono placeholder:text-gray-600 focus:ring-0"
             autoComplete="off"
-            spellCheck="false"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            data-form-type="other"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-bwignore="true"
           />
           <button
             type="submit"

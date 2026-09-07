@@ -155,11 +155,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               {/* Fine Year Selector */}
               <div className="flex items-center bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl px-1.5 py-1 shadow-2xs shrink-0">
                 <input
+                  id="cal_year_input"
+                  name="cal_year_input"
                   type="number"
                   min="1970"
                   max="2100"
                   value={currentYear}
                   onChange={handleYearChange}
+                  autoComplete="off"
+                  data-form-type="other"
                   className="w-14 sm:w-16 bg-transparent text-[var(--text-main)] font-black text-sm sm:text-base font-mono focus:outline-none text-center"
                   title={settings.language === "en" ? "Type or change Year" : "Digita o cambia Anno"}
                 />

@@ -170,11 +170,19 @@ export const CliManualModal: React.FC<CliManualModalProps> = ({ isOpen, onClose 
               <div className="relative w-full">
                 <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
                 <input
-                  type="text"
+                  id="man_search_query"
+                  name="man_search_query"
+                  type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={settings.language === "en" ? "Search command, flag or syntax..." : "Cerca comando, flag o sintassi..."}
-                  className="w-full pl-8 pr-3 py-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-form-type="other"
+                  data-lpignore="true"
+                  className="w-full pl-8 pr-3 py-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-base sm:text-xs text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
                 />
               </div>
             </div>

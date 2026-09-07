@@ -188,7 +188,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
           )}
 
           {/* Set / Change Master Passphrase Form */}
-          <form onSubmit={handleSavePassword} className="space-y-3 p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)]">
+          <form onSubmit={handleSavePassword} autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} data-form-type="other" className="space-y-3 p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)]">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)] flex items-center gap-1.5">
                 <Key className="w-3.5 h-3.5 text-purple-500" />
@@ -225,11 +225,21 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
             <div className="space-y-2">
               <div className="relative">
                 <input
+                  id="notula_passphrase_new"
+                  name="notula_passphrase_new"
                   type={showPwd ? 'text' : 'password'}
                   placeholder={masterPassword ? (settings.language === "en" ? "Enter NEW passphrase..." : "Inserisci la NUOVA passphrase...") : (settings.language === "en" ? "Enter new passphrase..." : "Inserisci nuova passphrase...")}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 pr-10 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
+                  className="w-full px-3.5 py-2.5 pr-10 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-base sm:text-xs text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <button
                   type="button"
@@ -241,11 +251,21 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
               </div>
 
               <input
+                id="notula_passphrase_confirm"
+                name="notula_passphrase_confirm"
                 type={showPwd ? 'text' : 'password'}
                 placeholder={settings.language === "en" ? "Confirm new passphrase..." : "Conferma nuova passphrase..."}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
+                autoComplete="new-password"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                data-form-type="other"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-bwignore="true"
+                className="w-full px-3.5 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-base sm:text-xs text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 

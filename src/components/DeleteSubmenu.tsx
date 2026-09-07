@@ -233,11 +233,15 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               <div>
                 <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Year:" : "Anno:"}</label>
                 <input
+                  id="del_year_val"
+                  name="del_year_val"
                   type="number"
                   value={yearVal}
                   onChange={(e) => setYearVal(e.target.value)}
                   placeholder={settings.language === "en" ? "E.g. 2026" : "Es. 2026"}
-                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-sm font-mono text-[var(--text-main)]"
+                  autoComplete="off"
+                  data-form-type="other"
+                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-base sm:text-sm font-mono text-[var(--text-main)]"
                 />
               </div>
             )}
@@ -248,7 +252,7 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
                 <select
                   value={monthVal}
                   onChange={(e) => setMonthVal(e.target.value)}
-                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-main)]"
+                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-base sm:text-sm text-[var(--text-main)]"
                 >
                   {Array.from({ length: 12 }, (_, i) => {
                     const mStr = String(i + 1).padStart(2, '0');
@@ -266,12 +270,16 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               <div>
                 <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Day (01 - 31):" : "Giorno (01 - 31):"}</label>
                 <input
+                  id="del_day_val"
+                  name="del_day_val"
                   type="number"
                   min={1}
                   max={31}
                   value={dayVal}
                   onChange={(e) => setDayVal(e.target.value.padStart(2, '0'))}
-                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-sm font-mono text-[var(--text-main)]"
+                  autoComplete="off"
+                  data-form-type="other"
+                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-base sm:text-sm font-mono text-[var(--text-main)]"
                 />
               </div>
             )}
@@ -280,11 +288,19 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               <div>
                 <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Exact title to delete:" : "Titolo esatto da cancellare:"}</label>
                 <input
+                  id="del_title_val"
+                  name="del_title_val"
                   type="text"
                   value={titleVal}
                   onChange={(e) => setTitleVal(e.target.value)}
                   placeholder={settings.language === "en" ? "Memo title..." : "Titolo del memo..."}
-                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-main)]"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-base sm:text-sm text-[var(--text-main)]"
                 />
               </div>
             )}
@@ -305,11 +321,19 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
               <div>
                 <label className="block text-xs text-[var(--text-muted)] mb-1">{settings.language === "en" ? "Memo IDs (comma-separated if multiple):" : "ID Memo (separati da virgola se multipli):"}</label>
                 <input
+                  id="del_id_val"
+                  name="del_id_val"
                   type="text"
                   value={idVal}
                   onChange={(e) => setIdVal(e.target.value)}
                   placeholder={settings.language === "en" ? "E.g. n_1724000000-12, n_1724000000-34" : "Es: n_1724000000-12, n_1724000000-34"}
-                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-sm font-mono text-[var(--text-main)]"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  className="w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-base sm:text-sm font-mono text-[var(--text-main)]"
                 />
               </div>
             )}

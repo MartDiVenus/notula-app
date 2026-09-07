@@ -171,32 +171,55 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
             <div className="relative flex-1">
               {searchMode === 'text' && (
                 <input
-                  type="text"
+                  id="search_query"
+                  name="search_query"
+                  type="search"
                   placeholder={settings.language === "en" ? "Type title or content keywords..." : "Digita parole chiave del titolo o contenuto..."}
                   value={textQuery}
                   onChange={(e) => setTextQuery(e.target.value)}
-                  
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
                   className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-sans"
                 />
               )}
 
               {searchMode === 'date' && (
                 <input
+                  id="search_date"
+                  name="search_date"
                   type="date"
                   value={dateQuery}
                   onChange={(e) => setDateQuery(e.target.value)}
-                  
+                  autoComplete="off"
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
                   className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-mono"
                 />
               )}
 
               {searchMode === 'id' && (
                 <input
+                  id="search_id"
+                  name="search_id"
                   type="text"
                   placeholder={settings.language === "en" ? "E.g. n_1724000000-12" : "Es. n_1724000000-12"}
                   value={idQuery}
                   onChange={(e) => setIdQuery(e.target.value)}
-                  
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
                   className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-mono"
                 />
               )}

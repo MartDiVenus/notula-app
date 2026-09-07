@@ -170,7 +170,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
+        <form onSubmit={handleSubmit} autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} data-form-type="other" className="p-6 space-y-4 overflow-y-auto">
           {error && (
             <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-semibold">
               {error}
@@ -193,13 +193,21 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
               <span>{settings.language === "en" ? "Memo Title *" : "Titolo del Memo *"}</span>
             </label>
             <input
+              id="memo_title"
+              name="memo_title"
               type="text"
               required
               placeholder={settings.language === "en" ? "E.g. Insurance expiry, Court Hearing, Boiler check..." : "Es. Scadenza assicurazione, Udienza Tribunale, Controllo caldaia..."}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-              autoFocus
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              data-form-type="other"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore="true"
+              className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             />
           </div>
 
@@ -210,11 +218,17 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
               <span>{settings.language === "en" ? "Reference Date / Expiration *" : "Data di Riferimento / Scadenza *"}</span>
             </label>
             <input
+              id="memo_date"
+              name="memo_date"
               type="date"
               required
               value={expirationDate}
               onChange={(e) => setExpirationDate(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              autoComplete="off"
+              data-form-type="other"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             />
           </div>
 
@@ -313,12 +327,16 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
                       {settings.language === "en" ? "Days Before" : "Giorni di preavviso"}
                     </label>
                     <input
+                      id="memo_alert_days"
+                      name="memo_alert_days"
                       type="number"
                       min="0"
                       max="30"
                       value={alertDaysBefore}
                       onChange={(e) => setAlertDaysBefore(parseInt(e.target.value) || 0)}
-                      className="w-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4]"
+                      autoComplete="off"
+                      data-form-type="other"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg px-3 py-2 text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4]"
                     />
                   </div>
                   
@@ -328,10 +346,14 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
                       {settings.language === "en" ? "Notification Time" : "Orario notifica"}
                     </label>
                     <input
+                      id="memo_alert_time"
+                      name="memo_alert_time"
                       type="time"
                       value={alertTime}
                       onChange={(e) => setAlertTime(e.target.value)}
-                      className="w-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg px-3 py-2 text-sm text-[var(--text-main)] focus:outline-none focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4]"
+                      autoComplete="off"
+                      data-form-type="other"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg px-3 py-2 text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:border-[#4285F4] focus:ring-1 focus:ring-[#4285F4]"
                     />
                   </div>
                 </div>
@@ -350,11 +372,20 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
               <span>{settings.language === "en" ? "Description, Details and Notes" : "Descrizione, Dettagli e Note"}</span>
             </label>
             <textarea
+              id="memo_description"
+              name="memo_description"
               rows={4}
               placeholder={settings.language === "en" ? "Enter details, notes, or formatted text..." : "Inserisci dettagli, note o testo formattato..."}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none font-sans"
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              data-form-type="other"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore="true"
+              className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none font-sans"
             />
           </div>
 
