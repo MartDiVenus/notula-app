@@ -52,6 +52,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
   const [alertDaysBefore, setAlertDaysBefore] = useState<number>(0);
   const [alertTime, setAlertTime] = useState<string>('09:00');
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     if (initialMemo) {
@@ -78,6 +79,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
       setAlertTime('09:00');
     }
     setError(null);
+    setIsSubmitting(false);
   }, [initialMemo, defaultDate, isOpen]);
 
   if (!isOpen) return null;
@@ -108,16 +110,18 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (!title.trim()) {
-      setError("Il titolo è obbligatorio.");
+      setError(settings.language === 'en' ? 'Title is required.' : 'Il titolo è obbligatorio.');
       return;
     }
     if (!expirationDate) {
-      setError("La data è obbligatoria.");
+      setError(settings.language === 'en' ? 'Date is required.' : 'La data è obbligatoria.');
       return;
     }
 
     try {
+      setIsSubmitting(true);
       await onSave({
         title: title.trim(),
         description: description.trim(),
@@ -133,12 +137,14 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
       onClose();
     } catch (err: any) {
       console.error("Save error:", err);
-      setError(err.message || "Errore durante il salvataggio o la sincronizzazione.");
+      setError(err.message || (settings.language === 'en' ? 'Error saving memo.' : 'Errore durante il salvataggio o la sincronizzazione.'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="w-full max-w-lg bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="bg-[var(--bg-subtle)] border-b border-[var(--border-color)] px-6 py-4 flex items-center justify-between">
@@ -352,19 +358,28 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
             />
           </div>
 
+          {error && (
+            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-semibold">
+              {error}
+            </div>
+          )}
+
           {/* Footer Buttons */}
           <div className="pt-2 flex items-center justify-end gap-2 border-t border-[var(--border-color)]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
+              className="px-4 py-2 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition cursor-pointer"
             >{settings.language === "en" ? "Cancel" : "Annulla"}</button>
             <button
               type="submit"
-              className="px-5 py-2.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md transition flex items-center gap-1.5"
+              disabled={isSubmitting}
+              className="px-5 py-2.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white shadow-md transition flex items-center gap-1.5 cursor-pointer"
             >
               <Check className="w-4 h-4" />
-              <span>{initialMemo ? (settings.language === 'en' ? 'Update Memo' : 'Salva Modifiche') : (settings.language === 'en' ? 'Save to Notula™' : 'Archivia in Notula™')}</span>
+              <span>{isSubmitting
+                ? (settings.language === 'en' ? 'Saving...' : 'Salvataggio...')
+                : (initialMemo ? (settings.language === 'en' ? 'Update Memo' : 'Salva Modifiche') : (settings.language === 'en' ? 'Save to Notula™' : 'Archivia in Notula™'))}</span>
             </button>
           </div>
         </form>

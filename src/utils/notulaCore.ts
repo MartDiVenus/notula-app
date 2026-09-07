@@ -332,18 +332,23 @@ export class NotulaCore {
     title?: string;
     description?: string;
     expirationDate?: string;
+    date?: string;
     time?: string;
     repeatType?: RepeatType;
     obfuscation?: ObfuscationLevel;
     isEncrypted?: boolean;
     groupId?: string;
     updateEntireGroup?: boolean;
+    gCalSync?: boolean;
+    gCalEventId?: string;
+    alertDaysBefore?: number;
+    alertTime?: string;
   }): MemoItem | null {
     const idx = this.memos.findIndex(m => m.id === params.id);
     if (idx === -1) return null;
 
     const current = this.memos[idx];
-    const expDate = params.expirationDate || current.expirationDate;
+    const expDate = params.expirationDate || params.date || current.expirationDate;
     const [year, month, day] = expDate.split('-');
 
     const updated: MemoItem = {
@@ -359,6 +364,10 @@ export class NotulaCore {
       obfuscation: params.obfuscation !== undefined ? params.obfuscation : current.obfuscation,
       isEncrypted: params.isEncrypted !== undefined ? params.isEncrypted : current.isEncrypted,
       groupId: params.groupId !== undefined ? params.groupId : current.groupId,
+      gCalSync: params.gCalSync !== undefined ? params.gCalSync : current.gCalSync,
+      gCalEventId: params.gCalEventId !== undefined ? params.gCalEventId : current.gCalEventId,
+      alertDaysBefore: params.alertDaysBefore !== undefined ? params.alertDaysBefore : current.alertDaysBefore,
+      alertTime: params.alertTime !== undefined ? params.alertTime : current.alertTime,
       updatedAt: new Date().toISOString(),
     };
 
@@ -376,6 +385,9 @@ export class NotulaCore {
             obfuscation: updated.obfuscation,
             isEncrypted: updated.isEncrypted,
             repeatType: updated.repeatType,
+            gCalSync: updated.gCalSync,
+            alertDaysBefore: updated.alertDaysBefore,
+            alertTime: updated.alertTime,
             updatedAt: new Date().toISOString(),
           };
         }

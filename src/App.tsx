@@ -350,7 +350,7 @@ export default function App() {
     alertDaysBefore?: number;
     alertTime?: string;
   }) => {
-    let savedMemo;
+    let savedMemo: MemoItem | null = null;
     if (editingMemo) {
       const updated = coreRef.current.updateMemo({
         id: editingMemo.id,
@@ -366,7 +366,7 @@ export default function App() {
         alertDaysBefore: data.alertDaysBefore,
         alertTime: data.alertTime
       });
-      savedMemo = updated.find(m => m.id === editingMemo.id);
+      savedMemo = updated;
     } else {
       savedMemo = coreRef.current.createMemo({
         ...data,
@@ -385,7 +385,6 @@ export default function App() {
           }
         } catch (e) {
           console.error("Failed to sync to GCal", e);
-          throw e;
         }
       }
     }
