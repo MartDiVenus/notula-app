@@ -164,14 +164,14 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
       log(settings.language === "en" ? "  NOTULA™ CLI COMPLETE COMMAND GUIDE (Ing. Mario Fantini)" : "  GUIDA COMPLETA COMANDI NOTULA™ CLI (Ing. Mario Fantini)");
       log("─────────────────────────────────────────────────────────────────────────");
       log(settings.language === "en" ? "1. MEMO CREATION:" : "1. CREAZIONE MEMO:");
-      log("   add --title \"<titolo>\" --date YYYY-MM-DD [--desc \"...\"] [--repeat <giorni>] [--obfuscate none|partial|full] [--encrypt]");
+      log("   add --title \"<titolo>\" --date YYYY-MM-DD [--desc \"...\"] [--repeat <daily|weekly|monthly|yearly>] [--until YYYY-MM-DD] [--obfuscate none|partial|full] [--encrypt]");
       log("   • Default (memo puntuale singolo): add --title \"Revisione\" --date 2026-09-01");
-      log("   • Ricorrente (ripetizione per N giorni): add --title \"Revisione\" --date 2026-09-01 --repeat 10");
+      log("   • Ricorrente (con termine opzionale): add --title \"Revisione\" --date 2026-09-01 --repeat daily --until 2026-09-10");
       log("   • Esempio cifrato: add --title \"Udienza Tribunale\" --date 2026-09-15 --desc \"Fascicolo 401\" --encrypt");
       log("");
       log(settings.language === "en" ? "2. EDIT & UPDATE (edit):" : "2. MODIFICA & AGGIORNAMENTO (edit):");
-      log("   edit --id <id> [--title \"...\"] [--date YYYY-MM-DD] [--desc \"...\"] [--repeat ...] [--obfuscate ...] [--encrypt / --no-encrypt]");
-      log("   Esempio: edit --id n_123 --title \"Udienza Rinviata\" --date 2026-10-02");
+      log("   edit --id <id> [--title \"...\"] [--date YYYY-MM-DD] [--desc \"...\"] [--repeat ...] [--until YYYY-MM-DD] [--obfuscate ...] [--encrypt / --no-encrypt]");
+      log("   Esempio: edit --id n_123 --title \"Udienza Rinviata\" --date 2026-10-02 --until 2026-11-01");
       log(settings.language === "en" ? "   (Note: editing AUTOMATICALLY syncs all memos linked by the same groupID!)" : "   (Nota: la modifica sincronizza AUTOMATICAMENTE tutti i memo collegati dallo stesso groupID!)");
       log("");
       log(settings.language === "en" ? "3. MULTIFORMAT EXPORT (export):" : "3. ESPORTAZIONE MULTIFORMATO (export):");
@@ -235,6 +235,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
           const time = getFlag(args, '--time');
           const desc = getFlag(args, '--desc') || '';
           const repeatRaw = getFlag(args, '--repeat');
+          const untilDate = getFlag(args, '--until');
           const obfuscate = (getFlag(args, '--obfuscate') as ObfuscationLevel) || 'none';
           const isEncrypted = args.includes('--encrypt');
           const groupId = getFlag(args, '--group');
@@ -279,11 +280,12 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
             obfuscation: obfuscate,
             isEncrypted,
             groupId: groupId || undefined,
+            untilDate: untilDate || undefined,
           });
 
           onMemosChanged();
           log(`✅ Memo creato con successo! ID: [${created.id}]`);
-          log(`   Titolo: "${created.title}" | Data: ${created.expirationDate} | Ricorrenza: ${created.repeatType}${created.groupId ? ` | GroupID: ${created.groupId}` : ''}`);
+          log(`   Titolo: "${created.title}" | Data: ${created.expirationDate} | Ricorrenza: ${created.repeatType}${untilDate ? ` (Fino al ${untilDate})` : ''}${created.groupId ? ` | GroupID: ${created.groupId}` : ''}`);
           break;
         }
 
@@ -307,6 +309,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
           const date = getFlag(args, '--date');
           const desc = getFlag(args, '--desc');
           const repeat = getFlag(args, '--repeat') as RepeatType | undefined;
+          const untilDate = getFlag(args, '--until');
           const obfuscate = getFlag(args, '--obfuscate') as ObfuscationLevel | undefined;
           
           let isEncrypted: boolean | undefined = undefined;
@@ -321,6 +324,7 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
             repeatType: repeat || undefined,
             obfuscation: obfuscate || undefined,
             isEncrypted: isEncrypted,
+            untilDate: untilDate || undefined,
             updateEntireGroup: true, // Aggiornamento automatico e trasparente di tutta la serie
           });
 

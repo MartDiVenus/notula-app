@@ -43,6 +43,7 @@ export interface MemoItem {
   gCalSync?: boolean;
   alertDaysBefore?: number;
   alertTime?: string;
+  untilDate?: string;
 }
 
 export type ThemeMode = 'system' | 'light' | 'dark';

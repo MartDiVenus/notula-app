@@ -26,6 +26,7 @@ interface MemoFormModalProps {
     gCalSync?: boolean;
     alertDaysBefore?: number;
     alertTime?: string;
+    untilDate?: string;
   }) => void;
   initialMemo?: MemoItem | null;
   defaultDate?: string;
@@ -51,6 +52,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
   const [gCalSync, setGCalSync] = useState<boolean>(false);
   const [alertDaysBefore, setAlertDaysBefore] = useState<number>(0);
   const [alertTime, setAlertTime] = useState<string>('09:00');
+  const [untilDate, setUntilDate] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -66,6 +68,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
       setGCalSync(initialMemo.gCalSync || false);
       setAlertDaysBefore(initialMemo.alertDaysBefore || 0);
       setAlertTime(initialMemo.alertTime || '09:00');
+      setUntilDate(initialMemo.untilDate || '');
     } else {
       setTitle('');
       setDescription('');
@@ -77,6 +80,7 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
       setGCalSync(false);
       setAlertDaysBefore(0);
       setAlertTime('09:00');
+      setUntilDate('');
     }
     setError(null);
     setIsSubmitting(false);
@@ -132,7 +136,8 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
         isEncrypted,
         gCalSync,
         alertDaysBefore,
-        alertTime
+        alertTime,
+        untilDate: untilDate || undefined
       });
       onClose();
     } catch (err: any) {
@@ -270,6 +275,29 @@ export const MemoFormModal: React.FC<MemoFormModalProps> = ({
               </select>
             </div>
           </div>
+
+          {/* Conditional Until Date */}
+          {repeatType !== 'none' && (
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 flex items-center gap-1.5">
+                <Repeat className="w-3.5 h-3.5 text-emerald-500" />
+                <span>{settings.language === "en" ? "Until Date (Optional)" : "Fino a quando (Opzionale)"}</span>
+              </label>
+              <input
+                id="memo_until_date"
+                name="memo_until_date"
+                type="date"
+                min={expirationDate}
+                value={untilDate}
+                onChange={(e) => setUntilDate(e.target.value)}
+                autoComplete="off"
+                data-form-type="other"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                className="w-full px-3.5 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              />
+            </div>
+          )}
 
           {/* Layer 3 - AES-256 Cryptographic Hardware Encryption */}
           <div className="p-3 rounded-xl border border-purple-500/30 bg-purple-500/5 flex flex-col gap-2">

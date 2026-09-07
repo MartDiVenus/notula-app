@@ -53,6 +53,7 @@ export class NotulaCore {
     alertDaysBefore?: number;
     alertTime?: string;
     gCalEventId?: string;
+    untilDate?: string;
   }): MemoItem {
     if (!params.title || !params.title.trim()) {
       throw new Error("Il titolo del memo è obbligatorio.");
@@ -84,6 +85,7 @@ export class NotulaCore {
       gCalSync: params.gCalSync,
       alertDaysBefore: params.alertDaysBefore,
       alertTime: params.alertTime,
+      untilDate: params.untilDate,
       gCalEventId: params.gCalEventId,
       createdAt: new Date().toISOString(),
     };
@@ -343,6 +345,7 @@ export class NotulaCore {
     gCalEventId?: string;
     alertDaysBefore?: number;
     alertTime?: string;
+    untilDate?: string;
   }): MemoItem | null {
     const idx = this.memos.findIndex(m => m.id === params.id);
     if (idx === -1) return null;
@@ -368,6 +371,7 @@ export class NotulaCore {
       gCalEventId: params.gCalEventId !== undefined ? params.gCalEventId : current.gCalEventId,
       alertDaysBefore: params.alertDaysBefore !== undefined ? params.alertDaysBefore : current.alertDaysBefore,
       alertTime: params.alertTime !== undefined ? params.alertTime : current.alertTime,
+      untilDate: params.untilDate !== undefined ? params.untilDate : current.untilDate,
       updatedAt: new Date().toISOString(),
     };
 
@@ -388,6 +392,7 @@ export class NotulaCore {
             gCalSync: updated.gCalSync,
             alertDaysBefore: updated.alertDaysBefore,
             alertTime: updated.alertTime,
+            untilDate: updated.untilDate,
             updatedAt: new Date().toISOString(),
           };
         }
@@ -402,11 +407,20 @@ export class NotulaCore {
   // CALENDAR & DATE MATCHING ENGINE
   // ==========================================
   public isMemoApplicableToDate(memo: MemoItem, dateStr: string): boolean {
-    const [targetYear, targetMonth, targetDay] = dateStr.split('-');
-
     if (memo.repeatType === 'none') {
       return memo.expirationDate === dateStr;
     }
+
+    if (dateStr < memo.expirationDate) {
+      return false;
+    }
+
+    if (memo.untilDate && dateStr > memo.untilDate) {
+      return false;
+    }
+
+    const [targetYear, targetMonth, targetDay] = dateStr.split('-');
+
     if (memo.repeatType === 'yearly') {
       return memo.month === targetMonth && memo.day === targetDay;
     }
@@ -420,7 +434,7 @@ export class NotulaCore {
       return diffDays >= 0 && diffDays % 7 === 0;
     }
     if (memo.repeatType === 'daily') {
-      return dateStr >= memo.expirationDate;
+      return true;
     }
 
     return false;

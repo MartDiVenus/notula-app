@@ -349,6 +349,7 @@ export default function App() {
     gCalSync?: boolean;
     alertDaysBefore?: number;
     alertTime?: string;
+    untilDate?: string;
   }) => {
     let savedMemo: MemoItem | null = null;
     if (editingMemo) {
@@ -364,7 +365,8 @@ export default function App() {
         updateEntireGroup: data.updateEntireGroup,
         gCalSync: data.gCalSync,
         alertDaysBefore: data.alertDaysBefore,
-        alertTime: data.alertTime
+        alertTime: data.alertTime,
+        untilDate: data.untilDate
       });
       savedMemo = updated;
     } else {

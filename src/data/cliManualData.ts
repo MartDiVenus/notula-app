@@ -49,6 +49,7 @@ export const CLI_COMMANDS_DOC: CliCommandDoc[] = [
       { flag: "--desc <str>", type: "string", desc: "Descrizione testuale estesa o note aggiuntive." },
       { flag: "--color <hex>", type: "hex", desc: "Codice colore esadecimale (default: #3b82f6)." },
       { flag: "--repeat <type>", type: "enum", desc: "Frequenza: none | daily | weekly | monthly | yearly | days (default: none)." },
+      { flag: "--until <YYYY-MM-DD>", type: "date", desc: "Data di fine ricorrenza (opzionale, interrompe i memo ricorrenti)." },
       { flag: "--interval <n>", type: "int", desc: "Intervallo numerico per la ricorrenza (es. ogni 15 giorni con --repeat days)." },
       { flag: "--security <0|1|2>", type: "int", desc: "Livello di privacy a video: 0 (Nessuno), 1 (Parziale IB•••401), 2 (Totale ••••••)." },
       { flag: "--encrypt", type: "flag", desc: "Attiva la cifratura hardware crittografica AES-256 E2E con Master Passphrase." }
@@ -56,7 +57,7 @@ export const CLI_COMMANDS_DOC: CliCommandDoc[] = [
     examples: [
       'add --title "Udienza Civile" --date 2026-09-20',
       'add --title "Fattura Server" --date 2026-09-01 --repeat monthly --desc "Hosting VPS" --encrypt',
-      'add --title "Manutenzione Impianto" --date 2026-10-01 --repeat days --interval 15 --color #10b981'
+      'add --title "Manutenzione Impianto" --date 2026-10-01 --repeat daily --until 2026-10-15 --color #10b981'
     ],
     notes: "Tutti i memo generati con una ricorrenza condividono lo stesso 'groupID'. Eventuali modifiche successive al titolo o alla sicurezza verranno propagate all'intera serie."
   },
@@ -73,12 +74,13 @@ export const CLI_COMMANDS_DOC: CliCommandDoc[] = [
       { flag: "--desc <str>", type: "string", desc: "Nuovo testo della descrizione estesa." },
       { flag: "--color <hex>", type: "hex", desc: "Nuovo codice colore identificativo." },
       { flag: "--security <0|1|2>", type: "int", desc: "Nuovo livello di offuscamento a video (0=Normale, 1=Parziale, 2=Totale)." },
-      { flag: "--encrypt", type: "flag", desc: "Abilita o aggiorna la crittografia AES-256 E2E." }
+      { flag: "--encrypt", type: "flag", desc: "Abilita o aggiorna la crittografia AES-256 E2E." },
+      { flag: "--until <YYYY-MM-DD>", type: "date", desc: "Nuova data di fine per la ricorrenza." }
     ],
     examples: [
       'edit --id n_17240012345 --title "Udienza Rinviata al Collegio"',
       'edit --id n_17240012345 --date 2026-10-15 --desc "Aula 3 Sezione Fallimentare"',
-      'edit --id n_17240098765 --security 2 --encrypt'
+      'edit --id n_17240098765 --security 2 --encrypt --until 2027-01-01'
     ],
     notes: "L'architettura Cascading Synchronization di Notula™ preserva le date individuali di calendario dei vari memo della serie, aggiornando in parallelo i dati condivisi."
   },
