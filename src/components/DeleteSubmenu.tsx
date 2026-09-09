@@ -352,14 +352,14 @@ export const DeleteSubmenu: React.FC<DeleteSubmenuProps> = ({
         <div className="bg-[var(--bg-subtle)] border-t border-[var(--border-color)] px-6 py-4 flex items-center justify-between">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition"
+            className="px-4 py-2 rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] active:scale-95 transition"
           >
             {settings.language === "en" ? "Cancel / Close" : "Annulla / Chiudi"}
           </button>
 
           <button
             onClick={handleExecuteDelete}
-            className="px-5 py-2.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md transition flex items-center gap-2"
+            className="px-5 py-2.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md active:scale-95 transition flex items-center gap-2"
           >
             <Trash2 className="w-4 h-4" />
             <span>{settings.language === 'en' ? 'Execute Deletion' : 'Esegui Eliminazione'}</span>
