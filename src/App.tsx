@@ -238,7 +238,7 @@ export default function App() {
         if (memos && memos.length > 0) {
           await mergeMemosWithConflictCheck(memos, false);
           setSyncStatusMsg((settings.language === "en" ? "Background Google™ Drive synchronization completed" : "Sincronizzazione Google™ Drive in background completata"));
-        } else {
+        } else if (coreRef.current.getMemos().length > 0) {
           await autoSyncToDrive(coreRef.current.getMemos(), masterPassword, false);
           setSyncStatusMsg((settings.language === "en" ? "Local memos synchronized to Google™ Drive" : "Memo locali sincronizzati su Google™ Drive"));
         }

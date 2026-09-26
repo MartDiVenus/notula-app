@@ -39,8 +39,14 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Pass through non-GET and chrome-extension requests
-  if (event.request.method !== 'GET' || event.request.url.startsWith('chrome-extension')) {
+  // Pass through non-GET, chrome-extension, and external API requests (Google Drive, Calendar, GIS, etc.)
+  if (
+    event.request.method !== 'GET' ||
+    event.request.url.startsWith('chrome-extension') ||
+    event.request.url.includes('googleapis.com') ||
+    event.request.url.includes('google.com') ||
+    !event.request.url.startsWith(self.location.origin)
+  ) {
     return;
   }
 
