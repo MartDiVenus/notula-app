@@ -232,7 +232,7 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                       {settings.language === "en" ? "Official Installation" : "Installazione Ufficiale"}
                     </div>
                     <div className="text-xs text-[var(--text-muted)] mt-0.5">
-                      {settings.language === "en" ? "Install Notula™ directly on your device for a native and offline experience." : "Installa Notula™ direttamente sul tuo dispositivo per un'esperienza nativa e offline."}
+                      {settings.language === "en" ? "Install Notula™ directly on your device for a standalone native experience connected in real time to your Google™ Drive Cloud." : "Installa Notula™ direttamente sul tuo dispositivo per un'esperienza nativa standalone connessa in tempo reale al tuo Cloud Google™ Drive."}
                     </div>
                   </div>
                 </div>
@@ -483,10 +483,10 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-1.5">
                       <div className="font-bold text-[var(--text-main)] flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>{settings.language === "en" ? "Offline-First & Immediate Architecture" : "Architettura Offline-First & Immediata"}</span>
+                        <span>{settings.language === "en" ? "100% Online Architecture (Cloud-Only & Total Symmetry)" : "Architettura 100% Online (Cloud-Only & Simmetria Totale)"}</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)]">
-                        {settings.language === "en" ? "Works always, even in total absence of Internet connection. Instantly loads the local archive on startup." : "Funziona sempre, anche in assenza totale di connessione Internet. All'avvio carica istantaneamente l'archivio locale."}
+                        {settings.language === "en" ? "Operates exclusively online on Google™ Drive (/Notula) with zero local memo database. Ensures total symmetry across all PCs and smartphones without divergence." : "Opera esclusivamente online su Google™ Drive (/Notula) senza alcun database memo locale. Garantisce simmetria assoluta tra tutti i PC e gli smartphone senza asimmetrie."}
                       </p>
                     </div>
 
@@ -724,6 +724,17 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                       </p>
                     </div>
                   </div>
+
+                  <div className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-emerald-500/30 text-[11px] text-[var(--text-muted)] space-y-1">
+                    <div className="font-bold text-emerald-600 dark:text-emerald-400">
+                      {settings.language === "en" ? "Manual File Import (.json / .xml) & Duplicate Handling:" : "Importazione Manuale da File (.json / .xml) e Gestione Duplicati:"}
+                    </div>
+                    <p>
+                      {settings.language === "en"
+                        ? "When manually importing an external .json or .xml backup file ('Import File'), if a memo ID already exists in your Google™ Drive Cloud with different content, Notula™ opens the interactive resolution dialog allowing you to choose: Replace [Y], Replace All [A], Ignore [I], or Keep Both [M] (creating a copy with a new ID in the Cloud)."
+                        : "Quando importi manualmente un file di backup esterno .json o .xml ('Importa File'), se l'ID di un memo è già presente nel tuo Cloud Google™ Drive con contenuto differente, Notula™ apre la finestra interattiva che ti permette di scegliere tra: Sostituisci [Y], Sostituisci Tutti [A], Ignora [I] oppure Tieni Entrambi [M] (creando una copia con nuovo ID nel Cloud)."}
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -734,21 +745,23 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                 <div className="p-5 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 space-y-3">
                   <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-bold text-sm">
                     <Cloud className="w-5 h-5 shrink-0" />
-                    <span>{settings.language === "en" ? "6. Google™ Drive Sync: Total Device Independence" : "6. Sincronizzazione Google™ Drive: Indipendenza Totale dal Dispositivo"}</span>
+                    <span>{settings.language === "en" ? "6. Google™ Drive Cloud-Only Engine: Total Symmetry Across Devices" : "6. Motore Cloud-Only su Google™ Drive: Simmetria Totale tra Dispositivi"}</span>
                   </div>
 
                   <p className="text-xs text-[var(--text-main)] leading-relaxed">
-                    <strong>{settings.language === "en" ? "You are free and independent from any device or operating system!" : "Sei libero e indipendente da qualsiasi dispositivo o sistema operativo!"}</strong>
+                    <strong>{settings.language === "en" ? "One single source of truth across all your PCs and smartphones!" : "Un'unica fonte di verità condivisa in tempo reale su tutti i tuoi PC e smartphone!"}</strong>
                   </p>
 
                   <div className="space-y-2 text-xs text-[var(--text-muted)]">
                     <p>
-                      Grazie all'architettura <strong>Google™ Drive-First</strong>{settings.language === "en" ? ", Notula™ archives the filing system in the reserved folder " : ", Notula™ archivia lo schedario nella cartella riservata "}<code>Notula/</code> {settings.language === "en" ? "of your Google™ account. This means that:" : "del tuo account Google™. Questo significa che:"}
+                      {settings.language === "en"
+                        ? <>Thanks to the <strong>100% Online Cloud-Only</strong> architecture, Notula™ stores and reads memos exclusively inside the dedicated <code>Notula/</code> folder of your personal Google™ Drive account, eliminating any local memo database:</>
+                        : <>Grazie all'architettura <strong>100% Online Cloud-Only</strong>, Notula™ legge e salva i memo esclusivamente nella cartella dedicata <code>Notula/</code> del tuo account Google™ Drive, eliminando qualsiasi database memo locale:</>}
                     </p>
                     <ul className="list-disc list-inside space-y-1 text-[11px] pl-2">
-                      <li>{settings.language === "en" ? "You can use Notula™ on " : "Puoi usare Notula™ su "}<strong>{settings.language === "en" ? "Windows PC, Mac, Linux, Tablet or Smartphone" : "PC Windows, Mac, Linux, Tablet o Smartphone"}</strong>{settings.language === "en" ? ": open the app, click " : ": aprendo l'app e cliccando su "}<em>{settings.language === "en" ? "Download from Google™ Drive" : "Scarica da Google™ Drive"}</em>{settings.language === "en" ? " and find all your synchronized memos." : " ritrovi tutti i tuoi memo sincronizzati."}</li>
-                      <li>{settings.language === "en" ? "If you change computers or format the device, " : "Se cambi computer o formatti il dispositivo, "}<strong>{settings.language === "en" ? "you don\'t lose anything" : "non perdi nulla"}</strong>{settings.language === "en" ? ": simply reconnect your Google™ Drive account and enter your Master Passphrase." : ": basta ricollegare il tuo account Google™ Drive e inserire la tua Master Passphrase."}</li>
-                      <li><strong>{settings.language === "en" ? "Intelligent Conflict Management:" : "Gestione Conflitti Intelligente:"}</strong>{settings.language === "en" ? " In case of divergence between local memory and Google™ Drive, Notula™ allows you to easily resolve the conflict (Replace [Y], Ignore [I], Duplicate both [M] or Apply to all [A])." : " In caso di divergenza tra la memoria locale e Google™ Drive, Notula™ ti consente di risolvere il conflitto con facilità (Sostituisci [Y], Ignora [I], Duplica entrambi [M] o Applica a tutti [A])."}</li>
+                      <li>{settings.language === "en" ? "When you open Notula™ on " : "Aprendo Notula™ su "}<strong>{settings.language === "en" ? "Windows PC, Mac, Linux, Tablet or Smartphone" : "PC Windows, Mac, Linux, Tablet o Smartphone"}</strong>{settings.language === "en" ? ", the archive is automatically loaded directly from Google™ Drive (/Notula) and refreshed whenever you return to the app window." : ", l'archivio viene caricato automaticamente da Google™ Drive (/Notula) e riallineato ogni volta che torni sulla finestra dell'app."}</li>
+                      <li><strong>{settings.language === "en" ? "Immediate Cloud Write:" : "Scrittura Cloud Istantanea:"}</strong>{settings.language === "en" ? " Every memo creation, edit, or deletion is immediately written to Google™ Drive so all your devices always display the exact same calendar." : " Ogni creazione, modifica o eliminazione di un memo viene salvata all'istante su Google™ Drive affinché tutti i dispositivi mostrino sempre lo stesso identico calendario."}</li>
+                      <li><strong>{settings.language === "en" ? "Zero Local-vs-Cloud Conflicts:" : "Zero Conflitti Locale/Cloud:"}</strong>{settings.language === "en" ? " By removing offline memo storage, local-vs-cloud asymmetries and sync conflicts between devices are permanently eliminated." : " Rimuovendo l'archiviazione offline dei memo, sono state eliminate alla radice tutte le asimmetrie e i conflitti di sincronizzazione tra dispositivi diversi."}</li>
                     </ul>
                   </div>
                 </div>
@@ -777,8 +790,8 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                     </p>
                     <p className="mt-2 p-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20 rounded-lg">
                       {settings.language === "en"
-                        ? "Important: To receive offline notifications on your smartphone, you must have the Google Calendar app installed and avoid clearing its cache. When you use Notula's 'Cloud' sync button to restore backups from Google Drive on a new device, Notula will automatically repopulate your Google Calendar with all your active memos!"
-                        : "Importante: per ricevere le notifiche offline sullo smartphone, devi avere l'app Google Calendar installata e non svuotarne la cache. Quando usi il pulsante di sincronizzazione 'Cloud' per ripristinare il backup da Google Drive su un nuovo dispositivo, Notula ripopolerà automaticamente anche il tuo Google Calendar in un colpo solo!"}
+                        ? "Important: To receive notifications on your smartphone even when Notula™ is closed, keep the Google Calendar app installed. When Notula™ loads your Cloud archive from Google™ Drive, it can also align your active memos with Google Calendar!"
+                        : "Importante: per ricevere le notifiche sullo smartphone anche a Notula™ chiusa, mantieni installata l'app Google Calendar. Quando Notula™ carica il tuo archivio Cloud da Google™ Drive, può allineare automaticamente anche il tuo Google Calendar con tutti i memo attivi!"}
                     </p>
                     
                     <div className="grid grid-cols-1 gap-3 mt-2">
@@ -819,8 +832,8 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                           </h4>
                           <p className="text-[10px] leading-relaxed">
                             {settings.language === "en"
-                              ? "The manual .ics download is still available (green icon) as a fallback for offline systems. Also, since Notula functions perfectly as a web cache with Cloud sync, native executables (.exe, .deb) have been permanently removed to keep the code clean."
-                              : "Lo scaricamento manuale .ics è ancora disponibile (icona verde) come fallback per i sistemi offline. Inoltre, poiché Notula funziona perfettamente tramite cache web e sync Cloud, i vecchi eseguibili nativi (.exe, .deb) sono stati rimossi in via definitiva per mantenere l'app pulita e leggera."}
+                              ? "The manual .ics download is still available (green icon) for external calendar import. Furthermore, since Notula™ operates as a 100% Online Cloud-Only PWA on Google™ Drive, legacy native executables (.exe, .deb) have been permanently retired to keep the app lightweight and universal."
+                              : "Lo scaricamento manuale .ics è ancora disponibile (icona verde) per l'esportazione verso calendari esterni. Inoltre, poiché Notula™ opera come PWA 100% Online Cloud-Only su Google™ Drive, i vecchi eseguibili nativi (.exe, .deb) sono stati rimossi in via definitiva per mantenere l'app leggera e universale."}
                           </p>
                         </div>
                       </div>
@@ -1072,7 +1085,8 @@ export const InfoGuideModal: React.FC<InfoGuideModalProps> = ({
                       </div>
                       <div className="mt-1 space-y-1">
                         <div><span className="text-blue-300">passwd NuovaPassword2026!</span> <span className="text-gray-400 text-[10px]">• Modifica/imposta Master Passphrase AES-256</span></div>
-                        <div><span className="text-blue-300">find --title "progetto"</span> <span className="text-gray-400 text-[10px]">• Ricerca testuale rapida</span></div>
+                        <div><span className="text-blue-300">find --title "progetto"</span> <span className="text-gray-400 text-[10px]">• Ricerca mirata per titolo</span></div>
+                        <div><span className="text-blue-300">find --desc "descrizione"</span> <span className="text-gray-400 text-[10px]">• Ricerca mirata per descrizione / note</span></div>
                         <div><span className="text-blue-300">info n_12345</span> <span className="text-gray-400 text-[10px]">• Scheda diagnostica completa con groupID</span></div>
                         <div><span className="text-blue-300">sync</span> <span className="text-gray-400 text-[10px]">• Avvia sincronizzazione da Google™ Drive</span></div>
                         <div><span className="text-blue-300">cloud-test</span> <span className="text-gray-400 text-[10px]">• Diagnostica di connessione Google™ Drive</span></div>

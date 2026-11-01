@@ -31,38 +31,45 @@ export function areMemosIdentical(a: MemoItem, b: MemoItem): boolean {
 }
 
 export function isDriveAuthenticated(): boolean {
-  if (gAccessToken) return true;
-  try {
-    const saved = sessionStorage.getItem('notula_drive_access_token');
-    if (saved && saved.trim()) {
-      gAccessToken = saved;
-      return true;
-    }
-  } catch {
-    // sessionStorage not available
-  }
-  return false;
+  return getDriveAccessToken() !== null;
 }
 
 export function getDriveAccessToken(): string | null {
-  if (!gAccessToken) {
-    try {
-      const saved = sessionStorage.getItem('notula_drive_access_token');
-      if (saved && saved.trim()) gAccessToken = saved;
-    } catch {
-      // ignore
+  try {
+    const expiryStr = sessionStorage.getItem('notula_drive_token_expiry') || localStorage.getItem('notula_drive_token_expiry');
+    if (expiryStr) {
+      const expiry = Number(expiryStr);
+      if (!isNaN(expiry) && Date.now() > expiry) {
+        setDriveAccessToken(null);
+        return null;
+      }
     }
+    if (!gAccessToken) {
+      const saved = sessionStorage.getItem('notula_drive_access_token') || localStorage.getItem('notula_drive_access_token');
+      if (saved && saved.trim()) {
+        gAccessToken = saved;
+      }
+    }
+  } catch {
+    // storage not available
   }
   return gAccessToken;
 }
 
-export function setDriveAccessToken(token: string | null): void {
+export function setDriveAccessToken(token: string | null, expiresInSeconds: number = 3300): void {
   gAccessToken = token;
   try {
     if (token) {
+      const expiry = String(Date.now() + expiresInSeconds * 1000);
       sessionStorage.setItem('notula_drive_access_token', token);
+      sessionStorage.setItem('notula_drive_token_expiry', expiry);
+      localStorage.setItem('notula_drive_access_token', token);
+      localStorage.setItem('notula_drive_token_expiry', expiry);
     } else {
       sessionStorage.removeItem('notula_drive_access_token');
+      sessionStorage.removeItem('notula_drive_token_expiry');
+      localStorage.removeItem('notula_drive_access_token');
+      localStorage.removeItem('notula_drive_token_expiry');
     }
   } catch {
     // ignore
@@ -77,6 +84,7 @@ export function getStoredDriveConfig(): DriveConfig {
       if (!parsed.clientId || parsed.clientId.trim() === '') {
         parsed.clientId = DEFAULT_GOOGLE_CLIENT_ID;
       }
+      parsed.autoSync = true; // Always true in Cloud-Only mode
       return parsed;
     } catch {
       // fallback
@@ -91,7 +99,7 @@ export function getStoredDriveConfig(): DriveConfig {
 }
 
 export function saveDriveConfig(config: DriveConfig): void {
-  localStorage.setItem('notula_drive_config', JSON.stringify(config));
+  localStorage.setItem('notula_drive_config', JSON.stringify({ ...config, autoSync: true }));
   if (config.clientId) {
     localStorage.setItem('notula_google_client_id', config.clientId);
   }
@@ -147,7 +155,8 @@ function setupTokenClient(
           onError(resp);
           return;
         }
-        setDriveAccessToken(resp.access_token);
+        const exp = resp.expires_in ? Number(resp.expires_in) - 120 : 3300;
+        setDriveAccessToken(resp.access_token, exp);
         onAuthSuccess(resp.access_token);
       },
     };
@@ -169,8 +178,9 @@ if (typeof window !== 'undefined') {
   if (hash && hash.includes('access_token=')) {
     const params = new URLSearchParams(hash.substring(1));
     const token = params.get('access_token');
+    const expiresIn = params.get('expires_in');
     if (token) {
-      setDriveAccessToken(token);
+      setDriveAccessToken(token, expiresIn ? Number(expiresIn) - 120 : 3300);
     }
     // Clean URL
     window.history.replaceState(null, '', window.location.pathname);
@@ -210,7 +220,8 @@ export function requestDriveAuth(promptConsent: boolean = false, silentOnly: boo
             reject(new Error("Autorizzazione negata o annullata: " + (resp.error_description || resp.error)));
             return;
           }
-          setDriveAccessToken(resp.access_token);
+          const exp = resp.expires_in ? Number(resp.expires_in) - 120 : 3300;
+          setDriveAccessToken(resp.access_token, exp);
           resolve(resp.access_token);
         };
         gTokenClient.requestAccessToken({ prompt: promptConsent ? 'consent' : '' });
@@ -241,79 +252,39 @@ export function requestDriveAuth(promptConsent: boolean = false, silentOnly: boo
 }
 
 /**
- * Finds or creates the dedicated "Notula" folder on Google Drive
+ * Returns all non-trashed "Notula" folder IDs on Google Drive (ordered oldest first),
+ * creating one if none exists.
  */
-export async function getOrCreateNotulaFolder(token: string): Promise<string> {
-  const cachedFolderId = typeof localStorage !== 'undefined' ? localStorage.getItem('notula_active_drive_folder_id') : null;
-
+export async function getAllNotulaFolders(token: string): Promise<string[]> {
   const query = encodeURIComponent(
     `name = '${DRIVE_FOLDER_NAME}' and mimeType = '${DRIVE_FOLDER_MIME}' and trashed = false`
   );
-  
+
   const res = await fetch(
     `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=drive&fields=files(id,name,mimeType,createdTime)&orderBy=createdTime asc`,
     {
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
         'Cache-Control': 'no-cache, no-store',
-        'Pragma': 'no-cache'
+        'Pragma': 'no-cache',
       },
-      cache: 'no-store'
+      cache: 'no-store',
     }
   );
 
   if (!res.ok) {
     if (res.status === 401) {
       setDriveAccessToken(null);
-      throw new Error("Token Google™ Drive scaduto. Riconnetti l'account dal pulsante Google™ Drive.");
+      throw new Error("Token Google™ Drive scaduto. Riconnetti l'account Google™ Drive.");
     }
     const errTxt = await res.text().catch(() => '');
     throw new Error(`Errore ricerca cartella Notula (${res.status}): ${errTxt}`);
   }
 
   const data = await res.json();
-  const folders = data.files || [];
-
+  const folders = (data.files || []).map((f: any) => f.id as string);
   if (folders.length > 0) {
-    // If cached folder ID exists and is still valid, use it
-    if (cachedFolderId && folders.some((f: any) => f.id === cachedFolderId)) {
-      return cachedFolderId;
-    }
-
-    // If multiple folders exist, inspect which one actually contains Notula files
-    if (folders.length > 1) {
-      for (const f of folders) {
-        try {
-          const testQuery = encodeURIComponent(`'${f.id}' in parents and trashed = false`);
-          const testRes = await fetch(
-            `https://www.googleapis.com/drive/v3/files?q=${testQuery}&spaces=drive&fields=files(id,name)&pageSize=5`,
-            {
-              headers: { 
-                Authorization: `Bearer ${token}`,
-                'Cache-Control': 'no-cache, no-store'
-              },
-              cache: 'no-store'
-            }
-          );
-          if (testRes.ok) {
-            const testData = await testRes.json();
-            if (testData.files && testData.files.length > 0) {
-              if (typeof localStorage !== 'undefined') {
-                localStorage.setItem('notula_active_drive_folder_id', f.id);
-              }
-              return f.id;
-            }
-          }
-        } catch {}
-      }
-    }
-
-    // Default to the first (oldest) folder
-    const selectedId = folders[0].id;
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('notula_active_drive_folder_id', selectedId);
-    }
-    return selectedId;
+    return folders;
   }
 
   // Create Notula folder if it doesn't exist
@@ -322,7 +293,7 @@ export async function getOrCreateNotulaFolder(token: string): Promise<string> {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache, no-store'
+      'Cache-Control': 'no-cache, no-store',
     },
     body: JSON.stringify({
       name: DRIVE_FOLDER_NAME,
@@ -336,10 +307,42 @@ export async function getOrCreateNotulaFolder(token: string): Promise<string> {
   }
 
   const folderData = await createRes.json();
-  if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('notula_active_drive_folder_id', folderData.id);
+  return [folderData.id];
+}
+
+/**
+ * Finds or creates the primary dedicated "Notula" folder on Google Drive
+ */
+export async function getOrCreateNotulaFolder(token: string): Promise<string> {
+  const folders = await getAllNotulaFolders(token);
+  if (folders.length === 1) {
+    return folders[0];
   }
-  return folderData.id;
+
+  // If multiple Notula folders exist, prefer the one containing files
+  for (const fId of folders) {
+    try {
+      const testQuery = encodeURIComponent(`'${fId}' in parents and trashed = false`);
+      const testRes = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=${testQuery}&spaces=drive&fields=files(id,name)&pageSize=5`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Cache-Control': 'no-cache, no-store',
+          },
+          cache: 'no-store',
+        }
+      );
+      if (testRes.ok) {
+        const testData = await testRes.json();
+        if (testData.files && testData.files.length > 0) {
+          return fId;
+        }
+      }
+    } catch {}
+  }
+
+  return folders[0];
 }
 
 /**
@@ -387,10 +390,13 @@ export async function saveSingleMemoToDrive(
   token: string,
   folderId: string,
   memo: MemoItem,
-  masterPassword: string | null = null
+  masterPassword: string | null = null,
+  knownExistingFileId?: string | null
 ): Promise<string> {
   const fileName = `memo_${memo.id}.json`;
-  const existingFileId = await findDriveFileInFolder(token, fileName, folderId);
+  const existingFileId = knownExistingFileId !== undefined
+    ? knownExistingFileId
+    : await findDriveFileInFolder(token, fileName, folderId);
 
   const payloadRaw = JSON.stringify(memo, null, 2);
   let finalPayload = payloadRaw;
@@ -429,7 +435,7 @@ export async function saveSingleMemoToDrive(
 }
 
 /**
- * Trashes / deletes a single memo file on Drive
+ * Trashes / deletes a single memo file on Drive across all Notula folders
  */
 export async function deleteMemoFromDrive(
   memoId: string
@@ -437,14 +443,23 @@ export async function deleteMemoFromDrive(
   try {
     if (!isDriveAuthenticated()) return false;
     const token = await requestDriveAuth(false, true);
-    const folderId = await getOrCreateNotulaFolder(token);
     const fileName = `memo_${memoId}.json`;
-    const fileId = await findDriveFileInFolder(token, fileName, folderId);
-    if (fileId) {
-      await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    const query = encodeURIComponent(`(name = '${fileName}' or name = '${memoId}.json') and trashed = false`);
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=drive&fields=files(id,name)`,
+      {
+        headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache, no-store' },
+        cache: 'no-store',
+      }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      for (const f of (data.files || [])) {
+        await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+      }
     }
     return true;
   } catch {
@@ -453,8 +468,9 @@ export async function deleteMemoFromDrive(
 }
 
 /**
- * Automatically uploads backup manifest AND individual memo files to Google Drive in folder "Notula"
- * Prioritizes the full manifest FIRST (< 500ms) so that cloud sync across devices is immediate.
+ * Automatically uploads backup manifest AND reconciles individual memo files in folder "Notula"
+ * Prioritizes the full manifest FIRST (< 500ms) so that cloud sync across devices is immediate,
+ * and cleans up any deleted individual memo_*.json files on Drive so deleted memos never resurrect.
  */
 export async function autoSyncToDrive(
   memos: MemoItem[],
@@ -495,16 +511,70 @@ export async function autoSyncToDrive(
     });
 
     if (!backupRes.ok) {
+      if (backupRes.status === 401) {
+        setDriveAccessToken(null);
+      }
       const errTxt = await backupRes.text().catch(() => '');
       throw new Error(`Upload archivio completo fallito (${backupRes.status}): ${errTxt}`);
     }
 
-    // 2. SECOND: Save individual memos into the Notula folder in fast concurrent batches (batches of 4)
-    for (let i = 0; i < memos.length; i += 4) {
-      const batch = memos.slice(i, i + 4);
+    // 2. SECOND: Reconcile individual memo_*.json files in the Notula folder
+    // List existing files in folderId so we can remove deleted ones and avoid redundant queries
+    const activeMemoIds = new Set(memos.map(m => m.id));
+    const existingMemoFiles = new Map<string, string>(); // memoId -> fileId
+
+    try {
+      const listQuery = encodeURIComponent(`'${folderId}' in parents and trashed = false and mimeType != '${DRIVE_FOLDER_MIME}'`);
+      const listRes = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=${listQuery}&spaces=drive&fields=files(id,name)&pageSize=200`,
+        {
+          headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache, no-store' },
+          cache: 'no-store',
+        }
+      );
+      if (listRes.ok) {
+        const listData = await listRes.json();
+        const filesToDelete: string[] = [];
+        for (const f of (listData.files || [])) {
+          if (f.name === DRIVE_FILE_NAME) continue;
+          if (f.name.startsWith('memo_') && f.name.endsWith('.json')) {
+            const mId = f.name.replace(/^memo_/, '').replace(/\.json$/, '');
+            if (!activeMemoIds.has(mId)) {
+              filesToDelete.push(f.id);
+            } else {
+              existingMemoFiles.set(mId, f.id);
+            }
+          }
+        }
+        // Delete orphan memo files that were removed by the user
+        for (let i = 0; i < filesToDelete.length; i += 5) {
+          const delBatch = filesToDelete.slice(i, i + 5);
+          await Promise.all(
+            delBatch.map(fId =>
+              fetch(`https://www.googleapis.com/drive/v3/files/${fId}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+              }).catch(() => {})
+            )
+          );
+        }
+      }
+    } catch (e) {
+      console.warn("Could not list existing files for reconciliation:", e);
+    }
+
+    // Upload new individual memo files (and update existing ones in batches)
+    for (let i = 0; i < memos.length; i += 5) {
+      const batch = memos.slice(i, i + 5);
       await Promise.all(
         batch.map(memo =>
-          saveSingleMemoToDrive(token, folderId, memo, masterPassword).catch(err => {
+          saveSingleMemoToDrive(
+            token,
+            folderId,
+            memo,
+            masterPassword,
+            existingMemoFiles.get(memo.id) || null
+          ).catch(err => {
             console.warn(`Single memo upload warning [${memo.id}]:`, err);
           })
         )
@@ -522,28 +592,32 @@ export async function autoSyncToDrive(
 }
 
 /**
- * Downloads memos from the Notula folder on Google Drive.
- * Reconciles BOTH the consolidated notula_backup.json manifest AND all individual memo_*.json files
- * so that any memo created on any device (even if only saved as a single file) is ALWAYS retrieved!
+ * Downloads memos from Google Drive (Single Source of Truth).
+ * Scans ALL Notula folders AND all JSON files accessible to the app, reconciling
+ * both notula_backup.json and individual memo files so every device sees the exact same memos.
  */
 export async function downloadFromDrive(
   masterPassword: string | null = null,
   interactive: boolean = true
 ): Promise<{ memos: MemoItem[]; rawCount: number; folderId: string }> {
   const token = await requestDriveAuth(false, !interactive);
-  const folderId = await getOrCreateNotulaFolder(token);
+  const allFolderIds = await getAllNotulaFolders(token);
+  const primaryFolderId = await getOrCreateNotulaFolder(token);
 
   const memosMap = new Map<string, MemoItem>();
   let backupModifiedTime = 0;
   let backupHadData = false;
+  let primaryBackupFileId: string | null = null;
 
-  // 1. Try reading the full consolidated backup inside the Notula folder first
-  const backupFileId = await findDriveFileInFolder(token, DRIVE_FILE_NAME, folderId);
-  if (backupFileId) {
+  // 1. Read consolidated notula_backup.json across any Notula folder (newest wins per memo ID)
+  for (const fId of allFolderIds) {
+    const bId = await findDriveFileInFolder(token, DRIVE_FILE_NAME, fId);
+    if (!bId) continue;
+    if (fId === primaryFolderId) primaryBackupFileId = bId;
+
     try {
-      // Get the modifiedTime of notula_backup.json to compare with individual files
       const fileMetaRes = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${backupFileId}?fields=id,modifiedTime`,
+        `https://www.googleapis.com/drive/v3/files/${bId}?fields=id,modifiedTime`,
         {
           headers: { 
             Authorization: `Bearer ${token}`,
@@ -556,11 +630,12 @@ export async function downloadFromDrive(
       if (fileMetaRes.ok) {
         const fileMeta = await fileMetaRes.json();
         if (fileMeta.modifiedTime) {
-          backupModifiedTime = new Date(fileMeta.modifiedTime).getTime();
+          const mTime = new Date(fileMeta.modifiedTime).getTime();
+          if (mTime > backupModifiedTime) backupModifiedTime = mTime;
         }
       }
 
-      const res = await fetch(`https://www.googleapis.com/drive/v3/files/${backupFileId}?alt=media&t=${Date.now()}`, {
+      const res = await fetch(`https://www.googleapis.com/drive/v3/files/${bId}?alt=media&t=${Date.now()}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Cache-Control': 'no-cache, no-store',
@@ -581,8 +656,17 @@ export async function downloadFromDrive(
         const parsed = JSON.parse(text);
         const list: MemoItem[] = Array.isArray(parsed) ? parsed : (parsed.memos || [parsed]);
         for (const item of list) {
-          if (item && item.id) {
-            memosMap.set(item.id, item);
+          if (item && item.id && item.title) {
+            const existing = memosMap.get(item.id);
+            if (!existing) {
+              memosMap.set(item.id, item);
+            } else {
+              const exTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
+              const inTime = item.updatedAt ? new Date(item.updatedAt).getTime() : 0;
+              if (inTime >= exTime) {
+                memosMap.set(item.id, item);
+              }
+            }
           }
         }
         backupHadData = true;
@@ -595,83 +679,77 @@ export async function downloadFromDrive(
     }
   }
 
-  // 2. ALWAYS scan all individual files in the Notula folder (with pagination!)
-  // Guarantees that any memo created on another device (such as memo_n_1790415893-669.json)
-  // is ALWAYS retrieved, even if notula_backup.json was outdated or missing!
-  let pageToken: string | null = null;
-  const individualFilesToFetch: Array<{ id: string; name: string; memoId: string }> = [];
+  // 2. Scan ALL individual JSON files across all Notula folders AND globally within drive.file scope
+  const seenFileIds = new Set<string>();
+  const individualFilesToFetch: Array<{ id: string; name: string }> = [];
 
-  do {
-    const query = encodeURIComponent(`'${folderId}' in parents and trashed = false and mimeType != '${DRIVE_FOLDER_MIME}'`);
-    const pageParam = pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '';
-    const listRes = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=drive&fields=nextPageToken,files(id,name,modifiedTime)&pageSize=100${pageParam}`,
-      {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Cache-Control': 'no-cache, no-store',
-          'Pragma': 'no-cache'
-        },
-        cache: 'no-store'
-      }
-    );
+  const collectCandidateFiles = (fileItems: any[]) => {
+    for (const f of fileItems) {
+      if (!f || !f.id || seenFileIds.has(f.id)) continue;
+      seenFileIds.add(f.id);
+      if (f.name === DRIVE_FILE_NAME) continue;
 
-    if (listRes.ok) {
-      const listData = await listRes.json();
-      pageToken = listData.nextPageToken || null;
-      const fileItems = listData.files || [];
+      if (f.name.endsWith('.json')) {
+        const memoId = f.name.replace(/^memo_/, '').replace(/\.json$/, '');
+        const fileModified = f.modifiedTime ? new Date(f.modifiedTime).getTime() : 0;
+        const existingInBackup = memosMap.get(memoId);
 
-      for (const f of fileItems) {
-        if (f.name === DRIVE_FILE_NAME) continue;
-
-        if (f.name.startsWith('memo_') && f.name.endsWith('.json')) {
-          const memoId = f.name.replace(/^memo_/, '').replace(/\.json$/, '');
-          const fileModified = f.modifiedTime ? new Date(f.modifiedTime).getTime() : 0;
-
-          // Fetch if this memo is NOT in the backup manifest, or if the individual file is newer than the backup
-          const existingInBackup = memosMap.get(memoId);
-          if (!existingInBackup || fileModified > backupModifiedTime) {
-            individualFilesToFetch.push({ id: f.id, name: f.name, memoId });
-          }
-        } else if (!backupHadData && f.name.endsWith('.json')) {
-          individualFilesToFetch.push({ id: f.id, name: f.name, memoId: f.id });
+        // Always fetch if this memo is NOT yet in memosMap (e.g. memo_n_1790415893-669.json)
+        // OR if the individual file on Drive was modified after notula_backup.json
+        if (!existingInBackup || fileModified > backupModifiedTime) {
+          individualFilesToFetch.push({ id: f.id, name: f.name });
         }
       }
-    } else {
-      console.warn("Failed to list files in Notula folder", await listRes.text().catch(() => ''));
-      break;
     }
-  } while (pageToken);
+  };
 
-  // If no memos found yet, check globally for any files named memo_n_*.json or notula_backup.json created by this app
-  if (memosMap.size === 0 && individualFilesToFetch.length === 0) {
-    try {
-      const globalQuery = encodeURIComponent(`trashed = false and (name contains 'memo_n_' or name = '${DRIVE_FILE_NAME}')`);
-      const globalRes = await fetch(
-        `https://www.googleapis.com/drive/v3/files?q=${globalQuery}&spaces=drive&fields=files(id,name,modifiedTime)&pageSize=50`,
+  for (const fId of allFolderIds) {
+    let pageToken: string | null = null;
+    do {
+      const query = encodeURIComponent(`'${fId}' in parents and trashed = false and mimeType != '${DRIVE_FOLDER_MIME}'`);
+      const pageParam = pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '';
+      const listRes = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=drive&fields=nextPageToken,files(id,name,modifiedTime)&pageSize=100${pageParam}`,
         {
           headers: { 
             Authorization: `Bearer ${token}`,
-            'Cache-Control': 'no-cache, no-store'
+            'Cache-Control': 'no-cache, no-store',
+            'Pragma': 'no-cache'
           },
           cache: 'no-store'
         }
       );
-      if (globalRes.ok) {
-        const gData = await globalRes.json();
-        for (const gf of (gData.files || [])) {
-          if (gf.name.startsWith('memo_') && gf.name.endsWith('.json')) {
-            const mId = gf.name.replace(/^memo_/, '').replace(/\.json$/, '');
-            if (!memosMap.has(mId)) {
-              individualFilesToFetch.push({ id: gf.id, name: gf.name, memoId: mId });
-            }
-          }
-        }
+
+      if (listRes.ok) {
+        const listData = await listRes.json();
+        pageToken = listData.nextPageToken || null;
+        collectCandidateFiles(listData.files || []);
+      } else {
+        break;
       }
-    } catch {}
+    } while (pageToken);
   }
 
-  // Fetch individual files in concurrent batches of 5
+  // Also check globally for any memo_*.json or n_*.json files created by the app
+  try {
+    const globalQuery = encodeURIComponent(`trashed = false and (name contains 'memo_' or name contains 'n_')`);
+    const globalRes = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=${globalQuery}&spaces=drive&fields=files(id,name,modifiedTime)&pageSize=100`,
+      {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache, no-store'
+        },
+        cache: 'no-store'
+      }
+    );
+    if (globalRes.ok) {
+      const gData = await globalRes.json();
+      collectCandidateFiles(gData.files || []);
+    }
+  } catch {}
+
+  // Fetch candidate individual files in concurrent batches of 5
   let newOrUpdatedCount = 0;
   for (let i = 0; i < individualFilesToFetch.length; i += 5) {
     const chunk = individualFilesToFetch.slice(i, i + 5);
@@ -695,18 +773,21 @@ export async function downloadFromDrive(
               }
               content = await decryptData(content, masterPassword);
             }
-            const parsedMemo: MemoItem = JSON.parse(content);
-            if (parsedMemo && parsedMemo.id) {
-              const existing = memosMap.get(parsedMemo.id);
-              if (!existing) {
-                memosMap.set(parsedMemo.id, parsedMemo);
-                newOrUpdatedCount++;
-              } else {
-                const existingTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
-                const incomingTime = parsedMemo.updatedAt ? new Date(parsedMemo.updatedAt).getTime() : 0;
-                if (incomingTime >= existingTime) {
+            const parsedData = JSON.parse(content);
+            const items: MemoItem[] = Array.isArray(parsedData) ? parsedData : [parsedData];
+            for (const parsedMemo of items) {
+              if (parsedMemo && parsedMemo.id && parsedMemo.title && parsedMemo.expirationDate) {
+                const existing = memosMap.get(parsedMemo.id);
+                if (!existing) {
                   memosMap.set(parsedMemo.id, parsedMemo);
                   newOrUpdatedCount++;
+                } else {
+                  const existingTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
+                  const incomingTime = parsedMemo.updatedAt ? new Date(parsedMemo.updatedAt).getTime() : 0;
+                  if (incomingTime >= existingTime) {
+                    memosMap.set(parsedMemo.id, parsedMemo);
+                    newOrUpdatedCount++;
+                  }
                 }
               }
             }
@@ -721,7 +802,7 @@ export async function downloadFromDrive(
   const finalMemos = Array.from(memosMap.values());
 
   // 3. Reconcile: If we discovered new/updated individual memo files that were missing from notula_backup.json,
-  // update notula_backup.json in the background so future syncs across all devices are instant!
+  // update notula_backup.json immediately so all devices see the unified state!
   if (finalMemos.length > 0 && (newOrUpdatedCount > 0 || !backupHadData)) {
     try {
       const payloadRaw = JSON.stringify(finalMemos, null, 2);
@@ -730,17 +811,17 @@ export async function downloadFromDrive(
         finalPayload = await encryptData(payloadRaw, masterPassword);
       }
       const metadata: any = { name: DRIVE_FILE_NAME, mimeType: 'application/json' };
-      if (!backupFileId) {
-        metadata.parents = [folderId];
+      if (!primaryBackupFileId) {
+        metadata.parents = [primaryFolderId];
       }
       const form = new FormData();
       form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
       form.append('file', new Blob([finalPayload], { type: 'application/json' }));
-      const url = backupFileId
-        ? `https://www.googleapis.com/upload/drive/v3/files/${backupFileId}?uploadType=multipart`
+      const url = primaryBackupFileId
+        ? `https://www.googleapis.com/upload/drive/v3/files/${primaryBackupFileId}?uploadType=multipart`
         : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
-      fetch(url, {
-        method: backupFileId ? 'PATCH' : 'POST',
+      await fetch(url, {
+        method: primaryBackupFileId ? 'PATCH' : 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: form,
         cache: 'no-store'
@@ -748,7 +829,7 @@ export async function downloadFromDrive(
     } catch {}
   }
 
-  return { memos: finalMemos, rawCount: finalMemos.length, folderId };
+  return { memos: finalMemos, rawCount: finalMemos.length, folderId: primaryFolderId };
 }
 
 /**

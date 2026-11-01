@@ -173,6 +173,28 @@ export const CLI_COMMANDS_DOC: CliCommandDoc[] = [
     ]
   },
   {
+    name: "find / search",
+    syntax: 'find [--title <query>] [--desc <query>] [--date <YYYY-MM-DD>] [--id <id>] [--exact]',
+    category: "query",
+    summary: "Ricerca mirata di memo per titolo, descrizione (--desc), data esatta o ID univoco.",
+    description: "Interroga l'archivio Notula™ filtrando per titolo (--title), contenuto della descrizione/note (--desc / --description), data di scadenza (--date) o identificativo (--id). Supporta il flag --exact per la corrispondenza esatta.",
+    options: [
+      { flag: "--title <query>", type: "string", desc: "Cerca i memo il cui titolo contiene la stringa specificata." },
+      { flag: "--desc <query>", type: "string", desc: "Cerca i memo la cui descrizione (note aggiuntive) contiene la stringa specificata." },
+      { flag: "--date <YYYY-MM-DD>", type: "date", desc: "Cerca tutti i memo attivi nella data specificata (puntuali e ricorrenti)." },
+      { flag: "--id <id>", type: "string", desc: "Cerca un memo specifico tramite il suo ID univoco." },
+      { flag: "--exact", type: "flag", desc: "Richiede la corrispondenza esatta dell'intera stringa cercata." }
+    ],
+    examples: [
+      'find --desc "descrizione"',
+      'find --desc "15:30"',
+      'find --title "Udienza"',
+      'find --title "Riunione" --desc "Sala A"',
+      "find --date 2026-09-30",
+      "find --id n_17240012345"
+    ]
+  },
+  {
     name: "rm / delete",
     syntax: "rm [--id <id>] [--group <groupID>] [--title <query>] [--expired] [--all] [--force]",
     category: "core",
@@ -202,8 +224,8 @@ export const CLI_COMMANDS_DOC: CliCommandDoc[] = [
     name: "sync",
     syntax: "sync",
     category: "export_import",
-    summary: "Attiva la sincronizzazione bidirezionale con Google™ Drive.",
-    description: "Scarica e allinea l'archivio locale con la cartella 'Notula/' del proprio account Google™ Drive, gestendo in automatico eventuali conflitti e applicando la crittografia E2E.",
+    summary: "Ricarica e riallinea istantaneamente l'archivio Cloud da Google™ Drive.",
+    description: "Interroga direttamente la cartella 'Notula/' del proprio account Google™ Drive (unica fonte di verità Cloud-Only), ricaricando i memo in memoria e applicando la decifratura E2E AES-256.",
     options: [],
     examples: ["sync"]
   },
@@ -433,10 +455,13 @@ notula> rm --all --force
 notula> passwd MiaNuovaPasswordSicura2026!
 \\end{lstlisting}
 
-\\subsection{8. Comandi di Query & Diagnostica: \\texttt{ls}, \\texttt{show}, \\texttt{sync}, \\texttt{stats}}
+\\subsection{8. Comandi di Query & Diagnostica: \\texttt{find}, \\texttt{ls}, \\texttt{info}, \\texttt{sync}, \\texttt{stats}}
 \\begin{lstlisting}[style=notulacli]
+notula> find --desc "descrizione"
+notula> find --title "Udienza"
+notula> find --date 2026-09-30
 notula> ls --year 2026 --expired
-notula> show n_17240012345
+notula> info n_17240012345
 notula> sync
 notula> stats
 \\end{lstlisting}

@@ -1,15 +1,15 @@
 # 📅 Notula™ • Advanced Time & Memo Engine (v2.2)
 
 <p align="center">
-  <b>High-engineering management of non-relational temporal memory. Offline-First Architecture, Google™ Drive Smart Sync & AES-256 Hardware Encryption.</b><br>
+  <b>High-engineering management of non-relational temporal memory. 100% Online Cloud-Only Architecture on Google™ Drive & AES-256 Hardware Encryption.</b><br>
   <i>Design & Development: Ing. Mario Fantini</i><br>
   <b>🌐 Official Web App: <a href="https://martdivenus.github.io/notula-app">https://martdivenus.github.io/notula-app</a></b>
 </p>
 
 ---
 
-**Notula™** is an offline-first single-page application (SPA) created in **React 19** and **Tailwind CSS v4** specifically designed for managing, filtering, and organizing temporal memos (deadlines, payments, bills, generic reminders, appointments). 
-Conceived by Ing. Mario Fantini, the application adopts a rigorous engineering approach: it completely eliminates reliance on third-party commercial databases (SaaS) and proprietary servers. Data is processed locally with zero latency, securely encrypted using AES-256 GCM hardware cryptography via Web Crypto API, and synchronized directly with the user's personal Google™ Drive space through an intelligent bidirectional synchronization engine with automatic conflict resolution.
+**Notula™** is a 100% Online Cloud-Only single-page application (SPA) created in **React 19** and **Tailwind CSS v4** specifically designed for managing, filtering, and organizing temporal memos (deadlines, payments, bills, generic reminders, appointments). 
+Conceived by Ing. Mario Fantini, the application adopts a rigorous engineering approach: it completely eliminates reliance on third-party commercial databases (SaaS), proprietary servers, and asymmetric local memo storage. All memos live exclusively in the user's personal Google™ Drive space (`Notula/` folder) as a single source of truth across all devices, securely encrypted client-side using AES-256 GCM hardware cryptography via Web Crypto API.
 
 Notula™ offers high-performance UI and an interactive calendar, alongside a powerful command-line terminal (CLI).
 
@@ -20,10 +20,10 @@ Unlike common task managers that only handle single notes, Notula™ implements 
 - **Automatic Clone Propagation**: By cloning a memo for N days, Notula™ automatically generates independent events, linking them sequentially under a single tracking code (`groupID`).
 - **Synchronous Cascade Updates**: If a user modifies the title, description, or security level of a memo belonging to a series, the engine intercepts the variation and automatically propagates it to all memos with the same `groupID`, ensuring total semantic coherence while leaving the specific expiration dates of each element strictly unaltered.
 
-### 2. 📡 Google™ Drive Smart Sync Engine (Bidirectional)
-The application natively integrates the Google™ Identity Services standard (OAuth 2.0). Memos are directly backed up in the user's private Google™ Drive (inside a dedicated `Notula/` folder) without intermediary servers.
-- **Bi-Directional Timestamp Verification**: The synchronization algorithm automatically resolves conflicts: if the local application and Google Drive present misalignments, Notula™ displays an interactive modal (Conflict Resolution Dashboard) to let the user precisely choose the overwrite flow.
-- **Background Multi-Chunk**: Supports saving massive bundles of memos without causing UI stuttering.
+### 2. 📡 Google™ Drive 100% Online Cloud-Only Engine
+The application natively integrates the Google™ Identity Services standard (OAuth 2.0). Memos are stored exclusively in the user's private Google™ Drive (inside a dedicated `Notula/` folder) without intermediary servers or local memo caching.
+- **Total Symmetry Across Devices**: Every PC and smartphone reads from and writes directly to Google™ Drive (`Notula/`), automatically loading memos at startup, writing immediately on every creation/edit/deletion, and refreshing on window focus.
+- **Manual Import Duplicate Resolution**: When importing external `.json` or `.xml` backup files, if a memo ID already exists in the Cloud with different content, Notula™ displays an interactive modal (`Replace [Y]`, `Replace All [A]`, `Ignore [I]`, `Keep Both [M]`).
 
 ### 3. 🛡️ Military-Grade Security & Visual Obfuscation
 The app adopts a strict multi-layer security policy:
@@ -205,8 +205,8 @@ Notula™ is optimized for standalone use:
 **Notula™** è un motore di promemoria e organizzazione temporale concepito secondo il principio **"Calendar-First"**. Notula™ adotta primariamente una filosofia a **consultazione consapevole**, dove è l'utente a visionare il calendario e a interagire attivamente con i propri impegni. Tuttavia, per garantire un supporto completo, integra un sistema **opzionale di Notifiche Push Native**: interfacciandosi direttamente con il sistema operativo del dispositivo (Windows Action Center, macOS Notification Center, Linux DE o Android Notification Shade), permette all'utente di scegliere se ricevere allarmi tempestivi, perfettamente integrati con l'ambiente desktop e mobile.
 
 L'applicazione garantisce:
-- **Sovranità Assoluta dei Dati**: Cifratura locale a 3 strati con derivazione di chiave PBKDF2 e cifratura simmetrica AES-256-GCM.
-- **Sincronizzazione Cloud-First**: Backup automatico e trasparente su **Google™ Drive** (cartella `Notula/`) e cache offline resiliente.
+- **Sovranità Assoluta dei Dati**: Cifratura client-side a 3 strati con derivazione di chiave PBKDF2 e cifratura simmetrica AES-256-GCM.
+- **Architettura 100% Online Cloud-Only**: Unica fonte di verità su **Google™ Drive** (cartella `Notula/`), con allineamento istantaneo ad ogni modifica e zero asimmetrie tra PC e smartphone.
 - **Doppia Interfaccia Operativa**: Visualizzazione grafica reattiva ad alta densità informativa + **Terminale CLI integrato** (in stile Unix) per utenti avanzati e sviluppatori.
 - **Esperienza PWA Standalone**: Installabile nativamente su dispositivi mobili (Android WebAPK, iOS Web Clip) e Desktop senza barre URL del browser o elementi di disturbo.
 
@@ -378,47 +378,35 @@ Notula™ è ottimizzata per l'uso standalone:
 
 ---
 
-## 🔄 Ripristino Dati e Pulizia Cache / Data Recovery & Cache Clearing (Important)
+## 🔄 Sessione Cloud e Pulizia Cache / Cloud Session & Cache Clearing (Important)
 
-Notula™ è progettata come una Progressive Web App (PWA) offline-first, ottimizzata per operare in ambienti **Mobile** e **Desktop**. I tuoi dati (inclusi i task, le impostazioni e i token di accesso) vengono salvati localmente nel motore di archiviazione sicuro del tuo sistema (`localStorage` e IndexedDB forniti dal browser).
+Notula™ opera con un'architettura **100% Online Cloud-Only**: tutti i tuoi memo risiedono esclusivamente nella cartella `Notula/` del tuo account **Google™ Drive**. Nel browser locale vengono salvati unicamente il token di sessione OAuth di Google e le preferenze visive dell'interfaccia (tema, lingua).
 
-### ⚠️ Attenzione: Cosa succede svuotando la cache
-Se esegui un'operazione di pulizia profonda del browser, come l'eliminazione di "Tutti i dati" da **Impostazioni > App > Chrome** (su Android) oppure la pulizia completa della cronologia e dei dati dei siti sul browser Desktop, stai eseguendo a tutti gli effetti un **Factory Reset (Ripristino di fabbrica)** della PWA.
-Questa operazione **eliminerà permanentemente**:
-1. Il tuo database locale dei memo.
-2. Le tue impostazioni di sistema (lingua, tema, permessi notifiche).
-3. I token di autorizzazione di Google™ Drive.
+### ℹ️ Cosa succede svuotando la cache del browser
+Se esegui una pulizia completa dei dati del browser su Android o Desktop, **non perdi alcun memo** poiché l'archivio risiede interamente su Google™ Drive. L'operazione rimuoverà soltanto:
+1. Il token di sessione corrente di Google™ Drive (richiedendo un nuovo login).
+2. Le preferenze visive locali (lingua, tema) e la Master Passphrase in memoria.
 
-### ♻️ Come ripristinare i dati (Procedura di Sync)
-Se hai svuotato la cache e hai perso i dati locali, segui attentamente questa procedura per recuperarli dal Cloud:
-
-1. **Apri Notula™ (Desktop o Mobile):** L'applicazione apparirà completamente vuota, come se fosse appena stata installata.
-2. **Connessione Cloud:** Clicca sull'icona a forma di nuvola (Cloud) nel menu principale.
-3. **Nuovo Login:** Effettua nuovamente l'accesso ("Sign in") con il tuo Account Google. Questo è necessario perché il token precedente è andato distrutto.
-4. **🔑 Master Passphrase (Se usavi la cifratura):** Se nel salvataggio precedente avevi attivato la cifratura AES-256 (icona a forma di scudo), **DEVI** inserire la tua Master Passphrase esatta nel pannello di sicurezza della PWA *prima* di ripristinare i dati. Se non lo fai, i memo scaricati rimarranno incomprensibili.
-5. **Download & Ripristino:** Premi il pulsante di Download dal Cloud. Notula contatterà Google Drive, scaricherà l'ultimo backup valido e ripopolerà istantaneamente il tuo database locale.
+### ♻️ Come riallineare l'app dopo la pulizia cache
+1. **Apri Notula™ (Desktop o Mobile):** All'avvio verrà visualizzata la schermata di accesso Cloud-Only.
+2. **Accedi con Google™ Drive:** Effettua il login con il tuo Account Google; Notula™ caricherà automaticamente tutti i tuoi memo dalla cartella `Notula/`.
+3. **🔑 Master Passphrase (Se usi la cifratura AES-256):** Se hai memo cifrati con AES-256, inserisci la tua Master Passphrase nel pannello di sicurezza per decifrarli istantaneamente in memoria.
 
 ---
 
-### 🇬🇧 Data Recovery & Cache Clearing (English)
+### 🇬🇧 Cloud Session & Cache Clearing (English)
 
-Notula™ is designed as an offline-first Progressive Web App (PWA), optimized to operate in both **Mobile** and **Desktop** environments. Your data (including tasks, settings, and access tokens) is stored locally in your system's secure storage engine (`localStorage` and IndexedDB provided by the browser).
+Notula™ operates with a **100% Online Cloud-Only** architecture: all your memos live exclusively inside the `Notula/` folder of your personal **Google™ Drive** account. The local browser only stores your Google OAuth session token and UI preferences (theme, language).
 
-### ⚠️ Warning: What happens when clearing the cache
-If you perform a deep clean of your browser, such as deleting "All data" from **Settings > Apps > Chrome** (on Android) or completely clearing site data and history on your Desktop browser, you are effectively performing a **Factory Reset** of the PWA.
-This operation will **permanently delete**:
-1. Your local memo database.
-2. Your system settings (language, theme, notification permissions).
-3. Your Google™ Drive authorization tokens.
+### ℹ️ What happens when clearing the browser cache
+If you clear your browser data on Android or Desktop, **no memos are ever lost** because the entire archive lives on Google™ Drive. Clearing the cache only removes:
+1. Your active Google™ Drive OAuth session token (requiring you to sign in again).
+2. Local UI preferences (language, theme) and the in-memory Master Passphrase.
 
-### ♻️ How to restore your data (Sync Procedure)
-If you have cleared your cache and lost your local data, follow this procedure carefully to recover it from the Cloud:
-
-1. **Open Notula™ (Desktop or Mobile):** The application will appear completely empty, as if freshly installed.
-2. **Cloud Connection:** Click on the Cloud icon in the main menu.
-3. **New Login:** Sign in again with your Google Account. This is required because the previous token was destroyed during the cache wipe.
-4. **🔑 Master Passphrase (If encryption was used):** If you had activated AES-256 encryption (shield icon) in your previous save, you **MUST** enter your exact Master Passphrase in the PWA security panel *before* restoring the data. Failure to do so will result in incomprehensible downloaded memos.
-5. **Download & Restore:** Click the Cloud Download button. Notula will contact Google Drive, download the latest valid backup, and instantly repopulate your local database.
+### ♻️ How to reconnect after clearing the cache
+1. **Open Notula™ (Desktop or Mobile):** You will be greeted by the Cloud-Only sign-in gate.
+2. **Sign in with Google™ Drive:** Authenticate with your Google Account; Notula™ will automatically load all your memos directly from your `Notula/` folder.
+3. **🔑 Master Passphrase (If AES-256 encryption is used):** If you have AES-256 encrypted memos, enter your Master Passphrase in the security panel to decrypt them in memory.
 
 ---
 

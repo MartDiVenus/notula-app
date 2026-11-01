@@ -95,6 +95,7 @@ export default function App() {
   const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState<number>(today.getMonth());
   const [selectedDay, setSelectedDay] = useState<number>(today.getDate());
+  const selectedCalendarDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
 
   // App Configuration & Security
   const [themeMode, setThemeMode] = useState<ThemeMode>('dark');
@@ -109,10 +110,25 @@ export default function App() {
   });
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState<boolean>(false);
 
-  // Cloud Sync & Connectivity State
+  // Cloud-Only (Single Source of Truth) & Connectivity State
   const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [isCloudReady, setIsCloudReady] = useState<boolean>(false);
+  const [cloudGateError, setCloudGateError] = useState<string | null>(null);
+  const [needsMasterPasswordOnGate, setNeedsMasterPasswordOnGate] = useState<boolean>(false);
+  const [gatePwdInput, setGatePwdInput] = useState<string>('');
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState<string | undefined>(undefined);
+  const isWritingRef = useRef<boolean>(false);
+  const isCloudReadyRef = useRef<boolean>(false);
+  const masterPasswordRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    isCloudReadyRef.current = isCloudReady;
+  }, [isCloudReady]);
+
+  useEffect(() => {
+    masterPasswordRef.current = masterPassword;
+  }, [masterPassword]);
 
   // Modals & Panels
   const [isTerminalOpen, setIsTerminalOpen] = useState<boolean>(false);
@@ -136,142 +152,190 @@ export default function App() {
   const [memoToDelete, setMemoToDelete] = useState<string | null>(null);
   const [formDefaultDate, setFormDefaultDate] = useState<string | undefined>(undefined);
 
-  // Interactive Conflict Resolution State
+  // Interactive Conflict Resolution State (Used for manual JSON/XML file imports)
   const [conflictPrompt, setConflictPrompt] = useState<ConflictPrompt | null>(null);
   const conflictResolverRef = useRef<((option: ConflictResolutionOption) => void) | null>(null);
 
   // File Input Ref for Import
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // --- 1. INITIAL LOAD & PERSISTENCE ---
+  // Connect & Load Authoritative Archive from Google Drive
+  const connectAndLoadFromDrive = async (interactive: boolean = true, pwdOverride?: string | null) => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setIsOnline(false);
+      setCloudGateError("Connessione Internet assente. Notula richiede una connessione attiva.");
+      return;
+    }
+
+    const pwdToUse = pwdOverride !== undefined ? pwdOverride : masterPasswordRef.current;
+    setIsSyncing(true);
+    setCloudGateError(null);
+    setSyncStatusMsg(
+      settings.language === 'en'
+        ? 'Aligning Cloud archive from Google™ Drive...'
+        : 'Allineamento archivio Cloud da Google™ Drive in corso...'
+    );
+
+    try {
+      const { memos } = await downloadFromDrive(pwdToUse, interactive);
+      coreRef.current.setMemos(memos);
+      setIsCloudReady(true);
+      setNeedsMasterPasswordOnGate(false);
+      forceUpdate();
+      const timeStr = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      setSyncStatusMsg(
+        settings.language === 'en'
+          ? `Cloud aligned (${memos.length} memos) • ${timeStr}`
+          : `Allineato con Google™ Drive (${memos.length} memo) • ${timeStr}`
+      );
+    } catch (err: any) {
+      const msg = err?.message || "Impossibile connettersi a Google™ Drive.";
+      if (msg.includes("Master Password")) {
+        setNeedsMasterPasswordOnGate(true);
+      }
+      setCloudGateError(msg);
+      setSyncStatusMsg("Connessione richiesta: " + msg);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Silent Auto-Refresh on Window Focus / Tab Visibility Change
+  const refreshFromDriveSilent = async () => {
+    if (
+      typeof navigator === 'undefined' ||
+      !navigator.onLine ||
+      !isCloudReadyRef.current ||
+      isWritingRef.current ||
+      !isDriveAuthenticated()
+    ) {
+      return;
+    }
+
+    try {
+      setIsSyncing(true);
+      const { memos } = await downloadFromDrive(masterPasswordRef.current, false);
+      if (!isWritingRef.current) {
+        coreRef.current.setMemos(memos);
+        forceUpdate();
+        const timeStr = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        setSyncStatusMsg(
+          settings.language === 'en'
+            ? `Cloud aligned (${memos.length} memos) • ${timeStr}`
+            : `Allineato con Google™ Drive (${memos.length} memo) • ${timeStr}`
+        );
+      }
+    } catch (err: any) {
+      if (err?.message && err.message.includes("scaduto")) {
+        setIsCloudReady(false);
+        setCloudGateError("Sessione Google™ Drive scaduta. Riconnetti per continuare.");
+      }
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // --- 1. INITIAL LOAD & CLOUD-ONLY LIFECYCLE ---
   useEffect(() => {
     // Load Theme
     const savedTheme = (localStorage.getItem(THEME_KEY) as ThemeMode) || 'dark';
     setThemeMode(savedTheme);
     applyTheme(savedTheme);
 
+    // Purge any legacy local memo cache so no device can ever show asymmetric stale local data
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+
     // Load Master Password (in-session or local)
     const savedPwd = sessionStorage.getItem(MASTER_PWD_KEY) || localStorage.getItem(MASTER_PWD_KEY);
-    if (savedPwd) setMasterPassword(savedPwd);
-
-    // Load Memos
-    const savedDB = localStorage.getItem(STORAGE_KEY);
-    if (savedDB) {
-      try {
-        const parsed = JSON.parse(savedDB);
-        coreRef.current.setMemos(parsed);
-      } catch (e) {
-        console.error("Errore nel parsing del database locale:", e);
-      }
-    } else {
-      // Seed starter memos if empty
-      const todayIso = getLocalYYYYMMDD(today);
-      const starterMemos: MemoItem[] = [
-        {
-          id: 'n_1724000001-01',
-          title: settings.language === 'en' ? 'Welcome to Notula (One-time Memo)' : 'Benvenuto in Notula (Memo Puntuale)',
-          description: settings.language === 'en' ? 'This is a one-time (non-recurring) memo. In the calendar, one-time memos are highlighted with colored borders: red if expired, orange if today, magenta if future.' : 'Questo è un memo puntuale (non ricorrente). Nel calendario i memo puntuali sono evidenziati con bordi colorati: rosso se scaduto, arancio se oggi, magenta se futuro.',
-          expirationDate: todayIso,
-          year: String(today.getFullYear()),
-          month: String(today.getMonth() + 1).padStart(2, '0'),
-          day: String(today.getDate()).padStart(2, '0'),
-          repeatType: 'none',
-          obfuscation: 'none',
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: 'n_1724000002-02',
-          title: settings.language === 'en' ? 'Notula Automatic Backup (Recurring Memo)' : 'Notula Backup Automatico (Memo Ricorrente)',
-          description: 'Questo è un memo ricorrente. Nel calendario i memo ricorrenti sono evidenziati con pallini colorati.',
-          expirationDate: todayIso,
-          year: String(today.getFullYear()),
-          month: String(today.getMonth() + 1).padStart(2, '0'),
-          day: String(today.getDate()).padStart(2, '0'),
-          repeatType: 'yearly',
-          obfuscation: 'partial',
-          createdAt: new Date().toISOString(),
-        }
-      ];
-      coreRef.current.setMemos(starterMemos);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(starterMemos));
+    if (savedPwd) {
+      setMasterPassword(savedPwd);
+      masterPasswordRef.current = savedPwd;
     }
-    forceUpdate();
 
-    // Setup Online/Offline Network Listeners
+    // Setup Online/Offline & Focus Listeners
     const handleOnline = () => {
       setIsOnline(true);
-      setSyncStatusMsg((settings.language === "en" ? "Connection restored: starting Google™ Drive sync..." : "Connessione ripristinata: avvio sincronizzazione Google™ Drive..."));
-      triggerDriveSyncOnConnect();
+      setCloudGateError(null);
+      if (isDriveAuthenticated()) {
+        connectAndLoadFromDrive(false, masterPasswordRef.current);
+      }
     };
 
     const handleOffline = () => {
       setIsOnline(false);
-      setSyncStatusMsg("Offline: utilizzo cache locale");
+      setSyncStatusMsg("Connessione Internet assente — Modalità Cloud-Only in pausa");
+    };
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === 'visible') {
+        refreshFromDriveSilent();
+      }
     };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    window.addEventListener('focus', handleVisibilityOrFocus);
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus);
 
-    // Immediate Drive-First Startup Sync (if online)
-    if (typeof navigator !== 'undefined' && navigator.onLine) {
-      setTimeout(() => {
-        triggerDriveSyncOnConnect();
-      }, 800);
+    // Immediate Cloud Startup Check (if online and already has valid token)
+    if (typeof navigator !== 'undefined' && navigator.onLine && isDriveAuthenticated()) {
+      connectAndLoadFromDrive(false, savedPwd || null);
     }
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('focus', handleVisibilityOrFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
     };
   }, []);
 
-  // Drive Connection / Startup Sync Trigger (Silent, non-intrusive)
-  const triggerDriveSyncOnConnect = async () => {
-    const driveCfg = getStoredDriveConfig();
-    if (!driveCfg.clientId) return;
-
-    // Only auto-sync silently if already authenticated (prevents OAuth popups on page load)
-    if (driveCfg.autoSync && isDriveAuthenticated()) {
-      try {
-        setIsSyncing(true);
-        const { memos } = await downloadFromDrive(masterPassword, false);
-        if (memos && memos.length > 0) {
-          await mergeMemosWithConflictCheck(memos, false);
-          setSyncStatusMsg((settings.language === "en" ? "Background Google™ Drive synchronization completed" : "Sincronizzazione Google™ Drive in background completata"));
-        } else if (coreRef.current.getMemos().length > 0) {
-          await autoSyncToDrive(coreRef.current.getMemos(), masterPassword, false);
-          setSyncStatusMsg((settings.language === "en" ? "Local memos synchronized to Google™ Drive" : "Memo locali sincronizzati su Google™ Drive"));
-        }
-      } catch (err: any) {
-        console.log("Drive background sync:", err.message || err);
-      } finally {
-        setIsSyncing(false);
-      }
-    } else {
-      setSyncStatusMsg((settings.language === "en" ? "Google™ Drive ready" : "Google™ Drive pronto"));
-    }
-  };
-
-  // Sync to LocalStorage & Drive on Memo Changes (Drive-First)
+  // Direct Cloud Write on Every Memo Mutation (Zero LocalStorage)
   const persistMemos = (memos: MemoItem[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
     forceUpdate();
 
-    if (typeof navigator !== 'undefined' && navigator.onLine) {
-      const driveCfg = getStoredDriveConfig();
-      if (driveCfg.autoSync && driveCfg.clientId) {
-        setIsSyncing(true);
-        autoSyncToDrive(memos, masterPassword).then((res) => {
-          if (res.success) {
-            setSyncStatusMsg((settings.language === "en" ? "Synchronized to Google™ Drive with high priority" : "Sincronizzato su Google™ Drive con massima priorità"));
-          }
-        }).catch((err) => {
-          console.warn("Drive auto-sync error:", err);
-        }).finally(() => {
-          setIsSyncing(false);
-        });
-      }
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setIsOnline(false);
+      return;
     }
+
+    isWritingRef.current = true;
+    setIsSyncing(true);
+    setSyncStatusMsg(
+      settings.language === 'en'
+        ? 'Saving directly to Google™ Drive...'
+        : 'Salvataggio diretto su Google™ Drive in corso...'
+    );
+
+    autoSyncToDrive(memos, masterPasswordRef.current, false)
+      .then(async (res) => {
+        if (!res.success) {
+          // Retry interactively if token expired during session
+          const retryRes = await autoSyncToDrive(memos, masterPasswordRef.current, true);
+          if (retryRes.success) {
+            const timeStr = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            setSyncStatusMsg(`Sincronizzato su Google™ Drive (${memos.length} memo) • ${timeStr}`);
+          } else {
+            setCloudGateError(retryRes.message);
+          }
+        } else {
+          const timeStr = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          setSyncStatusMsg(
+            settings.language === 'en'
+              ? `Saved on Google™ Drive (${memos.length} memos) • ${timeStr}`
+              : `Salvato su Google™ Drive (${memos.length} memo) • ${timeStr}`
+          );
+        }
+      })
+      .catch((err) => {
+        console.warn("Drive direct-write error:", err);
+      })
+      .finally(() => {
+        isWritingRef.current = false;
+        setIsSyncing(false);
+      });
   };
 
   // --- 2. THEME MANAGEMENT ---
@@ -437,24 +501,9 @@ export default function App() {
     }
   };
 
-  // Google™ Drive Download Handler with True Smart Sync
+  // Google™ Drive Authoritative Reload Handler (Single Source of Truth)
   const handleDownloadFromDrive = async () => {
-    setIsSyncing(true);
-    setSyncStatusMsg((settings.language === "en" ? "Connecting and downloading from Google™ Drive..." : "Connessione e download in corso da Google™ Drive..."));
-    try {
-      const { memos } = await downloadFromDrive(masterPassword, true);
-      if (memos.length === 0) {
-        setSyncStatusMsg((settings.language === "en" ? "No memos found in Google™ Drive backup." : (settings.language === "en" ? "No memos found in Google™ Drive backup." : (settings.language === "en" ? "No memos found in Google™ Drive backup." : "Nessun memo trovato nel backup Google™ Drive."))));
-        return;
-      }
-      await mergeMemosWithConflictCheck(memos, true);
-      setSyncStatusMsg(`Sincronizzazione completata con successo (${memos.length} memo elaborati)`);
-    } catch (err: any) {
-      setSyncStatusMsg("Errore: " + err.message);
-      alert((settings.language === "en" ? "Google™ Drive synchronization error: " : "Errore sincronizzazione Google™ Drive: ") + err.message);
-    } finally {
-      setIsSyncing(false);
-    }
+    await connectAndLoadFromDrive(true);
   };
 
   /**
@@ -606,6 +655,104 @@ export default function App() {
   return (
     <div className="flex flex-col min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-sans antialiased selection:bg-blue-600 selection:text-white">
       {/* ======================================================== */}
+      {/* 0. MANDATORY ONLINE & GOOGLE DRIVE CONNECTION GATE       */}
+      {/* ======================================================== */}
+      {(!isOnline || !isCloudReady) && (
+        <div className="fixed inset-0 z-40 bg-[var(--bg-main)]/95 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center space-y-5">
+            <div className="flex items-center justify-center">
+              <NotulaLogo size="lg" showText={true} />
+            </div>
+
+            {!isOnline ? (
+              <>
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-semibold w-full">
+                  {settings.language === 'en'
+                    ? 'Internet Connection Required (Online-Only Engine)'
+                    : 'Connessione Internet Richiesta (Motore Solo Online)'}
+                </div>
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                  {settings.language === 'en'
+                    ? 'Notula operates exclusively online on Google™ Drive to guarantee identical memos across all your PCs and smartphones with zero asymmetry. Reconnect to the internet to continue.'
+                    : 'Notula opera esclusivamente online su Google™ Drive per garantire che tutti i tuoi PC e smartphone condividano sempre gli stessi identici memo senza asimmetrie. Riconnettiti a Internet per continuare.'}
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="space-y-1.5">
+                  <h1 className="text-base sm:text-lg font-bold text-[var(--text-main)]">
+                    {settings.language === 'en'
+                      ? 'Cloud-Only Memo Engine'
+                      : 'Motore Memo Cloud-Only'}
+                  </h1>
+                  <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                    {settings.language === 'en'
+                      ? 'Connect to Google™ Drive (/Notula) to load and synchronize your unified memo archive in real time across all devices.'
+                      : 'Connettiti a Google™ Drive (/Notula) per caricare e sincronizzare in tempo reale il tuo archivio unico di memo su tutti i dispositivi.'}
+                  </p>
+                </div>
+
+                {needsMasterPasswordOnGate && (
+                  <div className="w-full text-left space-y-2 p-3.5 rounded-xl bg-purple-500/5 border border-purple-500/30">
+                    <label className="block text-xs font-semibold text-purple-400">
+                      {settings.language === 'en'
+                        ? 'AES-256 Master Password Required:'
+                        : 'Master Password AES-256 richiesta per decifrare il Cloud:'}
+                    </label>
+                    <input
+                      type="password"
+                      value={gatePwdInput}
+                      onChange={(e) => setGatePwdInput(e.target.value)}
+                      placeholder="Inserisci Master Password..."
+                      className="w-full px-3 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg text-sm font-mono text-[var(--text-main)]"
+                    />
+                  </div>
+                )}
+
+                {cloudGateError && (
+                  <div className="w-full p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-500 font-medium text-left">
+                    {cloudGateError}
+                  </div>
+                )}
+
+                <div className="w-full space-y-2.5 pt-1">
+                  <button
+                    onClick={() => {
+                      if (needsMasterPasswordOnGate && gatePwdInput.trim()) {
+                        const pwd = gatePwdInput.trim();
+                        setMasterPassword(pwd);
+                        masterPasswordRef.current = pwd;
+                        sessionStorage.setItem(MASTER_PWD_KEY, pwd);
+                        connectAndLoadFromDrive(true, pwd);
+                      } else {
+                        connectAndLoadFromDrive(true);
+                      }
+                    }}
+                    disabled={isSyncing}
+                    className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:opacity-60 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 whitespace-nowrap"
+                  >
+                    <RefreshCw className={`w-4 h-4 shrink-0 ${isSyncing ? 'animate-spin' : ''}`} />
+                    <span>
+                      {isSyncing
+                        ? (settings.language === 'en' ? 'Connecting to Google™ Drive...' : 'Allineamento con Google™ Drive in corso...')
+                        : (settings.language === 'en' ? 'Sign In & Load Memos from Google™ Drive' : 'Accedi e Carica i Memo da Google™ Drive')}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsCloudSyncOpen(true)}
+                    className="w-full py-2 px-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] hover:bg-[var(--bg-main)] active:scale-95 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition whitespace-nowrap"
+                  >
+                    {settings.language === 'en' ? 'Cloud Settings & Diagnostics' : 'Impostazioni Cloud & Diagnostica'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
       {/* 1. COMPACT SLEEK TOP HEADER */}
       {/* ======================================================== */}
       <header className="flex items-center justify-between px-2 sm:px-5 lg:px-6 py-2 bg-[var(--bg-header)] border-b border-[var(--border-color)] shadow-xs sticky top-0 z-30">
@@ -644,7 +791,7 @@ export default function App() {
           <button
             onClick={() => {
               setEditingMemo(null);
-              setFormDefaultDate(undefined);
+              setFormDefaultDate(selectedCalendarDateStr);
               setIsFormOpen(true);
             }}
             className="py-1.5 px-2.5 sm:px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-xs transition flex items-center gap-1"
@@ -654,29 +801,23 @@ export default function App() {
             <span className="hidden xs:inline sm:inline">{settings.language === "en" ? "New" : "Nuovo"}</span>
           </button>
 
-          {/* Cloud Sync Active Indicator (Streamlined, no CLOUD-FIRST clutter) */}
-          <div 
+          {/* Cloud Sync Active Indicator (Streamlined, Cloud-Only) */}
+          <button
             onClick={() => setIsCloudSyncOpen(true)}
-            className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg border cursor-pointer transition text-xs font-mono font-semibold ${
+            className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg border cursor-pointer transition text-xs font-mono font-semibold whitespace-nowrap ${
               isSyncing 
                 ? 'bg-blue-500/10 border-blue-500/40 text-blue-400' 
-                : isOnline 
+                : isOnline && isCloudReady
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:border-emerald-500' 
                   : 'bg-amber-500/10 border-amber-500/30 text-amber-500 hover:border-amber-500'
             }`}
-            title={isOnline ? (settings.language === "en" ? 'Google™ Drive Sync Active. Click to manage backup and synchronization.' : 'Google™ Drive Sync Attivo. Clicca per gestire backup e sincronizzazione.') : (settings.language === 'en' ? 'Offline: Local saving active.' : 'Offline: Salvataggio locale attivo.')}
+            title={syncStatusMsg || (settings.language === "en" ? 'Google™ Drive Cloud-Only Active. Click to manage.' : 'Google™ Drive Cloud-Only Attivo. Clicca per gestire.')}
           >
-            <div className={`w-2 h-2 rounded-full ${
-              isSyncing 
-                ? 'bg-blue-400 animate-spin' 
-                : isOnline 
-                  ? 'bg-emerald-500 animate-pulse' 
-                  : 'bg-amber-500'
-            }`}></div>
+            <Cloud className={`w-3.5 h-3.5 ${isSyncing ? 'animate-bounce text-blue-400' : 'text-emerald-500'}`} />
             <span className="hidden sm:inline text-[11px]">
-              {isSyncing ? 'SYNC...' : 'Cloud'}
+              {isSyncing ? 'SYNC...' : 'Drive Online'}
             </span>
-          </div>
+          </button>
 
           {/* E2E Security Badge */}
           <button
@@ -759,7 +900,7 @@ export default function App() {
             <button
               onClick={() => {
                 setEditingMemo(null);
-                setFormDefaultDate(undefined);
+                setFormDefaultDate(selectedCalendarDateStr);
                 setIsFormOpen(true);
               }}
               className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.3)] transition flex items-center justify-center gap-2"
@@ -1000,7 +1141,7 @@ export default function App() {
             onClick={() => {
               setIsMobileDrawerOpen(false);
               setEditingMemo(null);
-              setFormDefaultDate(undefined);
+              setFormDefaultDate(selectedCalendarDateStr);
               setIsFormOpen(true);
             }}
             className="w-full py-3 px-4 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2"
@@ -1256,7 +1397,7 @@ export default function App() {
         }}
         onSave={handleSaveMemoForm}
         initialMemo={editingMemo}
-        defaultDate={formDefaultDate}
+        defaultDate={formDefaultDate || selectedCalendarDateStr}
         hasMasterPassword={!!masterPassword}
       />
 
@@ -1284,6 +1425,12 @@ export default function App() {
         onClose={() => setIsCloudSyncOpen(false)}
         masterPassword={masterPassword}
         onDownloadDrive={handleDownloadFromDrive}
+        onDisconnectDrive={() => {
+          coreRef.current.setMemos([]);
+          setIsCloudReady(false);
+          setIsCloudSyncOpen(false);
+          forceUpdate();
+        }}
         isSyncing={isSyncing}
         syncStatusMsg={syncStatusMsg}
         totalMemos={totalMemosCount}

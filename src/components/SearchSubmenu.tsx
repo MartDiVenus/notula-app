@@ -35,8 +35,9 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
   onPrintMemo,
 }) => {
   const { settings } = useSettings();
-  const [searchMode, setSearchMode] = useState<'text' | 'date' | 'id'>('text');
+  const [searchMode, setSearchMode] = useState<'text' | 'desc' | 'date' | 'id'>('text');
   const [textQuery, setTextQuery] = useState('');
+  const [descQuery, setDescQuery] = useState('');
   const [dateQuery, setDateQuery] = useState('');
   const [idQuery, setIdQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'punctual' | 'recurring' | 'expired'>('all');
@@ -61,7 +62,7 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
     if (searchMode === 'text' && textQuery.trim()) {
       if (exactMatch) {
         const q = textQuery.toLowerCase().trim();
-        list = list.filter(m => m.title.toLowerCase() === q);
+        list = list.filter(m => m.title.toLowerCase() === q || (m.description || '').toLowerCase() === q);
       } else {
         const fuse = new Fuse(list, {
           keys: ['title', 'description'],
@@ -71,6 +72,12 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
         const fuseResults = fuse.search(textQuery.trim());
         list = fuseResults.map(result => result.item);
       }
+    } else if (searchMode === 'desc' && descQuery.trim()) {
+      const q = descQuery.toLowerCase().trim();
+      list = list.filter(m => {
+        const desc = (m.description || '').toLowerCase();
+        return exactMatch ? desc === q : desc.includes(q);
+      });
     } else if (searchMode === 'date' && dateQuery.trim()) {
       const target = dateQuery.trim();
       list = list.filter(m => {
@@ -100,7 +107,7 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
     }
 
     return list;
-  }, [memos, searchMode, textQuery, dateQuery, idQuery, filterType, todayStr, exactMatch]);
+  }, [memos, searchMode, textQuery, descQuery, dateQuery, idQuery, filterType, todayStr, exactMatch]);
 
   if (!isOpen) return null;
 
@@ -115,7 +122,7 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
             </div>
             <div>
               <h2 className="font-bold text-lg text-[var(--text-main)]">{settings.language === 'en' ? 'Search Memos (Notula Search)' : 'Cerca nei Memo (Notula Search)'}</h2>
-              <p className="text-xs text-[var(--text-muted)]">{settings.language === "en" ? "Search memos by title, text, exact date, or ID" : "Cerca memo per titolo, testo, data esatta o ID"}</p>
+              <p className="text-xs text-[var(--text-muted)]">{settings.language === "en" ? "Search memos by title, description (--desc), exact date, or ID" : "Cerca memo per titolo, descrizione (--desc), data esatta o ID"}</p>
             </div>
           </div>
           <button
@@ -128,41 +135,53 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
 
         {/* Search Mode Tabs */}
         <div className="p-6 pb-2 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-[var(--bg-subtle)] p-1.5 rounded-xl border border-[var(--border-color)]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-[var(--bg-subtle)] p-1.5 rounded-xl border border-[var(--border-color)]">
             <button
               onClick={() => setSearchMode('text')}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition cursor-pointer ${
                 searchMode === 'text'
                   ? 'bg-[var(--bg-card)] text-blue-600 dark:text-blue-400 shadow-sm border border-[var(--border-color)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
               <Tag className="w-3.5 h-3.5" />
-              <span>{settings.language === "en" ? "1. By Title / Text" : "1. Per Titolo / Testo"}</span>
+              <span>{settings.language === "en" ? "1. Title / Text" : "1. Titolo / Testo"}</span>
+            </button>
+
+            <button
+              onClick={() => setSearchMode('desc')}
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                searchMode === 'desc'
+                  ? 'bg-[var(--bg-card)] text-blue-600 dark:text-blue-400 shadow-sm border border-[var(--border-color)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>{settings.language === "en" ? "2. Description" : "2. Descrizione"}</span>
             </button>
 
             <button
               onClick={() => setSearchMode('date')}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition cursor-pointer ${
                 searchMode === 'date'
                   ? 'bg-[var(--bg-card)] text-blue-600 dark:text-blue-400 shadow-sm border border-[var(--border-color)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>{settings.language === "en" ? "2. By Date" : "2. Per Data"}</span>
+              <span>{settings.language === "en" ? "3. By Date" : "3. Per Data"}</span>
             </button>
 
             <button
               onClick={() => setSearchMode('id')}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition cursor-pointer ${
                 searchMode === 'id'
                   ? 'bg-[var(--bg-card)] text-blue-600 dark:text-blue-400 shadow-sm border border-[var(--border-color)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
               <Hash className="w-3.5 h-3.5" />
-              <span>{settings.language === "en" ? "3. By IDs" : "3. Per IDs"}</span>
+              <span>{settings.language === "en" ? "4. By IDs" : "4. Per IDs"}</span>
             </button>
           </div>
 
@@ -177,6 +196,26 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
                   placeholder={settings.language === "en" ? "Type title or content keywords..." : "Digita parole chiave del titolo o contenuto..."}
                   value={textQuery}
                   onChange={(e) => setTextQuery(e.target.value)}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-subtle)] border border-[var(--border-color)] rounded-xl text-base sm:text-sm text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-sans"
+                />
+              )}
+
+              {searchMode === 'desc' && (
+                <input
+                  id="search_desc"
+                  name="search_desc"
+                  type="search"
+                  placeholder={settings.language === "en" ? "Search inside memo description / notes (find --desc)..." : "Cerca nella descrizione / note dei memo (find --desc)..."}
+                  value={descQuery}
+                  onChange={(e) => setDescQuery(e.target.value)}
                   autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="none"
@@ -226,10 +265,11 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
 
               <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-3.5" />
 
-              {(textQuery || dateQuery || idQuery) && (
+              {(textQuery || descQuery || dateQuery || idQuery) && (
                 <button
                   onClick={() => {
                     setTextQuery('');
+                    setDescQuery('');
                     setDateQuery('');
                     setIdQuery('');
                   }}
@@ -256,7 +296,7 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
             </div>
           </div>
 
-          {searchMode === 'text' && (
+          {(searchMode === 'text' || searchMode === 'desc') && (
             <div className="flex items-center gap-2 mt-2 px-1">
               <input
                 type="checkbox"
@@ -266,17 +306,20 @@ export const SearchSubmenu: React.FC<SearchSubmenuProps> = ({
                 className="w-3.5 h-3.5 rounded border-[var(--border-color)] text-blue-600 focus:ring-blue-500 bg-[var(--bg-card)] cursor-pointer"
               />
               <label htmlFor="exactMatch" className="text-xs text-[var(--text-muted)] cursor-pointer select-none">
-                {settings.language === 'en' ? 'Exact title/text match (disable fuzzy search)' : 'Titolo esatto (disabilita ricerca fuzzy)'}
+                {searchMode === 'desc'
+                  ? (settings.language === 'en' ? 'Exact description match (--exact)' : 'Descrizione esatta (--exact)')
+                  : (settings.language === 'en' ? 'Exact title/text match (disable fuzzy search)' : 'Corrispondenza esatta (disabilita ricerca fuzzy)')}
               </label>
             </div>
           )}
 
           <div className="text-xs text-[var(--text-muted)] flex justify-between items-center px-1 mt-4">
             <span>{settings.language === "en" ? "Found " : "Trovati "}<strong>{results.length}</strong>{settings.language === "en" ? " matching memos" : " memo corrispondenti"}</span>
-            {(textQuery || dateQuery || idQuery || filterType !== 'all') && (
+            {(textQuery || descQuery || dateQuery || idQuery || filterType !== 'all') && (
               <button
                 onClick={() => {
                   setTextQuery('');
+                  setDescQuery('');
                   setDateQuery('');
                   setIdQuery('');
                   setFilterType('all');

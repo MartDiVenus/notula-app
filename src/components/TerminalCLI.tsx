@@ -194,7 +194,8 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
       log("   ls --expired                                        -> Mostra solo memo scaduti");
       log("");
       log("6. RICERCA & DIAGNOSTICA:");
-      log("   find --title \"<testo>\"                              -> Cerca per titolo o descrizione");
+      log("   find --title \"<titolo>\" [--exact]                   -> Cerca per titolo");
+      log("   find --desc \"<descrizione>\" [--exact]               -> Cerca per descrizione / note");
       log("   find --date YYYY-MM-DD                              -> Cerca per data esatta");
       log("   find --id <id>                                      -> Cerca per ID univoco");
       log(settings.language === "en" ? "   info <id>                                           -> Complete diagnostic card with groupID and AES-256 details" : "   info <id>                                           -> Scheda diagnostica completa con groupID e dettagli AES-256");
@@ -512,8 +513,10 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
         case 'find':
         case 'search': {
           const title = getFlag(args, '--title');
+          const desc = getFlag(args, '--desc') ?? getFlag(args, '--description');
           const date = getFlag(args, '--date');
           const id = getFlag(args, '--id');
+          const isExact = args.includes('--exact');
 
           let results: MemoItem[] = [];
           if (id) {
@@ -521,18 +524,35 @@ export const TerminalCLI: React.FC<TerminalCLIProps> = ({
             if (item) results = [item];
           } else if (date) {
             results = core.findByDate(date);
-          } else if (title) {
-            results = core.findByText(title);
+          } else if (title && desc) {
+            const byTitle = core.findByTitle(title, isExact);
+            const descIds = new Set(core.findByDescription(desc, isExact).map(m => m.id));
+            results = byTitle.filter(m => descIds.has(m.id));
+          } else if (desc !== null) {
+            results = core.findByDescription(desc, isExact);
+          } else if (title !== null) {
+            results = core.findByTitle(title, isExact);
           } else if (args[1] && !args[1].startsWith('--')) {
-            results = core.findByText(args.slice(1).join(' '));
+            const rawQuery = args.slice(1).filter(a => a !== '--exact').join(' ');
+            results = isExact
+              ? core.getMemos().filter(m =>
+                  m.title.toLowerCase() === rawQuery.toLowerCase() ||
+                  (m.description || '').toLowerCase() === rawQuery.toLowerCase()
+                )
+              : core.findByText(rawQuery);
           } else {
-            throw new Error("Specifica --title, --date o --id per la ricerca.");
+            throw new Error('Specifica --title "<titolo>", --desc "<descrizione>", --date YYYY-MM-DD o --id <id> per la ricerca.');
           }
 
           log(`🔍 Risultati ricerca (${results.length} trovati):`);
-          results.forEach((m) => {
-            log(`   • [${m.id}] ${m.expirationDate} "${m.title}" (Ricorrenza: ${m.repeatType})`);
-          });
+          if (results.length === 0) {
+            log("   (Nessun memo corrispondente ai criteri di ricerca)");
+          } else {
+            results.forEach((m) => {
+              const descPreview = m.description ? ` — Note: "${m.description}"` : '';
+              log(`   • [${m.id}] ${m.expirationDate} "${m.title}"${descPreview} (Ricorrenza: ${m.repeatType})`);
+            });
+          }
           break;
         }
 

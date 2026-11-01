@@ -249,6 +249,25 @@ export class NotulaCore {
     );
   }
 
+  // 2b. Per titolo specifico
+  public findByTitle(query: string, exactMatch = false): MemoItem[] {
+    if (!query || !query.trim()) return [];
+    const q = query.toLowerCase().trim();
+    return this.memos.filter(m =>
+      exactMatch ? m.title.toLowerCase() === q : m.title.toLowerCase().includes(q)
+    );
+  }
+
+  // 2c. Per descrizione / note aggiuntive (--desc)
+  public findByDescription(query: string, exactMatch = false): MemoItem[] {
+    if (!query || !query.trim()) return [];
+    const q = query.toLowerCase().trim();
+    return this.memos.filter(m => {
+      const desc = (m.description || '').toLowerCase();
+      return exactMatch ? desc === q : desc.includes(q);
+    });
+  }
+
   // 3. Per IDs
   public findByIds(ids: string[]): MemoItem[] {
     const idSet = new Set(ids.map(id => id.trim().toLowerCase()));

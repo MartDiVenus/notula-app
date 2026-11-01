@@ -398,6 +398,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               </p>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => onNewMemo(selectedDateStr)}
+            className="py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+            title={settings.language === "en" ? `Create new memo for ${selectedDateStr}` : `Crea nuovo memo per il ${selectedDateStr}`}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>{settings.language === "en" ? "Add Memo" : "Aggiungi Memo"}</span>
+          </button>
         </div>
 
         {selectedDayMemos.length === 0 ? (

@@ -21,6 +21,7 @@ interface CloudSyncModalProps {
   onClose: () => void;
   masterPassword: string | null;
   onDownloadDrive: () => void;
+  onDisconnectDrive?: () => void;
   isSyncing: boolean;
   syncStatusMsg?: string;
   totalMemos: number;
@@ -31,6 +32,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
   onClose,
   masterPassword,
   onDownloadDrive,
+  onDisconnectDrive,
   isSyncing,
   syncStatusMsg,
   totalMemos,
@@ -48,6 +50,8 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
     setClientIdInput(current.clientId);
     if (getDriveAccessToken()) {
       setAuthStatus('connected');
+    } else {
+      setAuthStatus('not_connected');
     }
   }, [isOpen]);
 
@@ -57,6 +61,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
     const updated: DriveConfig = {
       ...config,
       clientId: clientIdInput.trim(),
+      autoSync: true,
     };
     setConfig(updated);
     saveDriveConfig(updated);
@@ -76,6 +81,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
       if (diag.ok) {
         setAuthStatus('connected');
         setTestMsg(`✅ ${diag.message}`);
+        onDownloadDrive();
       } else {
         setAuthStatus(diag.tokenAcquired ? 'connected' : 'error');
         setTestMsg(`❌ ${diag.message}`);
@@ -92,6 +98,9 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
     setDriveAccessToken(null);
     setAuthStatus('not_connected');
     setTestMsg("Account Google™ Drive disconnesso.");
+    if (onDisconnectDrive) {
+      onDisconnectDrive();
+    }
   };
 
   return (
@@ -104,8 +113,8 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               <Cloud className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-lg text-[var(--text-main)]">{settings.language === 'en' ? 'Cloud & Google™ Drive Sync' : 'Sincronizzazione Cloud & Google™ Drive'}</h2>
-              <p className="text-xs text-[var(--text-muted)]">{settings.language === "en" ? "Transparent automatic save on Google™ Drive and remote download" : "Salvataggio automatico trasparente su Google™ Drive e download remoto"}</p>
+              <h2 className="font-bold text-lg text-[var(--text-main)]">{settings.language === 'en' ? 'Google™ Drive Cloud Engine (Online-Only)' : 'Motore Cloud Google™ Drive (Solo Online)'}</h2>
+              <p className="text-xs text-[var(--text-muted)]">{settings.language === "en" ? "Single Source of Truth on Google™ Drive across all devices" : "Unica fonte di verità su Google™ Drive condivisa tra tutti i dispositivi"}</p>
             </div>
           </div>
           <button
@@ -128,8 +137,8 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                 <div className="font-bold text-xs text-[var(--text-main)]">
                   {settings.language === 'en' ? 'Connection Status: ' : 'Stato Connessione: '}{authStatus === 'connected' ? (settings.language === 'en' ? 'Active & Authenticated' : 'Attivo & Autenticato') : (settings.language === 'en' ? 'Not connected / Waiting' : 'Non connesso / In attesa')}
                 </div>
-                <div className="text-[11px] text-[var(--text-muted)]">
-                  {totalMemos} {settings.language === 'en' ? 'memos in local archive • Remote folder:' : 'memo in archivio locale • Cartella remota:'} <strong>/Notula</strong>
+                <div className="text-[11px] text-[var(--text-muted)] tabular-nums">
+                  {totalMemos} {settings.language === 'en' ? 'memos in Cloud archive • Remote folder:' : 'memo in archivio Cloud • Cartella remota:'} <strong>/Notula</strong>
                 </div>
               </div>
             </div>
@@ -137,7 +146,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
             {authStatus === 'connected' && (
               <button
                 onClick={handleDisconnect}
-                className="text-xs text-red-500 hover:underline px-2 py-1"
+                className="text-xs text-red-500 hover:underline px-2 py-1 whitespace-nowrap shrink-0"
               >{settings.language === "en" ? "Disconnect" : "Disconnetti"}</button>
             )}
           </div>
@@ -153,43 +162,27 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
             )}
           </div>
 
-          {/* Configuration Form */}
+          {/* Cloud-Only Architecture Info */}
           <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 flex items-center justify-between">
-                <span>{settings.language === "en" ? "Google™ Drive API Integration" : "Integrazione Google™ Drive API"}</span>
-              </label>
-              <p className="text-[11px] text-[var(--text-muted)]">
-                {settings.language === "en" ? "Notula uses the OAuth 2.0 standard to securely access your files." : "Notula utilizza lo standard OAuth 2.0 per accedere in modo sicuro ai tuoi file."}
-              </p>
-              <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                {settings.language === "en" ? "Authorization scope:" : "Ambito di autorizzazione:"} <code>https://www.googleapis.com/auth/drive.file</code> (accesso ristretto alla sola cartella <code>/Notula</code>).
-              </p>
-            </div>
-
-            {/* Auto-Sync Toggle */}
-            <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-color)]">
-              <div>
-                <span className="text-xs font-semibold text-[var(--text-main)]">{settings.language === "en" ? "Automatic Synchronization" : "Sincronizzazione Automatica"}</span>
-                <p className="text-[11px] text-[var(--text-muted)]">{settings.language === "en" ? "Save to Google™ Drive on every add/edit/delete" : "Salva su Google™ Drive ad ogni aggiunta/modifica/eliminazione"}</p>
+            <div className="p-3.5 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-color)] space-y-1.5">
+              <div className="text-xs font-semibold text-[var(--text-main)]">
+                {settings.language === "en" ? "100% Online Cloud-Only Mode Active" : "Modalità 100% Online (Cloud-Only) Attiva"}
               </div>
-              <input
-                type="checkbox"
-                checked={config.autoSync}
-                onChange={(e) => {
-                  const updated = { ...config, autoSync: e.target.checked };
-                  setConfig(updated);
-                  saveDriveConfig(updated);
-                }}
-                className="w-4 h-4 text-blue-600 rounded cursor-pointer"
-              />
+              <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                {settings.language === "en"
+                  ? "Local browser storage is disabled for memos. Every PC and smartphone reads directly from Google™ Drive (/Notula) at startup and writes immediately on every change, guaranteeing zero asymmetry across devices."
+                  : "Il salvataggio locale nel browser è disattivato per i memo. Ogni PC e smartphone legge direttamente da Google™ Drive (/Notula) all'apertura e scrive istantaneamente a ogni modifica, garantendo totale simmetria tra tutti i dispositivi."}
+              </p>
+              <p className="text-[10px] text-[var(--text-muted)] pt-1">
+                {settings.language === "en" ? "Authorization scope:" : "Ambito di autorizzazione:"} <code>https://www.googleapis.com/auth/drive.file</code> (cartella <code>/Notula</code>).
+              </p>
             </div>
           </div>
 
-          {/* Test Feedback */}
-          {testMsg && (
+          {/* Test / Sync Feedback */}
+          {(testMsg || syncStatusMsg) && (
             <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs font-mono text-[var(--text-main)]">
-              {testMsg}
+              {testMsg || syncStatusMsg}
             </div>
           )}
 
@@ -198,10 +191,10 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
             <button
               onClick={handleTestDiagnostics}
               disabled={isTesting}
-              className="flex-1 py-2.5 px-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] hover:bg-[var(--border-color)] text-xs font-semibold text-[var(--text-main)] transition flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 px-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-subtle)] hover:bg-[var(--border-color)] active:scale-95 text-xs font-semibold text-[var(--text-main)] transition flex items-center justify-center gap-2 whitespace-nowrap"
             >
-              <ShieldCheck className="w-4 h-4 text-blue-500" />
-              <span>{isTesting ? 'Verifica in corso...' : (settings.language === "en" ? 'Verify and Connect Google™ Drive' : 'Verifica e Connetti Google™ Drive')}</span>
+              <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0" />
+              <span>{isTesting ? 'Verifica in corso...' : (settings.language === "en" ? 'Verify Google™ Drive Connection' : 'Verifica Connessione Google™ Drive')}</span>
             </button>
 
             <button
@@ -210,10 +203,10 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                 onClose();
               }}
               disabled={isSyncing}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold shadow-md transition flex items-center justify-center gap-2 whitespace-nowrap"
             >
-              <CloudDownload className="w-4 h-4" />
-              <span>{isSyncing ? 'Sincronizzazione...' : (settings.language === 'en' ? 'Download from Google™ Drive' : 'Scarica da Google™ Drive')}</span>
+              <CloudDownload className="w-4 h-4 shrink-0" />
+              <span>{isSyncing ? 'Allineamento...' : (settings.language === 'en' ? 'Reload Now from Google™ Drive' : 'Ricarica Ora da Google™ Drive')}</span>
             </button>
           </div>
         </div>
